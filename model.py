@@ -1,0 +1,123 @@
+import torch
+import torch.nn as nn
+
+
+class BasicBlock(nn.Module):
+    def __init__(self, in_ch, out_ch, stride=1):
+        super().__init__()
+        self.conv1 = nn.Conv2d(in_ch, out_ch, 3, stride=stride, padding=1, bias=False)
+        self.bn1   = nn.BatchNorm2d(out_ch)
+        self.conv2 = nn.Conv2d(out_ch, out_ch, 3, stride=1, padding=1, bias=False)
+        self.bn2   = nn.BatchNorm2d(out_ch)
+        self.relu  = nn.ReLU(inplace=True)
+
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_ch != out_ch:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_ch, out_ch, 1, stride=stride, bias=False),
+                nn.BatchNorm2d(out_ch),
+            )
+
+    def forward(self, x):
+        out = self.relu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out = out + self.shortcut(x)
+        out = self.relu(out)
+        return out
+
+
+class ResNetBackbone(nn.Module):
+    def __init__(self, in_channels, img_size):
+        super().__init__()
+        stem_stride = 1 if img_size <= 32 else 2
+        self.stem = nn.Sequential(
+            nn.Conv2d(in_channels, 64, 3, stride=stem_stride, padding=1, bias=False),
+            nn.BatchNorm2d(64),
+            nn.ReLU(inplace=True),
+        )
+        self.layer1 = self._make_layer(64,  64,  stride=1)
+        self.layer2 = self._make_layer(64,  128, stride=2)
+        self.layer3 = self._make_layer(128, 256, stride=2)
+        self.layer4 = self._make_layer(256, 512, stride=2)
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.feat_dim = 512
+
+    @staticmethod
+    def _make_layer(in_ch, out_ch, stride):
+        return nn.Sequential(
+            BasicBlock(in_ch,  out_ch, stride=stride),
+            BasicBlock(out_ch, out_ch, stride=1),
+        )
+
+    def forward(self, x):
+        x = self.stem(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+        x = self.pool(x)
+        return x.flatten(1)
+
+
+class ExpertFFN(nn.Module):
+    def __init__(self, in_dim, hidden_dim, out_dim):
+        super().__init__()
+        self.fc1 = nn.Linear(in_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, out_dim)
+
+    def forward(self, x):
+        return self.fc2(torch.relu(self.fc1(x)))
+
+
+class TopKGating(nn.Module):
+    def __init__(self, in_dim, num_experts, topk):
+        super().__init__()
+        self.topk = topk
+        self.gate = nn.Linear(in_dim, num_experts, bias=False)
+
+    def forward(self, x):
+        logits = self.gate(x)
+        probs = torch.softmax(logits.float(), dim=-1)
+
+        topk_vals, topk_idx = probs.topk(self.topk, dim=-1)
+
+        weights = torch.zeros_like(probs)
+        weights.scatter_(1, topk_idx, topk_vals)
+        weights = weights.to(x.dtype)
+
+        return weights, topk_idx
+
+
+class MoELayer(nn.Module):
+    def __init__(self, in_dim, hidden_dim, out_dim, num_experts, topk):
+        super().__init__()
+        self.gating  = TopKGating(in_dim, num_experts, topk)
+        self.experts = nn.ModuleList([
+            ExpertFFN(in_dim, hidden_dim, out_dim) for _ in range(num_experts)
+        ])
+
+    def forward(self, x):
+        weights, topk_idx = self.gating(x)
+        out = torch.zeros(x.size(0), self.experts[0].fc2.out_features, device=x.device, dtype=x.dtype)
+
+        for i, expert in enumerate(self.experts):
+            batch_mask = (topk_idx == i).any(dim=-1)
+            if batch_mask.any():
+                expert_output = expert(x[batch_mask])
+                gate_scores = weights[batch_mask, i].unsqueeze(-1)
+                out[batch_mask] += expert_output * gate_scores
+
+        return out
+
+
+class MoEFedModel(nn.Module):
+    def __init__(self, in_channels, num_classes, img_size, num_experts, topk):
+        super().__init__()
+        self.backbone = ResNetBackbone(in_channels, img_size)
+        feat_dim = self.backbone.feat_dim
+        self.moe_head = MoELayer(feat_dim, 512, num_classes, num_experts, topk)
+
+    def forward(self, x):
+        feat = self.backbone(x)
+        logits = self.moe_head(feat)
+        return logits

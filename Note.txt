@@ -1,0 +1,218 @@
+BLA-FedMoE 跑脚本说明
+======================
+
+入口脚本是仓库根目录的 main.py。
+先安装依赖，再在项目根目录执行命令。
+
+
+一、环境准备
+------------
+
+pip install -r requirements.txt
+
+数据默认下载到 ./data
+实验结果默认写到 ./results/<时间戳>/
+
+
+二、常用命令
+------------
+
+# 默认：BLA-FedMoE，CIFAR-10，10 个客户端，100 轮
+python main.py --method bla-fedmoe
+
+# 普通联邦 MoE（专家参数平均聚合，不走 FedLPA）
+python main.py --method moe
+
+# 完整示例
+python main.py --method bla-fedmoe --dataset cifar10 --num_clients 10 --num_experts 4 --rounds 100 --seed 42
+
+# 最小演示（自动改成 CIFAR-10 子集、1 轮、很小的模型和数据）
+python main.py --demo
+
+# 只下载全部数据集，然后退出，不训练
+python main.py --download-all
+
+# 对某次实验结果重新画图
+python plot/plot_results.py --result results/20260913-013621
+
+
+三、参数说明（对应 main.py）
+----------------------------
+
+【算法与数据】
+
+--method
+    联邦算法。可选：
+    bla-fedmoe  带宽受限上传 k 个专家，专家层用 FedLPA 聚合（默认）
+    moe         同样按带宽选专家上传，但参数做简单平均
+    当前两种方法选专家都是按带宽随机选；bla-fedmoe 的选择策略还没设计完。
+
+--dataset
+    数据集。可选：cifar10 / cifar100 / tinyimagenet / cinic-10 / stl10
+    默认 cifar10。首次运行会自动下载到 --data_root。
+
+--beta
+    Dirichlet 非独立同分布划分强度。越小，各客户端类别越偏。
+    默认 0.1。
+
+--data_root
+    数据集存放目录。默认 ./data
+
+
+【联邦规模】
+
+--num_clients
+    客户端总数。默认 10。
+
+--rounds
+    通信轮数（全局训练轮数）。默认 100。
+
+--frac
+    每轮参与训练的客户端比例。实际人数 = max(1, num_clients * frac)
+    默认 1.0，即每轮全体客户端都参与。
+
+--local_epochs
+    每个被选中的客户端，本轮本地 SGD 训练几个 epoch。默认 2。
+
+--batch_size
+    本地训练的 batch 大小。默认 64。测试时会用 min(256, batch_size * 4)。
+
+
+【MoE 模型】
+
+--num_experts
+    专家网络个数。默认 4。
+
+--topk
+    前向时每个样本激活前几个专家（Top-K gating）。默认 2。
+    注意：topk 控制的是推理/训练时用几个专家，不是上传几个专家。
+
+
+【端云带宽与上传专家数】
+
+上传专家个数不是单独参数，而是由带宽算出来的：
+    k = min(num_experts, 当前带宽 // expert_bw)
+
+--expert_bw
+    上传 1 个专家消耗的带宽代价。默认 10。
+
+--bw_min
+    客户端可用带宽的下限。
+    默认 -1：表示不波动，始终等于 bw_max。
+
+--bw_max
+    客户端可用带宽的上限。
+    默认 -1：表示等于 num_experts * expert_bw（够传全部专家）。
+
+例子：
+    5 个专家，expert_bw=10，当前带宽=40  -> 上传 4 个专家
+    想固定每轮只传 2 个专家，可设：
+        --expert_bw 10 --bw_min 20 --bw_max 20
+    想让带宽在 20~40 之间随机波动：
+        --expert_bw 10 --bw_min 20 --bw_max 40
+
+
+【优化器与学习率】
+
+--lr
+    本地 SGD 最大学习率（warmup 结束后用这个值）。默认 0.01。
+
+--lr_min
+    warmup 起始学习率。默认 0.0001。
+
+--warmup_rounds
+    学习率线性升温轮数。前 warmup_rounds 轮从 lr_min 升到 lr。
+    默认 5。设为 0 则一开始就用 --lr。
+
+--momentum
+    SGD 动量。默认 0.9。
+
+--weight_decay
+    权重衰减（L2）。默认 0.0001。
+
+--label_smooth
+    交叉熵标签平滑系数。默认 0.1。
+
+
+【仅 bla-fedmoe 用的 FedLPA 聚合参数】
+moe 方法会读这些参数，但聚合时不用它们。
+
+--lam
+    计算 Kronecker 因子时加在 A、B 矩阵对角线上的阻尼项。默认 0.001。
+
+--agg_iters
+    服务器端 FedLPA 优化迭代次数。默认 300。越大越慢。
+
+--agg_lr
+    FedLPA 聚合时 Adam 的学习率。默认 0.01。
+
+--kron_samples
+    每个客户端计算 Kronecker 因子时最多用多少个本地样本。默认 256。
+    越小越快、越省显存，估计越粗。
+
+
+【设备与可复现】
+
+--seed
+    随机种子，影响数据划分、客户端抽样、带宽抽样、专家随机选择。默认 42。
+
+--device
+    计算设备。可选：auto / cpu / cuda / mps
+    默认 auto：有 CUDA 用 GPU，否则尝试 Apple MPS，再不行用 CPU。
+
+--num_workers
+    DataLoader 的进程数。Windows 上建议保持 0（默认）。
+
+
+【调试 / 子集】
+
+--max_train_samples
+    若 >0，从训练集随机抽这么多样本再划分给客户端。默认 0 表示用全量。
+
+--max_test_samples
+    若 >0，测试集随机抽这么多样本。默认 0 表示用全量。
+
+--demo
+    开关，不需要再跟值。打开后强制改成很小的 CIFAR-10 演示配置：
+    2 客户端、2 专家、1 轮、1 个本地 epoch、训练 256 / 测试 64 张图等。
+    用来确认代码能跑通，不是正式实验。
+
+--download-all
+    开关。下载并解压全部支持的数据集后立刻退出，不训练。
+
+--output_dir
+    实验结果根目录。默认 ./results
+    每次运行会在下面再建一个时间戳子目录，例如 results/20260915-184400/
+
+
+四、输出文件
+------------
+
+每次训练结束后，时间戳目录里大致有：
+
+    rounds.csv / rounds.xlsx   每一轮的准确率、损失、耗时、上传专家
+    summary.xlsx               最佳准确率、总耗时等摘要
+    config.xlsx                本次用到的全部超参数
+    experiment.json            上面内容的 JSON 汇总
+    figure/                    自动画出的曲线图
+
+训练中途也会不断覆盖保存 rounds.csv / rounds.xlsx，中断后仍能看到已完成的轮次。
+
+
+五、画图脚本参数（plot/plot_results.py）
+----------------------------------------
+
+--result
+    某一次实验的结果目录，例如 results/20260913-013621（必填）
+
+--out
+    图片输出目录。不填则写到该结果目录下的 figure/
+
+
+六、Windows 提示
+----------------
+
+在 PowerShell 里先切到项目目录：
+
+    cd C:\Users\11023\Desktop\linzheng
+    python main.py --method bla-fedmoe --demo

@@ -1,0 +1,91 @@
+"""Client-cloud bandwidth budget for expert upload.
+
+k = min(num_experts, available_bw // expert_bw)
+Example: 5 experts, expert_bw=10, current bw=40 -> upload 4 experts.
+"""
+import hashlib
+
+import numpy as np
+
+
+EXPERT_PREFIX = 'moe_head.experts.'
+
+
+def _rng(seed, round_id, client_id, salt):
+    raw = f'{int(seed)}-{int(round_id)}-{int(client_id)}-{salt}'.encode()
+    h = int.from_bytes(hashlib.md5(raw).digest()[:4], 'little')
+    return np.random.RandomState(h)
+
+
+def resolve_bw_range(args):
+    expert_bw = max(int(args.expert_bw), 1)
+    full_bw = int(args.num_experts) * expert_bw
+    bw_max = full_bw if int(args.bw_max) < 0 else int(args.bw_max)
+    bw_min = bw_max if int(args.bw_min) < 0 else int(args.bw_min)
+    if bw_min > bw_max:
+        bw_min, bw_max = bw_max, bw_min
+    return bw_min, bw_max, expert_bw
+
+
+def sample_bandwidth(args, client_id, round_id):
+    bw_min, bw_max, _ = resolve_bw_range(args)
+    if bw_min == bw_max:
+        return bw_min
+    rng = _rng(args.seed, round_id, client_id, 'bandwidth')
+    return int(rng.randint(bw_min, bw_max + 1))
+
+
+def upload_expert_count(bandwidth, expert_bw, num_experts):
+    expert_bw = max(int(expert_bw), 1)
+    return int(min(num_experts, max(0, int(bandwidth) // expert_bw)))
+
+
+def random_select_experts(num_experts, k, seed, client_id, round_id, salt):
+    k = int(max(0, min(k, num_experts)))
+    if k <= 0:
+        return []
+    if k >= num_experts:
+        return list(range(num_experts))
+    rng = _rng(seed, round_id, client_id, salt)
+    return sorted(rng.choice(num_experts, size=k, replace=False).tolist())
+
+
+def expert_id_from_key(key):
+    if not key.startswith(EXPERT_PREFIX):
+        return None
+    rest = key[len(EXPERT_PREFIX):]
+    head = rest.split('.', 1)[0]
+    if not head.isdigit():
+        return None
+    return int(head)
+
+
+def filter_expert_state(state, expert_ids):
+    keep = set(expert_ids)
+    return {
+        key: value for key, value in state.items()
+        if (eid := expert_id_from_key(key)) is None or eid in keep
+    }
+
+
+def filter_expert_extra(extra, expert_ids):
+    if not extra:
+        return extra
+    keep = set(expert_ids)
+    return {
+        key: value for key, value in extra.items()
+        if (eid := expert_id_from_key(key)) is None or eid in keep
+    }
+
+
+def filter_expert_payload(state, extra, expert_ids):
+    return filter_expert_state(state, expert_ids), filter_expert_extra(extra, expert_ids)
+
+
+def plan_upload(args, client_id, round_id, salt):
+    bandwidth = sample_bandwidth(args, client_id, round_id)
+    k = upload_expert_count(bandwidth, args.expert_bw, args.num_experts)
+    expert_ids = random_select_experts(
+        args.num_experts, k, args.seed, client_id, round_id, salt,
+    )
+    return bandwidth, k, expert_ids

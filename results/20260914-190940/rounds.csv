@@ -1,0 +1,2 @@
+﻿Round,Timestamp,Method,LR,AvgLoss,TestAcc,BestAcc,BestRound,RoundTimeSec,RoundTimeHMS,LocalTrainTimeSec,AggTimeSec,EvalTimeSec,CumulativeTimeSec,CumulativeTimeHMS,NumClientsSelected,SelectedClients,SelectedExperts,ClientTrainTimesSec
+1,2026-09-14 19:09:43,BLA-FedMoE,0.01,2.180577390795621,14.0625,14.0625,1,3.8598,0:03.86,3.6737,0.0701,0.1142,3.8598,0:03.86,2,"1,0","1:0,1;0:0,1","2.3628,1.3108"

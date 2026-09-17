@@ -1,0 +1,378 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+%Template version as of 6/27/2024
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Conference Paper Title*\\
+{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured for https://ieeexplore.ieee.org  and
+should not be used}
+\thanks{Identify applicable funding agency here. If none, delete this.}
+}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{4\textsuperscript{th} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{5\textsuperscript{th} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{6\textsuperscript{th} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+}
+
+\maketitle
+
+\begin{abstract}
+This document is a model and instructions for \LaTeX.
+This and the IEEEtran.cls file define the components of your paper [title, text, heads, etc.]. *CRITICAL: Do Not Use Symbols, Special Characters, Footnotes, 
+or Math in Paper Title or Abstract.
+\end{abstract}
+
+\begin{IEEEkeywords}
+component, formatting, style, styling, insert.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Federated learning (FL) enables a set of edge clients to collaboratively train a model without sharing their raw data. This paradigm is particularly attractive for wireless edge intelligence, where data are naturally distributed across mobile devices, vehicles, sensors, and access points. However, practical wireless FL remains fundamentally constrained by time-varying uplink channels, heterogeneous client resources, and non-independent and identically distributed (non-IID) local data. In each communication round, a client may only be able to upload a limited number of bits due to its instantaneous channel state, power budget, bandwidth allocation, and latency requirement. As modern neural networks continue to grow in parameter size, the mismatch between model scale and wireless uplink capacity becomes a critical bottleneck.
+
+Mixture-of-Experts (MoE) models provide a promising architecture for scaling model capacity under conditional computation. Instead of activating all parameters for every input, an MoE model uses a router to assign each token or sample to a small subset of experts. This sparse activation property makes MoE naturally appealing for edge and federated learning: different clients may specialize different experts according to their local data distributions, while the global model can still maintain a large overall capacity. Nevertheless, deploying MoE models in wireless FL introduces a new communication challenge. Although only a subset of experts may be active for a given input, the local training process may still produce updates for multiple experts across local mini-batches. Uploading all expert updates is often infeasible under dynamic uplink budgets.
+
+A straightforward approach is to first perform standard local training and then sparsify the uploaded model update according to the available communication budget. For MoE models, this strategy can be interpreted as \emph{post-hoc sparse upload}: each client computes local updates for all routed experts during training, but uploads only a selected subset of expert updates after training. While such a method reduces uplink traffic, it does not reduce the local computation associated with experts whose updates are eventually discarded. Specifically, if an expert is trained locally but not transmitted to the server, its gradient computation, optimizer-state update, and memory footprint do not directly contribute to global aggregation. This inefficiency becomes more severe when the uplink budget is small, the number of experts is large, or the local training epoch is long. Therefore, communication-efficient MoE-FL should not only decide which expert updates to upload, but also determine which experts are worth training before local backpropagation starts.
+
+This paper is motivated by the following observation: the router in an MoE model can reveal client-specific expert preference signals before full local training. By running a small number of forward-only probing mini-batches, a client can estimate the relevance of each expert to its local data, e.g., through soft routing probabilities, top-\(k\) activation frequencies, routed token counts, or other utility proxies. Importantly, this probing process is much cheaper than full expert training because it does not require backpropagation through all experts. It also provides a vector-valued feedback signal: one probing pass can expose preference information for all experts rather than only for the selected ones. This property allows the client to identify a communication-feasible subset of experts before training.
+
+Based on this observation, we propose a \emph{probe-before-train} framework for wireless federated MoE learning. In each round, the wireless channel determines a client-specific uplink budget. The client first converts this budget into a feasible family of expert subsets. Before local training, the client performs lightweight router probing on a small set of local mini-batches to estimate the utility of each expert. It then selects a subset of experts that is both communication-feasible and locally useful. During formal local training, only the selected experts are updated, while the remaining experts are frozen. The client finally uploads the shared components and the selected expert updates to the server, which performs expert-wise sparse aggregation over the clients that uploaded each expert.
+
+This design fundamentally differs from conventional train-then-sparsify schemes. In the proposed framework, the communication constraint is pushed ahead of local backpropagation. Thus, the wireless channel does not merely determine which updates can be transmitted after training; it also shapes the local optimization path by deciding which expert parameters should participate in training. Consequently, the set of trained expert updates is aligned with the set of uploaded expert updates. This alignment avoids unnecessary computation on experts that cannot be transmitted and reduces the inconsistency between local update generation and global aggregation.
+
+The pre-training expert selection problem is nontrivial because the true utility of each expert is unknown before probing, while excessive probing itself introduces overhead. We formulate this problem as a budget-constrained combinatorial pure exploration problem with vector full-information feedback. In each probing step, the client observes a utility vector over all experts and updates confidence intervals for their estimated utilities. The client stops probing once the current best feasible expert subset can be distinguished from competing subsets with sufficient confidence, or when a maximum probing budget is reached. This formulation provides a principled mechanism to balance probing overhead and expert-selection reliability.
+
+The proposed framework also addresses two system-level issues in federated MoE training. First, because different clients may select different expert subsets under heterogeneous data and channel conditions, server aggregation must be performed at the expert level rather than over a dense global update. The server therefore aggregates each expert only over the clients that upload the corresponding expert update, with optional weights based on data size, routed token count, or reliability indicators. Second, sparse expert training may lead to expert starvation, where rarely selected experts receive insufficient updates. To mitigate this issue, a refresh mechanism can be incorporated to periodically force the exploration or update of under-trained experts, ensuring that all experts remain trainable over long-term federated rounds.
+
+The main contributions of this paper are summarized as follows:
+\begin{itemize}
+    \item We introduce a channel-aware probe-before-train framework for wireless federated MoE learning. Unlike post-hoc sparse upload methods, the proposed framework uses the uplink budget before local backpropagation to determine which experts should be trained and uploaded.
+    \item We formulate pre-training expert identification as a budget-constrained combinatorial pure exploration problem with vector full-information feedback. This formulation exploits the router's ability to provide expert preference signals through lightweight forward probing.
+    \item We develop a sparse local training and expert-wise federated aggregation mechanism that aligns trained experts with uploaded experts, thereby reducing redundant local computation and communication overhead under time-varying wireless uplink constraints.
+    \item We discuss starvation mitigation through periodic refresh or forced exploration, which improves long-term expert coverage and stabilizes federated MoE training under non-IID client data.
+\end{itemize}
+
+\newpage
+\section{Related Work}
+\newpage
+\section{Methodology}
+
+
+\subsection{System Model}
+%We consider a channel-aware federated learning problem for training a mixture-of-experts (MoE) model over wireless edge clients under heterogeneous data distributions and uplink communication constraints.
+
+Federated learning (FL) is a distributed collaborative training paradigm in which multiple clients jointly learn a shared global model without exposing their raw data to the server. Let $\mathcal{I}=\left \{ 1,2,\dots ,n \right \} $ denote the set of participating clients, and let $\mathcal{D}_i$ be the local dataset of client $i \in \mathcal{I}$ with size $n_i$. The standard FL objective is to minimize a weighted empirical risk over all clients:
+\begin{equation}
+\min_{\boldsymbol{\theta}} F(\boldsymbol{\theta})
+=
+\sum_{i\in\mathcal{I}}
+\frac{n_i}{n}
+F_i(\boldsymbol{\theta}),
+\quad
+n=\sum_{i\in\mathcal{I}} n_i ,
+\end{equation}
+where $F_i(\boldsymbol{\theta})$ denotes the empirical loss evaluated on $\mathcal{D}_i$.
+
+We consider an MoE-based global model, where multiple expert subnetworks are coordinated by a gating module. For an input sample $x$, the gate at MoE layer $\ell$ of client $i$ in communication round $r$ outputs a routing vector:
+\begin{equation}
+\mathbf{g}_{i,\ell}^{(r)}(x)
+=
+\bigl(
+g_{i,\ell,1}^{(r)}(x),
+\ldots,
+g_{i,\ell,E_\ell}^{(r)}(x)
+\bigr),
+\end{equation}
+where $g_{i,\ell,e}^{(r)}(x)$ represents the routing preference assigned to expert $e$ among the $E_\ell$ experts in layer $\ell$. These routing statistics reflect the data-dependent importance of different experts and can be used to guide expert selection under limited communication resources.
+
+In each round, due to the channel-dependent uplink budget $B_i^{(r)}$, client $i$ can only train and upload a subset of expert parameters. Let $\mathcal{S}_i^{(r)}$ denote the selected expert set, $c_j$ be the upload cost of expert $j$, and $c_{\rm sh}$ be the cost of shared parameters. The channel-aware expert selection problem with starvation avoidance can be formulated as:
+\begin{equation}
+\begin{aligned}
+\max_{\{\mathcal{S}_i^{(r)}\}_{i\in\mathcal{I}}}
+\quad
+&
+\sum_{i\in\mathcal{I}}
+\sum_{j\in \mathcal{S}_i^{(r)}}
+\mu_{i,j}^{(r)}
+\\
+\text{s.t.}
+\quad
+&
+\sum_{j\in \mathcal{S}_i^{(r)}} c_j + c_{\rm sh}
+\le B_i^{(r)},
+\quad \forall i\in\mathcal{I},
+\\
+&
+r-\tau_{i,j}^{(r)} \le N,
+\quad \forall i\in\mathcal{I},\ \forall j,
+\\
+&
+\mathcal{S}_i^{(r)} \subseteq \mathcal{E},
+\quad \forall i\in\mathcal{I},
+\end{aligned}
+\end{equation}
+where $\mu_{i,j}^{(r)}$ denotes the estimated utility of expert $j$ on client $i$, $\tau_{i,j}^{(r)}$ is the most recent round before $r$ in which expert $j$ was selected by client $i$, $N$ is the maximum allowable staleness interval, and $\mathcal{E}$ denotes the full expert set.
+
+\section{METHODOLOGY}
+\label{sec:methodology}
+
+We present a channel-aware probe-before-train framework for federated MoE learning. The key idea is to move expert selection before local backpropagation: the wireless channel determines how many expert updates can be uploaded, while lightweight router probing identifies which experts are worth training. Hence, each client trains only the experts that are both useful for its local data and feasible for uplink transmission.
+
+\subsection{Channel-Constrained Expert Feasibility}
+
+Consider a federated system with clients \(\mathcal{N}=\{1,\ldots,N\}\). The global MoE model consists of shared parameters, router parameters, and \(M\) expert blocks:
+\[
+\theta=
+\left(
+\theta_{\mathrm{sh}},
+\theta_{\mathrm{rt}},
+\{\theta_j\}_{j=1}^{M}
+\right).
+\]
+At communication round \(r\), client \(i\) has an uplink budget \(B_i^{(r)}\), determined by its current wireless channel state. Let \(c_j\) be the upload cost of expert block \(j\), and let \(c_{\mathrm{sh}}\) be the cost of uploading the shared and router updates. The feasible expert subsets are
+\[
+\mathcal{F}_i^{(r)}
+=
+\left\{
+S\subseteq [M]:
+\sum_{j\in S} c_j
+\le
+B_i^{(r)}-c_{\mathrm{sh}}
+\right\}.
+\label{eq:feasible_set}
+\]
+If all experts have the same size \(c_{\mathrm{ex}}\), this reduces to a cardinality constraint with
+\[
+K_i^{(r)}
+=
+\left\lfloor
+\frac{B_i^{(r)}-c_{\mathrm{sh}}}{c_{\mathrm{ex}}}
+\right\rfloor .
+\label{eq:uploadable_k}
+\]
+Thus, the physical layer specifies the feasible budget, whereas the learning layer selects the actual expert subset.
+
+\subsection{Probe-Before-Train Expert Identification}
+
+A conventional train-then-upload strategy first trains all locally activated experts and then uploads only a subset of them. Although it reduces communication, it still computes gradients for experts that are eventually discarded. To avoid such wasted computation, we let each client perform lightweight probing before local training.
+
+Specifically, client \(i\) samples a few local mini-batches and only runs forward routing to estimate expert utilities. For expert \(j\), let \(h_{i,j}^{(r)}(x)\in[0,1]\) denote a utility proxy, such as the soft gating weight, Top-\(k\) activation indicator, or executed token ratio. The true local utility is
+\[
+\mu_{i,j}^{(r)}
+=
+\mathbb{E}_{x\sim\mathcal{D}_i}
+\left[
+h_{i,j}^{(r)}(x)
+\right].
+\label{eq:utility}
+\]
+For the \(b\)-th probing mini-batch with token set \(\mathcal{T}_{i,b}\), the observation of expert \(j\) is
+\[
+Y_{i,j,b}^{(r)}
+=
+\frac{1}{|\mathcal{T}_{i,b}|}
+\sum_{t\in\mathcal{T}_{i,b}}
+h_{i,j}^{(r)}(t).
+\label{eq:batch_obs}
+\]
+Since the router typically computes scores for all experts before Top-\(k\) routing, one probing pass yields the full vector
+\[
+\mathbf{Y}_{i,b}^{(r)}
+=
+\left(
+Y_{i,1,b}^{(r)},\ldots,Y_{i,M,b}^{(r)}
+\right),
+\]
+which gives vector full-information feedback rather than single-arm bandit feedback. After \(n\) probing batches,
+\[
+\widehat{\mu}_{i,j}^{(r)}(n)
+=
+\frac{1}{n}
+\sum_{b=1}^{n}
+Y_{i,j,b}^{(r)} .
+\label{eq:emp_mean}
+\]
+The target expert subset is the best feasible combination:
+\[
+S_i^{\star,(r)}
+=
+\arg\max_{S\in\mathcal{F}_i^{(r)}}
+\sum_{j\in S}\mu_{i,j}^{(r)} .
+\label{eq:cpe}
+\]
+For equal-size experts, this becomes a Top-\(K_i^{(r)}\) identification problem.
+
+\subsection{Confidence-Based Stopping and Expert Refreshing}
+
+To reduce probing overhead, each client stops probing once the selected experts are sufficiently separated from the unselected ones. We maintain an empirical-Bernstein confidence interval
+\[
+L_{i,j}^{(r)}(n)=\widehat{\mu}_{i,j}^{(r)}(n)-\beta_{i,j}^{(r)}(n),\quad
+U_{i,j}^{(r)}(n)=\widehat{\mu}_{i,j}^{(r)}(n)+\beta_{i,j}^{(r)}(n),
+\]
+where, under full-information feedback,
+\[
+\beta_{i,j}^{(r)}(n)
+=
+\sqrt{
+\frac{
+2\widehat{V}_{i,j}^{(r)}(n)\log n
+}{n}
+}
++
+\frac{3\log n}{n}.
+\label{eq:beta}
+\]
+Here \(\widehat{V}_{i,j}^{(r)}(n)\) is the empirical variance of expert \(j\)'s observations. For equal-size experts, let
+\[
+\widehat{S}_{i}^{(r)}(n)
+=
+\operatorname{Top}K_i^{(r)}
+\left(
+\{\widehat{\mu}_{i,j}^{(r)}(n)\}_{j=1}^{M}
+\right).
+\]
+The probing stage terminates if
+\[
+\min_{j\in\widehat{S}_{i}^{(r)}(n)}
+L_{i,j}^{(r)}(n)
+>
+\max_{q\notin\widehat{S}_{i}^{(r)}(n)}
+U_{i,q}^{(r)}(n),
+\label{eq:stop}
+\]
+or when a maximum probing budget \(N_{\max}\) is reached. For general heterogeneous expert sizes, the Top-\(K\) rule is replaced by maximizing \(\sum_{j\in S}\widehat{\mu}_{i,j}^{(r)}(n)\) over \(S\in\mathcal{F}_i^{(r)}\).
+
+Pure utility-based selection may starve low-frequency experts. Therefore, each client maintains \(\tau_{i,j}^{(r)}\), the latest round in which expert \(j\) was locally trained. Given a refresh interval \(N_{\mathrm{ref}}\), the mandatory set is
+\[
+\mathcal{M}_i^{(r)}
+=
+\left\{
+j:r-\tau_{i,j}^{(r)}\ge N_{\mathrm{ref}}
+\right\}.
+\]
+If \(|\mathcal{M}_i^{(r)}|\le K_i^{(r)}\), all mandatory experts are selected first, and the remaining budget is filled using the highest estimated utilities. Otherwise, the client selects the \(K_i^{(r)}\) stalest experts in \(\mathcal{M}_i^{(r)}\). After training, \(\tau_{i,j}^{(r)}\) is updated for selected experts. A necessary feasibility condition for refreshing every local expert at least once within \(N_{\mathrm{ref}}\) rounds is \(N_{\mathrm{ref}}K_i\ge M\).
+
+\subsection{Sparse Local Training and Aggregation}
+
+Let \(\widehat{S}_{i}^{(r)}\) denote the final selected expert subset after probing and refreshing. During local training, client \(i\) freezes all unselected experts:
+\[
+\nabla_{\theta_j}\ell_i^{(r)}=\mathbf{0},
+\quad j\notin \widehat{S}_{i}^{(r)}.
+\]
+The uploaded update is
+\[
+\Delta_i^{(r)}
+=
+\left\{
+\Delta_{\mathrm{sh},i}^{(r)},
+\Delta_{\mathrm{rt},i}^{(r)},
+\Delta_{i,j}^{(r)}:j\in\widehat{S}_{i}^{(r)}
+\right\}.
+\label{eq:upload}
+\]
+Unselected experts may still remain in the forward graph to preserve the MoE function, but their gradients and optimizer states are not materialized.
+
+At the server, expert aggregation is performed only over clients that upload the corresponding expert. Define
+\[
+\mathcal{C}_j^{(r)}
+=
+\left\{
+i:j\in\widehat{S}_{i}^{(r)}
+\right\}.
+\]
+The global update for expert \(j\) is
+\[
+\Delta_j^{(r)}
+=
+\frac{
+\sum_{i\in\mathcal{C}_j^{(r)}}
+w_{i,j}^{(r)}\Delta_{i,j}^{(r)}
+}{
+\sum_{i\in\mathcal{C}_j^{(r)}}
+w_{i,j}^{(r)}
+}.
+\label{eq:expert_agg}
+\]
+We set \(w_{i,j}^{(r)}=n_{i,j}^{(r)}\), where \(n_{i,j}^{(r)}\) is the number of tokens actually executed on expert \(j\) at client \(i\). The shared and router parameters are aggregated using standard sample-size-weighted federated averaging. This expert-wise aggregation avoids treating missing expert updates as zero updates and better matches the sparse training structure of MoE models under non-IID data.
+
+\section{Evaluation}
+\label{sec:evaluation}
+
+\subsection{Baselines}
+The proposed method consists of two coupled modules: a probe-before-train expert selector (Ours-A) and an expert-wise sparse aggregator (Ours-B). To isolate their contributions, we keep the MoE architecture, local optimizer, uplink budget, and non-IID partition fixed, and construct two controlled comparison groups. In the first group, the aggregator is frozen to Ours-B while the expert-selection rule is replaced. In the second group, the selector is frozen to Ours-A while the server aggregation rule is replaced. The full method, denoted Ours-A\,+\,Ours-B, serves as the common reference in both groups.
+
+\subsubsection{Baselines for Validating Module A}
+These variants test whether probe-before-train expert identification is more effective than alternative selection rules under the same communication budget.
+
+\begin{itemize}
+    \item \textbf{Ours-A\,+\,Ours-B.} The proposed method. Each client converts the instantaneous uplink budget into an uploadable expert cardinality \(K_i^{(r)}\), estimates expert utilities by lightweight forward probing, trains only the selected experts, and uploads the corresponding sparse update. The server aggregates each expert only over the clients that uploaded it, with weights equal to the number of locally executed tokens on that expert.
+    \item \textbf{Random-A\,+\,Ours-B.} Each client uniformly samples \(K_i^{(r)}\) experts under the same budget and then follows the same sparse training and aggregation pipeline. This baseline follows the idea of random sub-model extraction in Federated Dropout~\cite{caldas2018expanding}, instantiated here as random expert-block selection rather than random neuron or filter dropping. It verifies that the gain of Ours-A does not come from sparsity alone.
+    \item \textbf{Posthoc-A\,+\,Ours-B.} Each client first trains all locally activated experts and only afterwards sparsifies the uploaded experts to meet the uplink budget, using the same utility score as Ours-A. This follows the sketched-update pipeline of communication-efficient FL, where a full local update is computed first and then compressed before uplink transmission~\cite{konecny2016federated}. The comparison isolates the timing of expert selection: whether the wireless budget should constrain local backpropagation, or only the final upload.
+    \item \textbf{RoutingFreq-A\,+\,Ours-B.} Each client still probes before training, but ranks experts by hard routing frequency, i.e., the fraction of probed samples dispatched to each expert by Top-\(k\) gating. This scoring rule follows FedMoE, which measures expert importance by activation frequency when constructing client-specific expert subsets~\cite{mei2024fedmoe}. The baseline tests whether soft gating probabilities are more informative than hard dispatch counts under the same probe-before-train protocol.
+    \item \textbf{Magnitude-A\,+\,Ours-B.} After a conventional local update, each client selects the \(K_i^{(r)}\) experts with the largest parameter-update norms \(\|\Delta\theta_j\|\) and uploads only those experts. This baseline asks whether router probing is more effective than selecting experts by the size of their realized updates.
+\end{itemize}
+
+\subsubsection{Baselines for Validating Module B}
+These variants test the expert-wise aggregation rule while keeping the probe-before-train selector fixed.
+
+\begin{itemize}
+    \item \textbf{Ours-A\,+\,Ours-B.} The proposed aggregator. Missing expert updates are skipped rather than imputed; each uploaded expert is averaged only over \(\mathcal{C}_j^{(r)}\), and the weight is the local executed-token count \(n_{i,j}^{(r)}\).
+    \item \textbf{Ours-A\,+\,FedAvg-B.} The server applies the sample-size-weighted averaging rule of FedAvg~\cite{mcmahan2017communication} independently to every uploaded tensor. Missing experts are skipped, so this baseline differs from Ours-B only in the aggregation weights: local dataset size \(n_i\) versus expert usage \(n_{i,j}^{(r)}\). It examines whether token-level expert weighting is necessary beyond standard client-size weighting.
+    \item \textbf{Ours-A\,+\,ZeroFill-B.} Missing expert updates are treated as zero tensors and then averaged together with the uploaded updates. This is a naive dense interpretation of sparse uploads and is included as a negative control rather than as a published method.
+    \item \textbf{Ours-A\,+\,Unweighted-B.} Uploaded expert updates are averaged uniformly over the contributing clients, without weighting by \(n_i\) or by expert usage. This matches the unweighted selective averaging used by FedRolex for partial model updates~\cite{alam2022fedrolex}. The baseline tests whether usage-aware weighting is material under Dirichlet quantity and label skew.
+\end{itemize}
+
+For overall method comparison, we further report a full-upload FedAvg-MoE upper bound that transmits every expert when the channel allows it~\cite{mcmahan2017communication}, together with two representative federated MoE methods: FedMix~\cite{reisser2021federated} and FedMoE~\cite{mei2024fedmoe}.
+
+\section*{Acknowledgment}
+
+The preferred spelling of the word ``acknowledgment'' in America is without 
+an ``e'' after the ``g''. Avoid the stilted expression ``one of us (R. B. 
+G.) thanks $\ldots$''. Instead, try ``R. B. G. thanks$\ldots$''. Put sponsor 
+acknowledgments in the unnumbered footnote on the first page.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}
