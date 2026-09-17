@@ -1,0 +1,79 @@
+{
+  "method": "moe",
+  "probe_rounds": 5,
+  "full_rounds": 100,
+  "total_probe_sec": 3723.99147105217,
+  "total_estimate_full_sec": 73385.585,
+  "datasets": [
+    {
+      "dataset": "cifar10",
+      "result_dir": "C:\\Users\\11023\\Desktop\\FedMoE\\results\\20260917-200416",
+      "device": "cuda",
+      "train_samples": 50000,
+      "test_samples": 10000,
+      "img_size": 32,
+      "best_acc": 30.68,
+      "final_acc": 30.68,
+      "probe_wall_sec": 628.9886620044708,
+      "avg_round_sec": 124.4804,
+      "avg_steady_round_sec": 131.7039,
+      "estimate_full_sec": 13170.390000000001
+    },
+    {
+      "dataset": "cifar100",
+      "result_dir": "C:\\Users\\11023\\Desktop\\FedMoE\\results\\20260917-201444",
+      "device": "cuda",
+      "train_samples": 50000,
+      "test_samples": 10000,
+      "img_size": 32,
+      "best_acc": 11.41,
+      "final_acc": 11.41,
+      "probe_wall_sec": 511.77601981163025,
+      "avg_round_sec": 101.2326,
+      "avg_steady_round_sec": 100.726225,
+      "estimate_full_sec": 10072.6225
+    },
+    {
+      "dataset": "tinyimagenet",
+      "result_dir": "C:\\Users\\11023\\Desktop\\FedMoE\\results\\20260917-202315",
+      "device": "cuda",
+      "train_samples": 100000,
+      "test_samples": 10000,
+      "img_size": 64,
+      "best_acc": 10.37,
+      "final_acc": 10.37,
+      "probe_wall_sec": 1198.3244128227234,
+      "avg_round_sec": 238.7772,
+      "avg_steady_round_sec": 238.03177499999998,
+      "estimate_full_sec": 23803.177499999998
+    },
+    {
+      "dataset": "cinic-10",
+      "result_dir": "C:\\Users\\11023\\Desktop\\FedMoE\\results\\20260917-204313",
+      "device": "cuda",
+      "train_samples": 90000,
+      "test_samples": 90000,
+      "img_size": 32,
+      "best_acc": 32.75666666666667,
+      "final_acc": 32.75666666666667,
+      "probe_wall_sec": 1286.5331604480743,
+      "avg_round_sec": 256.487,
+      "avg_steady_round_sec": 246.13122500000003,
+      "estimate_full_sec": 24613.1225
+    },
+    {
+      "dataset": "stl10",
+      "result_dir": "C:\\Users\\11023\\Desktop\\FedMoE\\results\\20260917-210447",
+      "device": "cuda",
+      "train_samples": 5000,
+      "test_samples": 8000,
+      "img_size": 96,
+      "best_acc": 26.65,
+      "final_acc": 26.65,
+      "probe_wall_sec": 98.369215965271,
+      "avg_round_sec": 17.3294,
+      "avg_steady_round_sec": 17.262725000000003,
+      "estimate_full_sec": 1726.2725000000003
+    }
+  ]
+}

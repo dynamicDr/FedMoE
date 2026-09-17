@@ -16,6 +16,7 @@ from torchvision.datasets import ImageFolder
 DATASET_CFG = {
     'cifar10':      {'num_classes': 10,  'in_channels': 3, 'img_size': 32},
     'cifar100':     {'num_classes': 100, 'in_channels': 3, 'img_size': 32},
+    'svhn':         {'num_classes': 10,  'in_channels': 3, 'img_size': 32},
     'tinyimagenet': {'num_classes': 200, 'in_channels': 3, 'img_size': 64},
     'cinic-10':     {'num_classes': 10,  'in_channels': 3, 'img_size': 32},
     'stl10':        {'num_classes': 10,  'in_channels': 3, 'img_size': 96},
@@ -96,6 +97,26 @@ def _ensure_stl10(root):
             'https://ai.stanford.edu/~acoates/stl10/stl10_binary.tar.gz',
         ], tar_path, min_bytes=10 * 1024 * 1024)
     _extract_tar(tar_path, root)
+
+
+def _ensure_svhn(root):
+    svhn_dir = os.path.join(root, 'SVHN')
+    os.makedirs(svhn_dir, exist_ok=True)
+    files = {
+        'train_32x32.mat': [
+            'http://ufldl.stanford.edu/housenumbers/train_32x32.mat',
+            'https://ufldl.stanford.edu/housenumbers/train_32x32.mat',
+        ],
+        'test_32x32.mat': [
+            'http://ufldl.stanford.edu/housenumbers/test_32x32.mat',
+            'https://ufldl.stanford.edu/housenumbers/test_32x32.mat',
+        ],
+    }
+    for name, urls in files.items():
+        dest = os.path.join(svhn_dir, name)
+        if os.path.exists(dest) and os.path.getsize(dest) > 1024:
+            continue
+        _download_file(urls, dest, min_bytes=10 * 1024 * 1024)
 
 
 def _prepare_tinyimagenet(root):
@@ -211,6 +232,17 @@ def get_dataset(name, data_root):
         te = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean, std)])
         return (ImageFolder(os.path.join(dp,'train'), transform=tr),
                 ImageFolder(os.path.join(dp,'test'),  transform=te))
+    elif name == 'svhn':
+        mean, std = (0.4377,0.4438,0.4728),(0.1980,0.2010,0.1970)
+        tr = transforms.Compose([
+             transforms.RandomCrop(32, 4),
+             transforms.AutoAugment(transforms.AutoAugmentPolicy.SVHN),
+             transforms.ToTensor(),
+             transforms.Normalize(mean, std)])
+        te = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean, std)])
+        _ensure_svhn(data_root)
+        return (torchvision.datasets.SVHN(data_root, split='train', download=False, transform=tr),
+                torchvision.datasets.SVHN(data_root, split='test',  download=False, transform=te))
     raise ValueError(f'Unsupported dataset: {name}')
 
 
@@ -273,4 +305,6 @@ def download_all_datasets(data_root):
     _prepare_tinyimagenet(data_root)
     print('[Dataset] Preparing CINIC-10')
     _prepare_cinic10(data_root)
+    print('[Dataset] Preparing SVHN')
+    _ensure_svhn(data_root)
     print('[Dataset] All datasets are ready.')

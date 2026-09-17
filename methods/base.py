@@ -31,6 +31,7 @@ class FederatedMethod:
             img_size=cfg['img_size'],
             num_experts=self.args.num_experts,
             topk=self.args.topk,
+            backbone=getattr(self.args, 'backbone', 'resnet'),
         ).to(self.device)
 
     def local_train(self, global_model, loader, lr, trainable_expert_ids=None,

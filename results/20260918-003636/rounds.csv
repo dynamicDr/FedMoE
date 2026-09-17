@@ -1,0 +1,2 @@
+﻿Round,Timestamp,Method,LR,AvgLoss,TestAcc,BestAcc,BestRound,RoundTimeSec,RoundTimeHMS,LocalTrainTimeSec,AggTimeSec,EvalTimeSec,CumulativeTimeSec,CumulativeTimeHMS,NumClientsSelected,SelectedClients,Bandwidth,SelectedExperts,UploadDetail,ClientTrainTimesSec
+1,2026-09-18 00:36:38,Ours,0.01,2.1415946148882,18.75,18.75,1,1.6886,0:01.69,1.5713,0.0189,0.0902,1.6886,0:01.69,2,"1,0",1:10;0:10,1:[0];0:[0],"c1:bw=10,experts=[0]; c0:bw=10,experts=[0]","0.9743,0.5970"

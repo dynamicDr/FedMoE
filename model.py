@@ -59,6 +59,51 @@ class ResNetBackbone(nn.Module):
         return x.flatten(1)
 
 
+# VGG11: 64, M, 128, M, 256, 256, M, 512, 512, M, 512, 512, M
+VGG11_CFG = [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M']
+
+
+class VGG11Backbone(nn.Module):
+    def __init__(self, in_channels, img_size):
+        super().__init__()
+        layers = []
+        ch = in_channels
+        for v in VGG11_CFG:
+            if v == 'M':
+                layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
+                continue
+            layers.append(nn.Conv2d(ch, v, kernel_size=3, padding=1, bias=False))
+            layers.append(nn.BatchNorm2d(v))
+            layers.append(nn.ReLU(inplace=True))
+            ch = v
+        self.features = nn.Sequential(*layers)
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.feat_dim = 512
+        # img_size kept for the same constructor signature as ResNetBackbone.
+
+    def forward(self, x):
+        x = self.features(x)
+        x = self.pool(x)
+        return x.flatten(1)
+
+
+BACKBONES = {
+    'resnet': ResNetBackbone,
+    'vgg11': VGG11Backbone,
+}
+
+
+def build_backbone(name, in_channels, img_size):
+    key = str(name).lower()
+    try:
+        cls = BACKBONES[key]
+    except KeyError as exc:
+        raise ValueError(
+            f'Unknown backbone: {name}. Available: {sorted(BACKBONES)}'
+        ) from exc
+    return cls(in_channels, img_size)
+
+
 class ExpertFFN(nn.Module):
     def __init__(self, in_dim, hidden_dim, out_dim):
         super().__init__()
@@ -111,9 +156,11 @@ class MoELayer(nn.Module):
 
 
 class MoEFedModel(nn.Module):
-    def __init__(self, in_channels, num_classes, img_size, num_experts, topk):
+    def __init__(self, in_channels, num_classes, img_size, num_experts, topk,
+                 backbone='resnet'):
         super().__init__()
-        self.backbone = ResNetBackbone(in_channels, img_size)
+        self.backbone_name = str(backbone).lower()
+        self.backbone = build_backbone(self.backbone_name, in_channels, img_size)
         feat_dim = self.backbone.feat_dim
         self.moe_head = MoELayer(feat_dim, 512, num_classes, num_experts, topk)
 

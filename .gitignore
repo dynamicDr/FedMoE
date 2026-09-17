@@ -10,6 +10,8 @@ env/
 
 # Datasets downloaded locally (e.g. Tiny-ImageNet)
 data/
+data.tar
+*.tar
 
 # Checkpoints / large artifacts
 *.pt

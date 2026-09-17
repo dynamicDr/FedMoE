@@ -29,6 +29,9 @@ python main.py --method bla-fedmoe --dataset cifar10 --num_clients 10 --num_expe
 # 最小演示（自动改成 CIFAR-10 子集、1 轮、很小的模型和数据）
 python main.py --demo
 
+# 换 VGG11 backbone 的最小演示
+python main.py --demo --backbone vgg11 --method ours
+
 # 只下载全部数据集，然后退出，不训练
 python main.py --download-all
 
@@ -48,7 +51,7 @@ python plot/plot_results.py --result results/20260913-013621
     当前两种方法选专家都是按带宽随机选；bla-fedmoe 的选择策略还没设计完。
 
 --dataset
-    数据集。可选：cifar10 / cifar100 / tinyimagenet / cinic-10 / stl10
+    数据集。可选：cifar10 / cifar100 / svhn / tinyimagenet / cinic-10 / stl10
     默认 cifar10。首次运行会自动下载到 --data_root。
 
 --beta
@@ -80,6 +83,10 @@ python plot/plot_results.py --result results/20260913-013621
 
 【MoE 模型】
 
+--backbone
+    共享特征提取器。可选：resnet / vgg11
+    默认 resnet（近似 ResNet-18）。vgg11 是带 BN 的 VGG11，同样输出 512 维特征再接 MoE 头。
+
 --num_experts
     专家网络个数。默认 4。
 
@@ -90,26 +97,27 @@ python plot/plot_results.py --result results/20260913-013621
 
 【端云带宽与上传专家数】
 
-上传专家个数不是单独参数，而是由带宽算出来的：
+上传专家个数由带宽算出来：
     k = min(num_experts, 当前带宽 // expert_bw)
 
 --expert_bw
     上传 1 个专家消耗的带宽代价。默认 10。
 
---bw_min
-    客户端可用带宽的下限。
-    默认 -1：表示不波动，始终等于 bw_max。
+--bw_min / --bw_max
+    客户端可用带宽区间。
+    默认 -1：不波动，带宽 = num_experts * expert_bw（够传全部专家）。
+    两者相等：固定预算，不抽信道。
+    bw_min < bw_max：每轮按 Rayleigh 块衰落 + 香农公式抽带宽，再裁到该区间。
 
---bw_max
-    客户端可用带宽的上限。
-    默认 -1：表示等于 num_experts * expert_bw（够传全部专家）。
+--snr_db
+    时变模式下的平均 SNR（dB）。默认 10。
+    |h|^2=1 时，预算落在 [bw_min, bw_max] 的中点。
 
 例子：
-    5 个专家，expert_bw=10，当前带宽=40  -> 上传 4 个专家
-    想固定每轮只传 2 个专家，可设：
+    固定每轮只传 2 个专家：
         --expert_bw 10 --bw_min 20 --bw_max 20
-    想让带宽在 20~40 之间随机波动：
-        --expert_bw 10 --bw_min 20 --bw_max 40
+    时变信道，K 大约在 1~4 之间：
+        --expert_bw 10 --bw_min 10 --bw_max 40 --snr_db 10
 
 
 【优化器与学习率】

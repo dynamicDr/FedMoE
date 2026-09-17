@@ -1,7 +1,8 @@
 """Client-cloud bandwidth budget for expert upload.
 
 k = min(num_experts, available_bw // expert_bw)
-Example: 5 experts, expert_bw=10, current bw=40 -> upload 4 experts.
+Static: bw_min == bw_max.
+Time-varying: Rayleigh block fading -> Shannon rate, clipped to [bw_min, bw_max].
 """
 import hashlib
 
@@ -9,6 +10,7 @@ import numpy as np
 
 
 EXPERT_PREFIX = 'moe_head.experts.'
+DEFAULT_SNR_DB = 10.0
 
 
 def _rng(seed, round_id, client_id, salt):
@@ -28,11 +30,18 @@ def resolve_bw_range(args):
 
 
 def sample_bandwidth(args, client_id, round_id):
+    """Fixed budget, or Rayleigh-Shannon budget clipped to [bw_min, bw_max]."""
     bw_min, bw_max, _ = resolve_bw_range(args)
     if bw_min == bw_max:
         return bw_min
     rng = _rng(args.seed, round_id, client_id, 'bandwidth')
-    return int(rng.randint(bw_min, bw_max + 1))
+    # h ~ CN(0,1) => |h|^2 ~ Exp(1). Mean SNR maps |h|^2=1 to the interval midpoint.
+    gain = float(rng.exponential(1.0))
+    snr = 10.0 ** (float(getattr(args, 'snr_db', DEFAULT_SNR_DB)) / 10.0)
+    rate = np.log2(1.0 + snr * gain)
+    rate_ref = np.log2(1.0 + snr)
+    scale = 0.5 * (bw_min + bw_max) / max(rate_ref, 1e-12)
+    return int(np.clip(np.rint(scale * rate), bw_min, bw_max))
 
 
 def upload_expert_count(bandwidth, expert_bw, num_experts):

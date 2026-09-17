@@ -26,26 +26,32 @@ def get_args():
     p.add_argument('--method', default='bla-fedmoe', choices=sorted(METHOD_REGISTRY),
                    help='Federated method class to run.')
     p.add_argument('--select', default=None, choices=sorted(SELECT_REGISTRY),
-                   help='Expert selection: ours | random | posthoc | '
-                        'routingfreq | magnitude. Default: method preset.')
+                   help='Expert selection: ours | posthoc | fedrolex | snip | '
+                        'random | routingfreq | magnitude. Default: method preset.')
     p.add_argument('--merge', default=None, choices=sorted(MERGE_REGISTRY),
-                   help='Aggregation: ours | fedavg | zerofill. '
+                   help='Aggregation: ours | fedavg | fedavgm | fedadam | zerofill. '
                         'Default: method preset.')
     p.add_argument('--dataset',       default='cifar10',
-                   choices=['cifar10','cifar100','tinyimagenet','cinic-10','stl10'])
+                   choices=['cifar10','cifar100','svhn','tinyimagenet','cinic-10','stl10'])
     p.add_argument('--beta',          type=float, default=0.1)
     p.add_argument('--data_root',     default='./data')
     p.add_argument('--num_clients',   type=int,   default=10)
+    p.add_argument('--backbone',      default='resnet',
+                   choices=['resnet', 'vgg11'],
+                   help='Shared feature extractor: resnet | vgg11.')
     p.add_argument('--num_experts',   type=int,   default=4)
     p.add_argument('--topk',          type=int,   default=2)
     p.add_argument('--expert_bw',     type=int,   default=10,
                    help='Bandwidth cost of uploading one expert.')
-    p.add_argument('--bw_min',        type=int,   default=-1,
-                   help='Min available client-cloud bandwidth. '
-                        '<0 means no fluctuation (use bw_max).')
-    p.add_argument('--bw_max',        type=int,   default=-1,
-                   help='Max available client-cloud bandwidth. '
+    p.add_argument('--bw_min',        type=int,   default=10,
+                   help='Min uplink budget. Default 10 => K=1. '
+                        '<0 means no fading (use bw_max).')
+    p.add_argument('--bw_max',        type=int,   default=40,
+                   help='Max uplink budget. Default 40 => K=M. '
                         '<0 means num_experts * expert_bw.')
+    p.add_argument('--snr_db',        type=float, default=10.0,
+                   help='Mean SNR (dB) for Rayleigh-Shannon fading when '
+                        'bw_min < bw_max.')
     p.add_argument('--rounds',        type=int,   default=100)
     p.add_argument('--frac',          type=float, default=1.0)
     p.add_argument('--local_epochs',  type=int,   default=2)
@@ -60,7 +66,19 @@ def get_args():
     p.add_argument('--agg_lr',        type=float, default=1e-2)
     p.add_argument('--kron_samples',  type=int,   default=256)
     p.add_argument('--probe_batches', type=int,   default=2,
-                   help='Select Ours: forward-only probe batches before local training.')
+                   help='Probe batches before local training for ours/snip.')
+    p.add_argument('--server_momentum', type=float, default=0.9,
+                   help='FedAvgM server momentum.')
+    p.add_argument('--server_lr', type=float, default=1.0,
+                   help='FedAvgM server learning rate.')
+    p.add_argument('--fedadam_lr', type=float, default=0.01,
+                   help='FedAdam server learning rate.')
+    p.add_argument('--fedadam_beta1', type=float, default=0.9,
+                   help='FedAdam first-moment coefficient.')
+    p.add_argument('--fedadam_beta2', type=float, default=0.99,
+                   help='FedAdam second-moment coefficient.')
+    p.add_argument('--fedadam_tau', type=float, default=1e-3,
+                   help='FedAdam numerical stability term.')
     p.add_argument('--label_smooth',  type=float, default=0.1)
     p.add_argument('--seed',          type=int,   default=42)
     p.add_argument('--device',        default='auto',
@@ -129,15 +147,19 @@ def main():
     print(f'\n{"="*66}')
     print(f' {method.name}  ')
     print(f'  Dataset={args.dataset} | beta={args.beta} | '
-          f'Clients={args.num_clients} | Experts={args.num_experts}')
+          f'Backbone={args.backbone} | Clients={args.num_clients} | '
+          f'Experts={args.num_experts}')
     select_name = getattr(getattr(method, 'selector', None), 'name', None)
     merge_name = getattr(getattr(method, 'merger', None), 'name', None)
     if select_name or merge_name:
         print(f'  Select={select_name or "-"} | Merge={merge_name or "-"}')
     bw_min, bw_max, expert_bw = resolve_bw_range(args)
     print(f'  Rounds={args.rounds} | LR={args.lr}')
+    fading = bw_min < bw_max
+    fade_txt = (f'Rayleigh-Shannon, SNR={args.snr_db:g} dB'
+                if fading else 'static')
     print(f'  Bandwidth: expert_bw={expert_bw} | bw=[{bw_min}, {bw_max}] '
-          f'| k=floor(bw/{expert_bw})')
+          f'| {fade_txt} | k=floor(bw/{expert_bw})')
     print(f'{"="*66}\n')
 
     train_ds, test_ds = get_dataset(args.dataset, args.data_root)
@@ -152,7 +174,8 @@ def main():
     else:
         select_note = 'random experts (还没设计)'
     print(f'[Upload] expert_bw={expert_bw} | available bw=[{bw_min}, {bw_max}] '
-          f'| upload k=floor(bw/{expert_bw}), cap={args.num_experts} | {select_note}')
+          f'| {fade_txt} | upload k=floor(bw/{expert_bw}), cap={args.num_experts} '
+          f'| {select_note}')
     print()
     client_loaders = [
         DataLoader(Subset(train_ds, idx), batch_size=args.batch_size,
@@ -229,8 +252,9 @@ def main():
         round_time = time.perf_counter() - round_t0
         elapsed = time.perf_counter() - experiment_t0
         print(f'{rnd:>5} | {current_lr:>7.5f} | {avg_loss:>8.4f} | '
-              f'{acc:>7.2f}% | {best_acc:>7.2f}% | {format_hms(round_time):>10}')
-        print(f'      bandwidth/experts | {upload_detail}')
+              f'{acc:>7.2f}% | {best_acc:>7.2f}% | {format_hms(round_time):>10}',
+              flush=True)
+        print(f'      bandwidth/experts | {upload_detail}', flush=True)
 
         history_records.append({
             'Round': rnd,
@@ -274,11 +298,13 @@ def main():
         'beta': args.beta,
         'data_root': os.path.abspath(args.data_root),
         'num_clients': args.num_clients,
+        'backbone': args.backbone,
         'num_experts': args.num_experts,
         'topk': args.topk,
         'expert_bw': args.expert_bw,
         'bw_min': bw_min,
         'bw_max': bw_max,
+        'snr_db': args.snr_db,
         'rounds': args.rounds,
         'frac': args.frac,
         'local_epochs': args.local_epochs,

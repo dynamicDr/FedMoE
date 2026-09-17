@@ -1,9 +1,11 @@
 from .base import SelectBase
+from .fedrolex import FedRolex
 from .magnitude import Magnitude
 from .ours import Ours
 from .posthoc import Posthoc
 from .random import Random
 from .routingfreq import RoutingFreq
+from .snip import SNIP
 
 SELECT_REGISTRY = {
     'ours': Ours,
@@ -11,11 +13,13 @@ SELECT_REGISTRY = {
     'posthoc': Posthoc,
     'routingfreq': RoutingFreq,
     'magnitude': Magnitude,
+    'fedrolex': FedRolex,
+    'snip': SNIP,
 }
 
 __all__ = [
     'SelectBase', 'Ours', 'Random', 'Posthoc', 'RoutingFreq', 'Magnitude',
-    'SELECT_REGISTRY', 'build_selector',
+    'FedRolex', 'SNIP', 'SELECT_REGISTRY', 'build_selector',
 ]
 
 
