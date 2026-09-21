@@ -1,0 +1,18 @@
+========================================
+Job    : svhn-vgg11-e8-ours
+Host   : gpu-4090-103
+Date   : Sun Sep 20 08:57:05 HKT 2026
+GPU    : 0
+Python : /userhome/cs3/duanty/miniconda3/envs/moe/bin/python
+Command: python -u main.py --method ours --dataset svhn --backbone vgg11 --select ours --merge ours --device cuda --num_experts 8
+========================================
+
+==================================================================
+ Ours  
+  Dataset=svhn | beta=0.1 | Backbone=vgg11 | width_mult=1 | Clients=10 | Experts=8
+  Select=ours | Merge=ours
+  Expert refresh N_ref=8
+  Rounds=100 | LR=0.01
+  Bandwidth: expert_bw=10 | bw=[10, 40] | Rayleigh-Shannon, SNR=10 dB | k=floor(bw/10)
+==================================================================
+

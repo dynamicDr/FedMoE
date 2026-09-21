@@ -1,13 +1,14 @@
 import torch
 
-from .fedavg import FedAvg
+from .base import collect_present_keys, trainable_param_names
+from .fedavg_old import FedAvgOld
 
 
-class FedAvgM(FedAvg):
-    """Skip-missing FedAvg, then server-side momentum on uploaded tensors only."""
+class FedAvgM(FedAvgOld):
+    """Skip-missing FedAvg, then server momentum on trainable parameters."""
 
     name = 'fedavgm'
-    description = 'skip-missing FedAvg with server momentum'
+    description = 'skip-missing FedAvg with server momentum on trainable params'
 
     def __init__(self, args, device):
         super().__init__(args, device)
@@ -17,14 +18,16 @@ class FedAvgM(FedAvg):
 
     def merge(self, global_model, payloads):
         averaged = super().merge(global_model, payloads)
-        present_keys = set()
-        for payload in payloads:
-            present_keys.update(payload['state'].keys())
+        present_keys = collect_present_keys(payloads)
+        trainable = trainable_param_names(global_model)
         new_state = {}
         for key, g_param in global_model.state_dict().items():
             avg = averaged[key]
-            if key not in present_keys:
+            apply_momentum = key in trainable and key in present_keys
+            if not apply_momentum:
                 new_state[key] = avg
+                if key in self.velocity:
+                    self.velocity[key] = self.momentum * self.velocity[key]
                 continue
             g_cpu = g_param.detach().cpu().float()
             delta = avg.float() - g_cpu

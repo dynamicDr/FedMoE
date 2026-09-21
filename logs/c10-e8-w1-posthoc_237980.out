@@ -1,0 +1,257 @@
+========================================
+Job    : c10-e8-w1-posthoc
+Host   : gpu-4090-801
+Date   : Sat Sep 19 07:32:35 HKT 2026
+GPU    : 0
+Python : /userhome/cs3/duanty/miniconda3/envs/moe/bin/python
+Command: python -u main.py --method ours --dataset cifar10 --backbone resnet --select posthoc --merge ours --device cuda --num_experts 8 --width_mult 1 --bw_max -1 --output_dir ./results/c10-e8-w1-posthoc
+========================================
+
+==================================================================
+ Ours  
+  Dataset=cifar10 | beta=0.1 | Backbone=resnet | width_mult=1 | Clients=10 | Experts=8
+  Select=posthoc | Merge=ours
+  Rounds=100 | LR=0.01
+  Bandwidth: expert_bw=10 | bw=[10, 80] | Rayleigh-Shannon, SNR=10 dB | k=floor(bw/10)
+==================================================================
+
+
+[Partition] Dirichlet beta=0.1, 10 clients
+  Client 0:   6071 samples | 3/10 classes
+  Client 1:  18481 samples | 7/10 classes
+  Client 2:    174 samples | 3/10 classes
+  Client 3:    462 samples | 3/10 classes
+  Client 4:   2759 samples | 3/10 classes
+  Client 5:   5740 samples | 7/10 classes
+  Client 6:   1703 samples | 4/10 classes
+  Client 7:   3407 samples | 7/10 classes
+  Client 8:   6483 samples | 7/10 classes
+  Client 9:   4720 samples | 10/10 classes
+
+[Upload] expert_bw=10 | available bw=[10, 80] | Rayleigh-Shannon, SNR=10 dB | upload k=floor(bw/10), cap=8 | train all experts, then upload top-k by gate scores
+
+[Model] Total params: 13,315,216
+
+[Export] 本次实验目录: /userhome/cs3/duanty/FedMoE/results/c10-e8-w1-posthoc/20260919-073238
+
+Round |      LR |  AvgLoss |  TestAcc |     Best |  RoundTime
+--------------------------------------------------------------------------------
+    1 | 0.00208 |   1.4608 |   21.55% |   21.55% |    1:02.31
+      bandwidth/experts | c8:bw=55,experts=[0,1,2,4,5]; c1:bw=29,experts=[4,6]; c5:bw=44,experts=[0,4,5,6]; c0:bw=10,experts=[4]; c7:bw=20,experts=[4,6]; c2:bw=29,experts=[0,4]; c9:bw=45,experts=[1,3,4,6]; c4:bw=40,experts=[0,4,5,6]; c3:bw=51,experts=[0,1,3,4,6]; c6:bw=41,experts=[0,1,4,6]
+    2 | 0.00406 |   1.2491 |   33.39% |   33.39% |    1:00.60
+      bandwidth/experts | c0:bw=36,experts=[1,4,6]; c1:bw=41,experts=[1,4,5,6]; c8:bw=48,experts=[0,1,4,6]; c5:bw=69,experts=[0,1,2,4,5,6]; c3:bw=67,experts=[0,1,2,4,5,6]; c4:bw=30,experts=[0,4,6]; c7:bw=55,experts=[0,1,2,4,6]; c9:bw=46,experts=[0,4,5,6]; c6:bw=17,experts=[4]; c2:bw=22,experts=[4,6]
+    3 | 0.00604 |   1.1654 |   40.72% |   40.72% |    1:01.02
+      bandwidth/experts | c9:bw=48,experts=[0,4,5,6]; c2:bw=42,experts=[0,1,4,6]; c0:bw=50,experts=[0,1,4,5,6]; c6:bw=40,experts=[0,2,4,6]; c8:bw=30,experts=[1,4,6]; c5:bw=13,experts=[4]; c3:bw=26,experts=[4,6]; c7:bw=33,experts=[0,4,6]; c1:bw=13,experts=[4]; c4:bw=52,experts=[0,2,4,5,6]
+    4 | 0.00802 |   1.1097 |   44.41% |   44.41% |    1:01.15
+      bandwidth/experts | c1:bw=40,experts=[0,1,4,6]; c7:bw=45,experts=[0,4,5,6]; c6:bw=53,experts=[0,1,2,4,6]; c2:bw=60,experts=[0,1,2,4,5,6]; c8:bw=31,experts=[1,4,6]; c0:bw=59,experts=[0,1,2,4,6]; c3:bw=34,experts=[1,4,6]; c4:bw=56,experts=[0,1,2,4,6]; c5:bw=73,experts=[0,1,2,3,4,5,6]; c9:bw=22,experts=[4,6]
+    5 | 0.01000 |   1.0778 |   47.74% |   47.74% |    1:01.16
+      bandwidth/experts | c1:bw=20,experts=[4,6]; c5:bw=40,experts=[0,4,5,6]; c4:bw=48,experts=[0,4,5,6]; c8:bw=37,experts=[1,4,6]; c0:bw=50,experts=[0,1,2,4,6]; c7:bw=24,experts=[4,6]; c6:bw=53,experts=[0,2,3,4,6]; c3:bw=63,experts=[0,1,2,4,5,6]; c2:bw=10,experts=[4]; c9:bw=62,experts=[0,1,2,4,5,6]
+    6 | 0.01000 |   1.0428 |   49.85% |   49.85% |    1:02.06
+      bandwidth/experts | c8:bw=67,experts=[0,1,2,4,5,6]; c2:bw=42,experts=[0,1,4,6]; c5:bw=27,experts=[4,6]; c7:bw=58,experts=[0,2,4,5,6]; c3:bw=36,experts=[1,4,6]; c1:bw=32,experts=[0,4,6]; c9:bw=48,experts=[0,4,5,6]; c0:bw=31,experts=[0,4,6]; c4:bw=17,experts=[4]; c6:bw=20,experts=[4,6]
+    7 | 0.01000 |   1.0177 |   53.30% |   53.30% |    1:01.29
+      bandwidth/experts | c0:bw=36,experts=[0,4,6]; c5:bw=49,experts=[0,1,4,6]; c2:bw=40,experts=[0,1,4,6]; c6:bw=13,experts=[4]; c3:bw=26,experts=[4,6]; c7:bw=31,experts=[0,4,6]; c4:bw=14,experts=[4]; c1:bw=10,experts=[4]; c8:bw=57,experts=[0,1,2,4,6]; c9:bw=10,experts=[4]
+    8 | 0.01000 |   0.9929 |   52.47% |   53.30% |    1:01.36
+      bandwidth/experts | c4:bw=10,experts=[3]; c8:bw=37,experts=[3,4,7]; c1:bw=58,experts=[2,3,4,6,7]; c3:bw=37,experts=[4,6,7]; c0:bw=32,experts=[3,4,7]; c5:bw=28,experts=[4,7]; c2:bw=54,experts=[0,3,4,6,7]; c9:bw=59,experts=[0,4,5,6,7]; c7:bw=15,experts=[3]; c6:bw=41,experts=[4,5,6,7]
+    9 | 0.01000 |   0.9855 |   59.40% |   59.40% |    1:02.40
+      bandwidth/experts | c2:bw=21,experts=[4,6]; c0:bw=52,experts=[0,1,2,4,6]; c4:bw=59,experts=[0,4,5,6,7]; c9:bw=26,experts=[3,4]; c8:bw=18,experts=[4]; c6:bw=31,experts=[0,4,6]; c7:bw=46,experts=[0,4,6,7]; c5:bw=52,experts=[0,2,4,5,6]; c1:bw=14,experts=[4]; c3:bw=23,experts=[3,4]
+   10 | 0.01000 |   0.9520 |   57.76% |   59.40% |    1:02.30
+      bandwidth/experts | c4:bw=37,experts=[0,4,6]; c2:bw=34,experts=[0,4,6]; c7:bw=37,experts=[1,4,6]; c0:bw=59,experts=[0,2,4,5,6]; c6:bw=65,experts=[0,1,2,4,5,6]; c3:bw=46,experts=[0,2,4,6]; c5:bw=58,experts=[0,2,4,5,6]; c8:bw=35,experts=[0,4,6]; c9:bw=35,experts=[0,4,6]; c1:bw=41,experts=[0,4,5,6]
+   11 | 0.01000 |   0.9399 |   61.20% |   61.20% |    1:02.31
+      bandwidth/experts | c5:bw=28,experts=[4,6]; c2:bw=27,experts=[4,6]; c7:bw=44,experts=[0,1,4,6]; c3:bw=50,experts=[0,1,2,4,6]; c0:bw=28,experts=[4,6]; c8:bw=39,experts=[0,4,6]; c9:bw=33,experts=[0,4,6]; c6:bw=55,experts=[0,1,4,5,6]; c1:bw=40,experts=[0,2,4,6]; c4:bw=16,experts=[4]
+   12 | 0.01000 |   0.9345 |   60.94% |   61.20% |    1:02.14
+      bandwidth/experts | c1:bw=42,experts=[0,1,4,6]; c5:bw=56,experts=[0,3,4,5,6]; c2:bw=57,experts=[0,2,4,5,6]; c4:bw=28,experts=[1,2]; c3:bw=35,experts=[0,4,6]; c7:bw=30,experts=[0,4,6]; c9:bw=42,experts=[0,4,5,6]; c6:bw=29,experts=[4,6]; c8:bw=55,experts=[0,1,3,4,6]; c0:bw=49,experts=[0,2,4,6]
+   13 | 0.01000 |   0.9252 |   64.21% |   64.21% |    1:00.09
+      bandwidth/experts | c3:bw=30,experts=[4,5,6]; c1:bw=47,experts=[0,4,5,6]; c4:bw=10,experts=[4]; c5:bw=29,experts=[4,6]; c8:bw=15,experts=[4]; c6:bw=36,experts=[3,4,6]; c9:bw=15,experts=[1]; c7:bw=58,experts=[0,2,4,5,6]; c0:bw=25,experts=[4,6]; c2:bw=16,experts=[4]
+   14 | 0.01000 |   0.9073 |   64.79% |   64.79% |    0:58.73
+      bandwidth/experts | c2:bw=45,experts=[0,1,4,6]; c4:bw=10,experts=[4]; c5:bw=64,experts=[0,1,2,4,5,6]; c1:bw=38,experts=[0,4,6]; c7:bw=25,experts=[4,6]; c0:bw=25,experts=[4,6]; c9:bw=32,experts=[2,4,6]; c3:bw=45,experts=[0,2,4,6]; c8:bw=21,experts=[4,5]; c6:bw=67,experts=[0,2,3,4,5,6]
+   15 | 0.01000 |   0.9096 |   64.18% |   64.79% |    0:58.99
+      bandwidth/experts | c7:bw=59,experts=[0,2,4,5,6]; c0:bw=20,experts=[4,6]; c1:bw=14,experts=[4]; c8:bw=52,experts=[0,1,2,4,6]; c3:bw=10,experts=[4]; c2:bw=53,experts=[0,1,4,5,6]; c4:bw=47,experts=[0,4,5,6]; c5:bw=18,experts=[4]; c9:bw=19,experts=[4]; c6:bw=33,experts=[0,4,6]
+   16 | 0.01000 |   0.8991 |   64.54% |   64.79% |    0:58.75
+      bandwidth/experts | c6:bw=40,experts=[0,4,6,7]; c1:bw=29,experts=[3,7]; c3:bw=43,experts=[0,4,6,7]; c8:bw=49,experts=[0,4,6,7]; c7:bw=22,experts=[3,4]; c5:bw=40,experts=[0,4,6,7]; c4:bw=35,experts=[3,4,6]; c9:bw=24,experts=[4,7]; c0:bw=57,experts=[0,3,4,6,7]; c2:bw=52,experts=[0,3,4,6,7]
+   17 | 0.01000 |   0.8487 |   58.78% |   64.79% |    0:57.87
+      bandwidth/experts | c4:bw=58,experts=[0,4,5,6,7]; c7:bw=25,experts=[4,7]; c8:bw=10,experts=[4]; c3:bw=52,experts=[0,2,3,4,6]; c5:bw=10,experts=[4]; c1:bw=29,experts=[4,6]; c0:bw=11,experts=[1]; c2:bw=19,experts=[4]; c9:bw=37,experts=[3,4,6]; c6:bw=39,experts=[0,4,6]
+   18 | 0.01000 |   0.9219 |   67.12% |   67.12% |    0:58.56
+      bandwidth/experts | c1:bw=10,experts=[4]; c8:bw=10,experts=[4]; c5:bw=35,experts=[0,4,6]; c2:bw=37,experts=[0,4,6]; c9:bw=19,experts=[4]; c7:bw=55,experts=[0,2,4,5,6]; c4:bw=56,experts=[0,3,4,5,6]; c3:bw=37,experts=[0,4,6]; c0:bw=49,experts=[0,4,5,6]; c6:bw=31,experts=[0,4,6]
+   19 | 0.01000 |   0.8880 |   65.98% |   67.12% |    0:59.68
+      bandwidth/experts | c8:bw=56,experts=[0,1,3,4,6]; c0:bw=42,experts=[0,2,4,6]; c4:bw=51,experts=[0,3,4,5,6]; c1:bw=46,experts=[0,2,4,6]; c9:bw=38,experts=[0,4,6]; c5:bw=29,experts=[4,6]; c7:bw=22,experts=[1,4]; c2:bw=14,experts=[4]; c6:bw=66,experts=[0,1,3,4,5,6]; c3:bw=40,experts=[0,1,4,6]
+   20 | 0.01000 |   0.8830 |   69.51% |   69.51% |    0:59.28
+      bandwidth/experts | c0:bw=28,experts=[4,6]; c2:bw=41,experts=[0,2,4,6]; c1:bw=40,experts=[0,1,4,6]; c9:bw=17,experts=[5]; c7:bw=43,experts=[0,4,5,6]; c6:bw=68,experts=[0,1,4,5,6,7]; c3:bw=18,experts=[4]; c5:bw=10,experts=[3]; c4:bw=59,experts=[0,1,2,4,6]; c8:bw=50,experts=[0,1,3,4,6]
+   21 | 0.01000 |   0.8744 |   65.50% |   69.51% |    0:59.22
+      bandwidth/experts | c1:bw=41,experts=[0,4,5,6]; c2:bw=39,experts=[0,4,6]; c7:bw=12,experts=[4]; c4:bw=48,experts=[0,4,5,6]; c8:bw=18,experts=[4]; c5:bw=32,experts=[4,5,6]; c0:bw=66,experts=[0,1,2,4,5,6]; c3:bw=10,experts=[5]; c6:bw=16,experts=[4]; c9:bw=25,experts=[1,4]
+   22 | 0.01000 |   0.8830 |   70.81% |   70.81% |    0:59.41
+      bandwidth/experts | c7:bw=16,experts=[4]; c9:bw=33,experts=[2,4,6]; c1:bw=10,experts=[4]; c6:bw=61,experts=[0,1,2,4,5,6]; c5:bw=17,experts=[1]; c2:bw=66,experts=[0,1,2,4,5,6]; c0:bw=67,experts=[0,1,2,4,5,6]; c4:bw=36,experts=[0,4,6]; c3:bw=56,experts=[0,2,4,5,6]; c8:bw=33,experts=[4,5,6]
+   23 | 0.01000 |   0.8674 |   69.22% |   70.81% |    0:59.72
+      bandwidth/experts | c5:bw=52,experts=[0,2,4,5,6]; c7:bw=15,experts=[4]; c4:bw=56,experts=[0,4,5,6,7]; c6:bw=10,experts=[4]; c9:bw=50,experts=[0,1,4,5,6]; c8:bw=35,experts=[2,4,6]; c3:bw=15,experts=[4]; c1:bw=62,experts=[0,2,3,4,5,6]; c2:bw=32,experts=[0,4,6]; c0:bw=11,experts=[4]
+   24 | 0.01000 |   0.8639 |   65.05% |   70.81% |    0:59.75
+      bandwidth/experts | c6:bw=30,experts=[0,4,6]; c4:bw=12,experts=[4]; c7:bw=10,experts=[3]; c9:bw=50,experts=[0,4,5,6,7]; c2:bw=43,experts=[3,4,6,7]; c1:bw=10,experts=[7]; c5:bw=25,experts=[4,7]; c8:bw=18,experts=[7]; c3:bw=10,experts=[7]; c0:bw=31,experts=[3,4,7]
+   25 | 0.01000 |   0.8695 |   67.12% |   70.81% |    1:00.00
+      bandwidth/experts | c9:bw=40,experts=[0,3,4,6]; c6:bw=16,experts=[4]; c4:bw=58,experts=[0,4,5,6,7]; c3:bw=14,experts=[3]; c5:bw=64,experts=[0,1,3,4,5,6]; c1:bw=49,experts=[0,4,5,6]; c8:bw=55,experts=[0,1,3,4,6]; c2:bw=12,experts=[4]; c0:bw=56,experts=[0,1,4,5,6]; c7:bw=40,experts=[0,4,6,7]
+   26 | 0.01000 |   0.8742 |   72.38% |   72.38% |    0:59.71
+      bandwidth/experts | c3:bw=44,experts=[0,4,5,6]; c6:bw=34,experts=[0,4,6]; c9:bw=50,experts=[0,4,5,6,7]; c7:bw=31,experts=[2,4,6]; c1:bw=33,experts=[0,4,6]; c5:bw=20,experts=[4,6]; c2:bw=30,experts=[0,4,6]; c8:bw=53,experts=[0,1,3,4,6]; c0:bw=11,experts=[4]; c4:bw=48,experts=[0,4,5,6]
+   27 | 0.01000 |   0.8498 |   71.22% |   72.38% |    0:59.16
+      bandwidth/experts | c7:bw=51,experts=[0,1,4,5,6]; c1:bw=62,experts=[0,1,3,4,5,6]; c4:bw=12,experts=[3]; c0:bw=36,experts=[0,4,6]; c9:bw=18,experts=[4]; c2:bw=20,experts=[4,6]; c8:bw=55,experts=[0,1,4,5,6]; c3:bw=21,experts=[1,4]; c6:bw=63,experts=[0,1,3,4,5,6]; c5:bw=37,experts=[0,4,6]
+   28 | 0.01000 |   0.8473 |   71.16% |   72.38% |    0:56.46
+      bandwidth/experts | c6:bw=29,experts=[4,7]; c9:bw=49,experts=[0,4,5,6]; c0:bw=47,experts=[0,4,5,6]; c8:bw=29,experts=[4,6]; c2:bw=10,experts=[4]; c5:bw=33,experts=[0,4,6]; c1:bw=25,experts=[4,6]; c3:bw=12,experts=[4]; c4:bw=10,experts=[1]; c7:bw=10,experts=[4]
+   29 | 0.01000 |   0.8457 |   73.67% |   73.67% |    0:56.62
+      bandwidth/experts | c4:bw=38,experts=[2,4,6]; c0:bw=44,experts=[0,4,5,6]; c1:bw=33,experts=[0,4,6]; c9:bw=44,experts=[0,4,5,6]; c6:bw=43,experts=[0,4,5,6]; c8:bw=34,experts=[0,4,6]; c7:bw=21,experts=[4,6]; c3:bw=32,experts=[0,4,6]; c2:bw=18,experts=[4]; c5:bw=33,experts=[0,4,6]
+   30 | 0.01000 |   0.8456 |   68.95% |   73.67% |    0:56.69
+      bandwidth/experts | c5:bw=62,experts=[0,1,4,5,6,7]; c1:bw=35,experts=[0,4,6]; c9:bw=54,experts=[0,2,4,5,6]; c4:bw=51,experts=[0,3,4,5,6]; c0:bw=17,experts=[2]; c8:bw=41,experts=[0,1,4,6]; c6:bw=11,experts=[2]; c7:bw=12,experts=[4]; c3:bw=59,experts=[0,2,4,5,6]; c2:bw=27,experts=[1,2]
+   31 | 0.01000 |   0.8431 |   75.55% |   75.55% |    0:56.30
+      bandwidth/experts | c6:bw=29,experts=[4,6]; c4:bw=19,experts=[4]; c9:bw=45,experts=[0,1,4,6]; c1:bw=30,experts=[2,4,6]; c5:bw=62,experts=[0,1,2,4,5,6]; c8:bw=33,experts=[2,4,6]; c3:bw=24,experts=[4,6]; c2:bw=15,experts=[5]; c0:bw=47,experts=[0,4,5,6]; c7:bw=63,experts=[0,1,2,4,5,6]
+   32 | 0.01000 |   0.8315 |   72.46% |   75.55% |    0:56.13
+      bandwidth/experts | c8:bw=21,experts=[4,7]; c5:bw=36,experts=[0,4,6]; c4:bw=49,experts=[0,4,5,6]; c7:bw=47,experts=[0,3,4,6]; c0:bw=46,experts=[3,4,6,7]; c1:bw=21,experts=[4,7]; c3:bw=28,experts=[4,7]; c6:bw=27,experts=[4,6]; c2:bw=54,experts=[0,3,4,6,7]; c9:bw=31,experts=[0,4,6]
+   33 | 0.01000 |   0.8351 |   74.57% |   75.55% |    0:55.82
+      bandwidth/experts | c7:bw=52,experts=[0,4,5,6,7]; c1:bw=34,experts=[0,4,6]; c3:bw=70,experts=[0,1,2,3,4,5,6]; c6:bw=37,experts=[0,4,6]; c5:bw=29,experts=[3,4]; c9:bw=42,experts=[0,3,4,6]; c2:bw=24,experts=[4,6]; c8:bw=50,experts=[0,1,3,4,6]; c4:bw=45,experts=[0,4,6,7]; c0:bw=62,experts=[0,1,2,4,5,6]
+   34 | 0.01000 |   0.8261 |   73.34% |   75.55% |    0:56.42
+      bandwidth/experts | c4:bw=46,experts=[0,4,6,7]; c1:bw=46,experts=[0,4,5,6]; c6:bw=48,experts=[0,4,5,6]; c9:bw=68,experts=[0,1,4,5,6,7]; c8:bw=42,experts=[0,4,5,6]; c0:bw=22,experts=[4,6]; c5:bw=60,experts=[0,1,4,5,6,7]; c7:bw=32,experts=[0,4,6]; c3:bw=72,experts=[0,1,2,3,4,5,6]; c2:bw=54,experts=[0,1,4,5,6]
+   35 | 0.01000 |   0.8207 |   74.93% |   75.55% |    0:58.84
+      bandwidth/experts | c4:bw=33,experts=[0,4,6]; c0:bw=20,experts=[4,6]; c1:bw=31,experts=[1,3,4]; c6:bw=44,experts=[1,3,4,6]; c2:bw=46,experts=[0,4,5,6]; c8:bw=50,experts=[0,1,3,4,6]; c9:bw=27,experts=[4,6]; c7:bw=48,experts=[0,4,5,6]; c5:bw=41,experts=[0,4,5,6]; c3:bw=24,experts=[4,6]
+   36 | 0.01000 |   0.8165 |   75.23% |   75.55% |    0:59.05
+      bandwidth/experts | c9:bw=37,experts=[0,4,6]; c0:bw=36,experts=[0,4,6]; c3:bw=60,experts=[0,1,2,4,5,6]; c7:bw=27,experts=[4,6]; c6:bw=43,experts=[0,4,6,7]; c5:bw=49,experts=[0,4,5,6]; c1:bw=10,experts=[4]; c4:bw=74,experts=[0,1,3,4,5,6,7]; c8:bw=51,experts=[0,1,4,5,6]; c2:bw=50,experts=[0,1,4,5,6]
+   37 | 0.01000 |   0.8207 |   74.86% |   75.55% |    0:59.05
+      bandwidth/experts | c1:bw=18,experts=[4]; c5:bw=39,experts=[4,5,6]; c2:bw=36,experts=[0,4,6]; c6:bw=65,experts=[0,1,4,5,6,7]; c4:bw=39,experts=[2,4,6]; c7:bw=42,experts=[0,4,5,6]; c9:bw=40,experts=[0,4,5,6]; c0:bw=54,experts=[0,1,4,5,6]; c3:bw=36,experts=[0,4,6]; c8:bw=10,experts=[4]
+   38 | 0.01000 |   0.8172 |   75.11% |   75.55% |    0:59.61
+      bandwidth/experts | c8:bw=46,experts=[0,3,4,6]; c6:bw=17,experts=[2]; c4:bw=52,experts=[0,4,5,6,7]; c1:bw=31,experts=[0,4,6]; c5:bw=10,experts=[4]; c2:bw=10,experts=[2]; c3:bw=38,experts=[0,4,6]; c7:bw=51,experts=[0,2,4,5,6]; c9:bw=26,experts=[2,4]; c0:bw=40,experts=[0,4,5,6]
+   39 | 0.01000 |   0.8112 |   77.33% |   77.33% |    0:59.65
+      bandwidth/experts | c3:bw=26,experts=[4,6]; c0:bw=10,experts=[4]; c1:bw=45,experts=[0,2,4,6]; c7:bw=40,experts=[0,1,4,6]; c6:bw=31,experts=[0,4,6]; c8:bw=45,experts=[0,2,4,6]; c2:bw=36,experts=[0,4,6]; c4:bw=36,experts=[0,4,6]; c9:bw=24,experts=[4,6]; c5:bw=75,experts=[0,1,2,4,5,6,7]
+   40 | 0.01000 |   0.8045 |   75.78% |   77.33% |    1:01.33
+      bandwidth/experts | c8:bw=26,experts=[4,7]; c1:bw=42,experts=[0,4,6,7]; c5:bw=32,experts=[0,4,6]; c6:bw=46,experts=[0,4,5,6]; c2:bw=65,experts=[0,3,4,5,6,7]; c7:bw=66,experts=[0,1,3,4,5,6]; c3:bw=10,experts=[7]; c4:bw=19,experts=[4]; c9:bw=40,experts=[0,4,5,6]; c0:bw=36,experts=[3,4,7]
+   41 | 0.01000 |   0.8045 |   72.83% |   77.33% |    1:00.19
+      bandwidth/experts | c2:bw=54,experts=[0,1,4,5,6]; c6:bw=10,experts=[4]; c8:bw=57,experts=[0,1,4,5,6]; c1:bw=10,experts=[4]; c4:bw=50,experts=[0,3,4,6,7]; c5:bw=61,experts=[0,1,3,4,5,6]; c7:bw=68,experts=[0,2,4,5,6,7]; c3:bw=40,experts=[0,4,5,6]; c9:bw=54,experts=[0,3,4,5,6]; c0:bw=10,experts=[2]
+   42 | 0.01000 |   0.8015 |   78.23% |   78.23% |    0:59.71
+      bandwidth/experts | c5:bw=50,experts=[0,1,4,5,6]; c1:bw=49,experts=[0,4,5,6]; c3:bw=48,experts=[0,3,4,6]; c9:bw=51,experts=[0,1,4,6,7]; c6:bw=34,experts=[0,4,6]; c0:bw=15,experts=[4]; c7:bw=20,experts=[4,6]; c4:bw=55,experts=[0,4,5,6,7]; c8:bw=42,experts=[0,4,5,6]; c2:bw=40,experts=[0,4,5,6]
+   43 | 0.01000 |   0.8040 |   74.93% |   78.23% |    0:58.39
+      bandwidth/experts | c5:bw=53,experts=[0,1,4,5,6]; c1:bw=58,experts=[0,1,3,4,6]; c2:bw=51,experts=[0,1,4,5,6]; c8:bw=45,experts=[0,1,4,6]; c9:bw=32,experts=[0,4,6]; c7:bw=21,experts=[4,6]; c4:bw=34,experts=[0,4,6]; c6:bw=12,experts=[3]; c3:bw=65,experts=[0,1,2,4,5,6]; c0:bw=21,experts=[4,6]
+   44 | 0.01000 |   0.8091 |   77.06% |   78.23% |    0:58.54
+      bandwidth/experts | c0:bw=66,experts=[0,1,2,4,5,6]; c3:bw=47,experts=[0,4,5,6]; c4:bw=29,experts=[1,4]; c2:bw=37,experts=[0,4,6]; c7:bw=75,experts=[0,1,2,3,4,5,6]; c5:bw=24,experts=[4,6]; c6:bw=20,experts=[4,6]; c9:bw=37,experts=[0,4,6]; c8:bw=34,experts=[0,4,6]; c1:bw=45,experts=[0,4,5,6]
+   45 | 0.01000 |   0.8022 |   76.66% |   78.23% |    0:59.94
+      bandwidth/experts | c8:bw=55,experts=[0,1,4,5,6]; c0:bw=36,experts=[0,4,6]; c3:bw=67,experts=[0,1,2,4,5,6]; c4:bw=64,experts=[0,2,4,5,6,7]; c7:bw=36,experts=[0,4,6]; c2:bw=49,experts=[0,4,5,6]; c9:bw=25,experts=[4,6]; c6:bw=10,experts=[1]; c5:bw=44,experts=[0,4,5,6]; c1:bw=56,experts=[0,3,4,5,6]
+   46 | 0.01000 |   0.7955 |   76.31% |   78.23% |    1:01.55
+      bandwidth/experts | c9:bw=37,experts=[2,4,6]; c3:bw=27,experts=[4,6]; c6:bw=39,experts=[2,4,7]; c1:bw=41,experts=[0,4,5,6]; c4:bw=64,experts=[0,3,4,5,6,7]; c5:bw=41,experts=[0,4,5,6]; c2:bw=57,experts=[0,2,4,5,6]; c8:bw=39,experts=[3,4,6]; c0:bw=55,experts=[0,1,4,5,6]; c7:bw=28,experts=[4,6]
+   47 | 0.01000 |   0.7955 |   77.40% |   78.23% |    1:00.75
+      bandwidth/experts | c5:bw=52,experts=[0,2,4,6,7]; c6:bw=22,experts=[4,6]; c7:bw=53,experts=[0,2,4,5,6]; c9:bw=17,experts=[4]; c8:bw=39,experts=[2,4,6]; c3:bw=70,experts=[0,1,2,3,4,5,6]; c4:bw=10,experts=[4]; c0:bw=46,experts=[0,4,5,6]; c1:bw=30,experts=[2,4,6]; c2:bw=54,experts=[0,1,4,5,6]
+   48 | 0.01000 |   0.7970 |   74.46% |   78.23% |    1:01.76
+      bandwidth/experts | c1:bw=50,experts=[0,4,5,6,7]; c8:bw=50,experts=[0,1,4,6,7]; c4:bw=67,experts=[0,3,4,5,6,7]; c2:bw=57,experts=[0,3,4,6,7]; c9:bw=52,experts=[0,1,4,5,6]; c6:bw=45,experts=[0,4,5,6]; c5:bw=55,experts=[0,1,4,5,6]; c7:bw=62,experts=[0,1,2,4,5,6]; c0:bw=16,experts=[3]; c3:bw=18,experts=[7]
+   49 | 0.01000 |   0.7959 |   79.14% |   79.14% |    1:02.34
+      bandwidth/experts | c4:bw=48,experts=[0,4,5,6]; c3:bw=32,experts=[0,4,6]; c8:bw=26,experts=[4,6]; c0:bw=20,experts=[4,7]; c2:bw=58,experts=[0,1,4,5,6]; c5:bw=56,experts=[0,3,4,5,6]; c6:bw=13,experts=[4]; c7:bw=44,experts=[0,4,6,7]; c9:bw=53,experts=[0,3,4,5,6]; c1:bw=54,experts=[0,1,4,5,6]
+   50 | 0.01000 |   0.7819 |   76.45% |   79.14% |    1:01.46
+      bandwidth/experts | c8:bw=32,experts=[0,4,6]; c4:bw=10,experts=[4]; c7:bw=34,experts=[0,4,6]; c6:bw=68,experts=[0,1,4,5,6,7]; c2:bw=63,experts=[0,1,2,4,5,6]; c1:bw=64,experts=[0,2,3,4,5,6]; c3:bw=39,experts=[0,4,6]; c0:bw=29,experts=[4,6]; c9:bw=27,experts=[4,7]; c5:bw=31,experts=[0,4,6]
+   51 | 0.01000 |   0.7763 |   78.69% |   79.14% |    1:03.59
+      bandwidth/experts | c5:bw=47,experts=[0,4,5,6]; c0:bw=53,experts=[0,1,4,5,6]; c1:bw=21,experts=[4,6]; c2:bw=20,experts=[4,6]; c8:bw=46,experts=[0,1,4,6]; c6:bw=52,experts=[0,3,4,5,6]; c9:bw=18,experts=[4]; c3:bw=55,experts=[0,2,4,5,6]; c4:bw=11,experts=[4]; c7:bw=27,experts=[4,6]
+   52 | 0.01000 |   0.7848 |   77.35% |   79.14% |    1:02.85
+      bandwidth/experts | c0:bw=46,experts=[0,2,4,6]; c8:bw=18,experts=[4]; c5:bw=24,experts=[4,6]; c7:bw=34,experts=[3,4,6]; c1:bw=40,experts=[0,4,5,6]; c4:bw=33,experts=[1,4,6]; c9:bw=31,experts=[0,4,6]; c6:bw=51,experts=[0,1,4,5,6]; c2:bw=29,experts=[4,6]; c3:bw=43,experts=[0,4,5,6]
+   53 | 0.01000 |   0.7820 |   78.98% |   79.14% |    1:03.58
+      bandwidth/experts | c8:bw=22,experts=[4,5]; c4:bw=28,experts=[2,4]; c5:bw=44,experts=[0,4,5,6]; c1:bw=59,experts=[0,1,4,5,6]; c3:bw=47,experts=[0,4,5,6]; c9:bw=61,experts=[0,1,4,5,6,7]; c6:bw=36,experts=[0,4,6]; c7:bw=44,experts=[0,4,5,6]; c0:bw=39,experts=[0,4,6]; c2:bw=51,experts=[0,1,4,5,6]
+   54 | 0.01000 |   0.7720 |   78.54% |   79.14% |    1:02.38
+      bandwidth/experts | c2:bw=10,experts=[4]; c1:bw=53,experts=[0,2,4,5,6]; c8:bw=55,experts=[0,3,4,5,6]; c7:bw=61,experts=[0,1,2,4,5,6]; c3:bw=30,experts=[0,4,6]; c0:bw=37,experts=[0,4,6]; c6:bw=54,experts=[0,2,4,5,6]; c5:bw=10,experts=[4]; c9:bw=50,experts=[0,2,4,5,6]; c4:bw=32,experts=[0,4,6]
+   55 | 0.01000 |   0.7723 |   76.91% |   79.14% |    1:01.90
+      bandwidth/experts | c7:bw=54,experts=[0,2,4,5,6]; c2:bw=41,experts=[0,4,5,6]; c4:bw=14,experts=[4]; c3:bw=52,experts=[0,1,3,4,6]; c8:bw=14,experts=[2]; c5:bw=53,experts=[0,2,4,6,7]; c1:bw=60,experts=[0,3,4,5,6,7]; c6:bw=42,experts=[0,4,5,6]; c0:bw=27,experts=[4,6]; c9:bw=62,experts=[0,1,4,5,6,7]
+   56 | 0.01000 |   0.7986 |   75.93% |   79.14% |    1:00.93
+      bandwidth/experts | c9:bw=52,experts=[0,1,4,5,6]; c1:bw=56,experts=[0,3,4,5,6]; c3:bw=10,experts=[7]; c2:bw=53,experts=[0,3,4,6,7]; c5:bw=31,experts=[1,4,6]; c4:bw=10,experts=[3]; c8:bw=13,experts=[7]; c7:bw=18,experts=[4]; c6:bw=23,experts=[4,6]; c0:bw=70,experts=[0,1,2,3,4,5,6]
+   57 | 0.01000 |   0.7970 |   80.93% |   80.93% |    1:01.59
+      bandwidth/experts | c3:bw=64,experts=[0,1,2,4,5,6]; c8:bw=43,experts=[0,1,4,6]; c6:bw=48,experts=[0,4,5,6]; c1:bw=49,experts=[0,4,5,6]; c7:bw=69,experts=[0,2,4,5,6,7]; c0:bw=70,experts=[0,1,2,4,5,6,7]; c5:bw=44,experts=[3,4,5,6]; c4:bw=41,experts=[4,5,6,7]; c2:bw=33,experts=[0,4,6]; c9:bw=19,experts=[3]
+   58 | 0.01000 |   0.7787 |   76.75% |   80.93% |    1:00.50
+      bandwidth/experts | c7:bw=24,experts=[4,6]; c2:bw=10,experts=[2]; c9:bw=57,experts=[0,4,5,6,7]; c6:bw=55,experts=[0,4,5,6,7]; c5:bw=35,experts=[4,5,6]; c1:bw=30,experts=[0,4,6]; c8:bw=40,experts=[0,4,5,6]; c4:bw=38,experts=[0,4,6]; c3:bw=61,experts=[0,1,2,4,5,6]; c0:bw=47,experts=[0,4,5,6]
+   59 | 0.01000 |   0.7715 |   78.87% |   80.93% |    1:00.60
+      bandwidth/experts | c2:bw=37,experts=[0,4,6]; c8:bw=56,experts=[0,3,4,5,6]; c9:bw=28,experts=[4,6]; c6:bw=19,experts=[3]; c1:bw=65,experts=[0,1,2,4,5,6]; c4:bw=26,experts=[4,6]; c7:bw=28,experts=[4,6]; c5:bw=32,experts=[0,4,6]; c0:bw=52,experts=[0,1,4,5,6]; c3:bw=35,experts=[0,4,6]
+   60 | 0.01000 |   0.7707 |   78.99% |   80.93% |    0:59.85
+      bandwidth/experts | c0:bw=53,experts=[0,1,4,5,6]; c7:bw=48,experts=[0,3,4,6]; c4:bw=30,experts=[1,4,6]; c2:bw=30,experts=[0,4,6]; c5:bw=33,experts=[4,5,6]; c8:bw=24,experts=[4,6]; c6:bw=59,experts=[0,1,4,5,6]; c9:bw=10,experts=[4]; c1:bw=54,experts=[0,1,4,5,6]; c3:bw=44,experts=[0,4,5,6]
+   61 | 0.01000 |   0.7694 |   79.41% |   80.93% |    0:59.32
+      bandwidth/experts | c5:bw=49,experts=[0,4,5,6]; c6:bw=37,experts=[0,4,6]; c2:bw=29,experts=[1,4]; c9:bw=38,experts=[0,4,6]; c1:bw=33,experts=[0,4,6]; c3:bw=43,experts=[0,4,5,6]; c8:bw=55,experts=[0,1,4,5,6]; c4:bw=38,experts=[2,4,6]; c7:bw=43,experts=[0,4,5,6]; c0:bw=60,experts=[0,1,2,4,5,6]
+   62 | 0.01000 |   0.7634 |   81.13% |   81.13% |    0:59.57
+      bandwidth/experts | c8:bw=13,experts=[4]; c6:bw=62,experts=[0,1,2,4,5,6]; c9:bw=16,experts=[2]; c4:bw=60,experts=[0,3,4,5,6,7]; c5:bw=67,experts=[0,1,4,5,6,7]; c0:bw=28,experts=[4,6]; c3:bw=53,experts=[0,2,4,5,6]; c2:bw=42,experts=[0,4,5,6]; c1:bw=75,experts=[0,2,3,4,5,6,7]; c7:bw=44,experts=[0,1,4,6]
+   63 | 0.01000 |   0.7556 |   79.52% |   81.13% |    0:59.54
+      bandwidth/experts | c5:bw=10,experts=[2]; c9:bw=21,experts=[4,6]; c6:bw=34,experts=[0,4,6]; c3:bw=52,experts=[0,3,4,5,6]; c8:bw=32,experts=[2,4,6]; c1:bw=50,experts=[0,3,4,5,6]; c7:bw=68,experts=[0,1,2,4,5,6]; c0:bw=41,experts=[0,4,5,6]; c2:bw=28,experts=[4,6]; c4:bw=52,experts=[0,4,5,6,7]
+   64 | 0.01000 |   0.7543 |   78.07% |   81.13% |    0:58.88
+      bandwidth/experts | c6:bw=50,experts=[0,1,4,5,6]; c4:bw=38,experts=[0,4,6]; c5:bw=24,experts=[4,6]; c3:bw=38,experts=[4,6,7]; c7:bw=34,experts=[0,4,6]; c0:bw=32,experts=[3,4,6]; c8:bw=53,experts=[0,3,4,6,7]; c9:bw=59,experts=[0,1,4,5,6]; c2:bw=56,experts=[0,3,4,6,7]; c1:bw=28,experts=[4,6]
+   65 | 0.01000 |   0.7586 |   79.50% |   81.13% |    0:58.76
+      bandwidth/experts | c7:bw=10,experts=[7]; c5:bw=29,experts=[3,4]; c4:bw=57,experts=[0,4,5,6,7]; c6:bw=50,experts=[0,2,4,5,6]; c8:bw=66,experts=[0,1,3,4,5,6]; c3:bw=42,experts=[0,4,5,6]; c0:bw=41,experts=[0,4,6,7]; c2:bw=28,experts=[4,6]; c1:bw=58,experts=[0,3,4,5,6]; c9:bw=47,experts=[3,4,5,6]
+   66 | 0.01000 |   0.7578 |   79.22% |   81.13% |    0:56.67
+      bandwidth/experts | c2:bw=41,experts=[0,2,4,6]; c5:bw=17,experts=[4]; c1:bw=54,experts=[0,3,4,5,6]; c8:bw=24,experts=[4,6]; c9:bw=31,experts=[4,6,7]; c6:bw=30,experts=[4,6,7]; c4:bw=41,experts=[0,4,5,6]; c0:bw=38,experts=[0,4,6]; c3:bw=66,experts=[0,1,2,4,5,6]; c7:bw=50,experts=[0,2,4,5,6]
+   67 | 0.01000 |   0.7537 |   79.70% |   81.13% |    0:58.10
+      bandwidth/experts | c4:bw=51,experts=[0,4,5,6,7]; c5:bw=48,experts=[0,4,5,6]; c1:bw=36,experts=[0,4,6]; c3:bw=25,experts=[4,6]; c6:bw=53,experts=[0,3,4,5,6]; c0:bw=32,experts=[0,4,6]; c2:bw=43,experts=[0,4,5,6]; c9:bw=60,experts=[0,1,4,5,6,7]; c7:bw=59,experts=[0,1,4,5,6]; c8:bw=10,experts=[4]
+   68 | 0.01000 |   0.7558 |   80.46% |   81.13% |    0:58.08
+      bandwidth/experts | c1:bw=42,experts=[0,1,4,6]; c8:bw=31,experts=[0,4,6]; c2:bw=58,experts=[0,1,4,5,6]; c0:bw=30,experts=[0,4,6]; c3:bw=26,experts=[4,6]; c4:bw=49,experts=[0,1,4,6]; c5:bw=45,experts=[0,4,5,6]; c9:bw=15,experts=[4]; c7:bw=28,experts=[3,4]; c6:bw=32,experts=[0,4,6]
+   69 | 0.01000 |   0.7504 |   81.27% |   81.27% |    0:58.57
+      bandwidth/experts | c3:bw=41,experts=[0,4,5,6]; c7:bw=58,experts=[0,1,4,5,6]; c1:bw=31,experts=[0,4,6]; c4:bw=41,experts=[0,2,4,6]; c9:bw=35,experts=[4,5,6]; c5:bw=39,experts=[0,4,6]; c0:bw=52,experts=[0,1,2,4,6]; c2:bw=66,experts=[0,1,2,4,5,6]; c8:bw=42,experts=[0,1,4,6]; c6:bw=26,experts=[4,6]
+   70 | 0.01000 |   0.7557 |   81.27% |   81.27% |    0:59.24
+      bandwidth/experts | c1:bw=24,experts=[2,7]; c9:bw=10,experts=[2]; c7:bw=28,experts=[4,6]; c3:bw=32,experts=[0,4,6]; c0:bw=30,experts=[0,4,6]; c6:bw=26,experts=[4,6]; c2:bw=55,experts=[0,1,4,5,6]; c4:bw=58,experts=[0,3,4,5,6]; c5:bw=23,experts=[1,7]; c8:bw=48,experts=[0,4,5,6]
+   71 | 0.01000 |   0.7174 |   74.97% |   81.27% |    0:58.78
+      bandwidth/experts | c4:bw=42,experts=[0,4,5,6]; c0:bw=16,experts=[5]; c1:bw=52,experts=[0,2,4,5,6]; c9:bw=40,experts=[0,4,5,6]; c7:bw=20,experts=[4,6]; c5:bw=33,experts=[2,4,6]; c3:bw=62,experts=[0,2,3,4,5,6]; c6:bw=50,experts=[0,1,4,5,6]; c8:bw=39,experts=[2,4,6]; c2:bw=61,experts=[0,1,2,4,5,6]
+   72 | 0.01000 |   0.7544 |   82.04% |   82.04% |    0:58.80
+      bandwidth/experts | c8:bw=30,experts=[4,6,7]; c1:bw=39,experts=[0,4,6]; c5:bw=43,experts=[0,4,5,6]; c7:bw=48,experts=[0,4,5,6]; c6:bw=19,experts=[4]; c0:bw=52,experts=[0,3,4,5,6]; c3:bw=23,experts=[4,7]; c2:bw=23,experts=[3,7]; c9:bw=38,experts=[0,4,6]; c4:bw=39,experts=[0,4,6]
+   73 | 0.01000 |   0.7479 |   78.19% |   82.04% |    1:00.21
+      bandwidth/experts | c2:bw=47,experts=[0,4,5,6]; c8:bw=11,experts=[3]; c3:bw=40,experts=[0,4,5,6]; c1:bw=66,experts=[0,2,3,4,5,6]; c5:bw=17,experts=[3]; c9:bw=52,experts=[0,3,4,5,6]; c0:bw=28,experts=[4,7]; c7:bw=37,experts=[4,6,7]; c6:bw=20,experts=[2,4]; c4:bw=41,experts=[0,4,5,6]
+   74 | 0.01000 |   0.7614 |   80.47% |   82.04% |    1:00.18
+      bandwidth/experts | c3:bw=10,experts=[1]; c0:bw=40,experts=[0,4,5,6]; c1:bw=28,experts=[4,6]; c5:bw=50,experts=[0,1,4,5,6]; c7:bw=65,experts=[0,1,2,4,5,6]; c8:bw=28,experts=[4,6]; c6:bw=10,experts=[7]; c2:bw=10,experts=[4]; c4:bw=47,experts=[0,4,5,6]; c9:bw=32,experts=[4,5,6]
+   75 | 0.01000 |   0.7470 |   81.01% |   82.04% |    0:59.83
+      bandwidth/experts | c2:bw=40,experts=[0,4,5,6]; c9:bw=61,experts=[0,1,4,5,6,7]; c1:bw=54,experts=[0,3,4,5,6]; c3:bw=20,experts=[4,6]; c7:bw=28,experts=[4,6]; c6:bw=56,experts=[0,1,3,4,6]; c5:bw=31,experts=[0,4,6]; c4:bw=56,experts=[0,4,5,6,7]; c0:bw=60,experts=[0,1,2,4,5,6]; c8:bw=53,experts=[0,1,4,5,6]
+   76 | 0.01000 |   0.7440 |   80.44% |   82.04% |    0:59.34
+      bandwidth/experts | c8:bw=29,experts=[4,6]; c5:bw=37,experts=[0,4,6]; c0:bw=31,experts=[0,4,6]; c3:bw=15,experts=[4]; c2:bw=25,experts=[4,6]; c6:bw=23,experts=[4,6]; c7:bw=66,experts=[0,2,3,4,5,6]; c4:bw=60,experts=[0,1,4,5,6,7]; c9:bw=57,experts=[0,3,4,5,6]; c1:bw=53,experts=[0,1,4,5,6]
+   77 | 0.01000 |   0.7425 |   79.50% |   82.04% |    0:56.83
+      bandwidth/experts | c9:bw=29,experts=[4,6]; c2:bw=34,experts=[0,4,6]; c1:bw=62,experts=[0,1,2,4,5,6]; c8:bw=10,experts=[4]; c4:bw=10,experts=[2]; c7:bw=10,experts=[4]; c6:bw=57,experts=[0,1,4,5,6]; c0:bw=63,experts=[0,1,2,4,5,6]; c3:bw=40,experts=[0,4,5,6]; c5:bw=59,experts=[0,1,4,5,6]
+   78 | 0.01000 |   0.7386 |   80.99% |   82.04% |    0:56.11
+      bandwidth/experts | c0:bw=26,experts=[4,6]; c4:bw=23,experts=[3,4]; c3:bw=38,experts=[0,4,6]; c7:bw=36,experts=[0,4,6]; c8:bw=54,experts=[0,1,4,5,6]; c1:bw=41,experts=[0,4,6,7]; c9:bw=31,experts=[2,4,6]; c6:bw=57,experts=[0,1,4,5,6]; c5:bw=63,experts=[0,1,4,5,6,7]; c2:bw=34,experts=[0,4,6]
+   79 | 0.01000 |   0.7367 |   81.02% |   82.04% |    0:55.96
+      bandwidth/experts | c6:bw=21,experts=[4,6]; c9:bw=10,experts=[4]; c0:bw=36,experts=[0,4,6]; c4:bw=80,experts=[0,1,2,3,4,5,6,7]; c7:bw=46,experts=[0,4,5,6]; c8:bw=44,experts=[0,2,4,6]; c5:bw=53,experts=[0,2,4,5,6]; c3:bw=26,experts=[2,3]; c1:bw=37,experts=[0,4,6]; c2:bw=33,experts=[1,2,4]
+   80 | 0.01000 |   0.7341 |   81.22% |   82.04% |    0:55.66
+      bandwidth/experts | c5:bw=65,experts=[0,1,4,5,6,7]; c9:bw=53,experts=[0,1,4,5,6]; c7:bw=48,experts=[0,4,5,6]; c1:bw=31,experts=[0,4,6]; c3:bw=31,experts=[4,6,7]; c4:bw=57,experts=[0,4,5,6,7]; c2:bw=44,experts=[3,4,6,7]; c0:bw=47,experts=[0,3,4,6]; c6:bw=39,experts=[0,4,6]; c8:bw=51,experts=[0,4,5,6,7]
+   81 | 0.01000 |   0.7346 |   80.08% |   82.04% |    0:54.61
+      bandwidth/experts | c6:bw=51,experts=[0,2,4,5,6]; c2:bw=45,experts=[0,4,5,6]; c3:bw=67,experts=[0,1,2,4,5,6]; c1:bw=49,experts=[0,4,5,6]; c4:bw=42,experts=[0,4,5,6]; c5:bw=30,experts=[3,4,6]; c9:bw=26,experts=[4,6]; c7:bw=58,experts=[0,4,5,6,7]; c8:bw=48,experts=[0,3,4,6]; c0:bw=50,experts=[0,4,5,6,7]
+   82 | 0.01000 |   0.7365 |   80.82% |   82.04% |    0:52.70
+      bandwidth/experts | c1:bw=64,experts=[0,2,3,4,5,6]; c0:bw=30,experts=[0,4,6]; c6:bw=36,experts=[4,6,7]; c8:bw=58,experts=[0,1,4,5,6]; c7:bw=40,experts=[0,1,4,6]; c3:bw=39,experts=[4,5,6]; c2:bw=30,experts=[0,4,6]; c9:bw=56,experts=[0,4,5,6,7]; c5:bw=40,experts=[0,4,5,6]; c4:bw=30,experts=[0,4,6]
+   83 | 0.01000 |   0.7364 |   81.71% |   82.04% |    0:52.18
+      bandwidth/experts | c9:bw=51,experts=[0,4,5,6,7]; c4:bw=10,experts=[4]; c2:bw=41,experts=[0,4,5,6]; c7:bw=37,experts=[0,4,6]; c5:bw=10,experts=[4]; c0:bw=10,experts=[4]; c6:bw=53,experts=[0,3,4,5,6]; c1:bw=63,experts=[0,1,3,4,5,6]; c8:bw=39,experts=[0,4,6]; c3:bw=42,experts=[0,4,5,6]
+   84 | 0.01000 |   0.7256 |   81.68% |   82.04% |    0:53.73
+      bandwidth/experts | c8:bw=67,experts=[0,1,3,4,5,6]; c3:bw=32,experts=[0,4,6]; c1:bw=58,experts=[0,2,4,5,6]; c6:bw=10,experts=[4]; c9:bw=20,experts=[3,4]; c2:bw=36,experts=[0,4,6]; c7:bw=47,experts=[2,3,4,6]; c5:bw=20,experts=[4,6]; c4:bw=27,experts=[4,6]; c0:bw=10,experts=[4]
+   85 | 0.01000 |   0.7286 |   81.47% |   82.04% |    0:52.93
+      bandwidth/experts | c0:bw=38,experts=[1,2,4]; c2:bw=45,experts=[0,4,5,6]; c8:bw=70,experts=[0,2,3,4,5,6,7]; c6:bw=42,experts=[0,4,5,6]; c1:bw=57,experts=[0,3,4,5,6]; c4:bw=42,experts=[0,4,5,6]; c9:bw=58,experts=[0,3,4,5,6]; c3:bw=51,experts=[0,2,4,5,6]; c5:bw=12,experts=[4]; c7:bw=11,experts=[4]
+   86 | 0.01000 |   0.7300 |   82.46% |   82.46% |    0:53.29
+      bandwidth/experts | c5:bw=47,experts=[0,4,5,6]; c8:bw=28,experts=[4,6]; c2:bw=24,experts=[4,6]; c6:bw=55,experts=[0,1,4,5,6]; c0:bw=30,experts=[0,4,6]; c4:bw=18,experts=[4]; c7:bw=44,experts=[0,4,5,6]; c3:bw=28,experts=[4,6]; c1:bw=72,experts=[0,1,2,4,5,6,7]; c9:bw=43,experts=[0,2,4,6]
+   87 | 0.01000 |   0.7266 |   81.02% |   82.46% |    0:54.98
+      bandwidth/experts | c1:bw=29,experts=[4,6]; c2:bw=67,experts=[0,1,2,4,5,6]; c7:bw=22,experts=[4,6]; c5:bw=10,experts=[2]; c6:bw=60,experts=[0,1,2,4,5,6]; c3:bw=68,experts=[0,2,3,4,5,6]; c4:bw=34,experts=[1,2,3]; c9:bw=37,experts=[0,4,6]; c8:bw=46,experts=[0,3,4,6]; c0:bw=35,experts=[0,4,6]
+   88 | 0.01000 |   0.7247 |   81.38% |   82.46% |    0:55.06
+      bandwidth/experts | c8:bw=43,experts=[0,4,5,6]; c6:bw=27,experts=[4,6]; c3:bw=33,experts=[4,6,7]; c7:bw=41,experts=[0,4,5,6]; c0:bw=62,experts=[0,1,3,4,5,6]; c4:bw=38,experts=[4,6,7]; c9:bw=31,experts=[1,4,6]; c1:bw=28,experts=[4,6]; c5:bw=30,experts=[1,4,7]; c2:bw=46,experts=[3,4,6,7]
+   89 | 0.01000 |   0.7212 |   80.23% |   82.46% |    0:55.13
+      bandwidth/experts | c3:bw=31,experts=[1,4,6]; c8:bw=74,experts=[0,1,2,3,4,5,6]; c2:bw=44,experts=[0,4,5,6]; c9:bw=60,experts=[0,3,4,5,6,7]; c7:bw=21,experts=[4,7]; c5:bw=46,experts=[3,4,5,6]; c0:bw=13,experts=[7]; c6:bw=32,experts=[0,4,6]; c4:bw=30,experts=[0,4,6]; c1:bw=41,experts=[0,4,5,6]
+   90 | 0.01000 |   0.7161 |   82.19% |   82.46% |    0:54.79
+      bandwidth/experts | c7:bw=72,experts=[0,1,2,3,4,5,6]; c1:bw=31,experts=[0,4,6]; c3:bw=36,experts=[0,4,6]; c9:bw=63,experts=[0,3,4,5,6,7]; c0:bw=64,experts=[0,1,2,4,5,6]; c6:bw=26,experts=[4,7]; c2:bw=21,experts=[4,6]; c5:bw=27,experts=[4,6]; c8:bw=50,experts=[0,1,4,5,6]; c4:bw=35,experts=[0,4,6]
+   91 | 0.01000 |   0.7162 |   81.24% |   82.46% |    0:54.83
+      bandwidth/experts | c1:bw=50,experts=[0,2,4,5,6]; c9:bw=35,experts=[4,5,6]; c5:bw=52,experts=[0,1,4,5,6]; c7:bw=51,experts=[0,2,4,5,6]; c3:bw=40,experts=[0,4,5,6]; c4:bw=54,experts=[0,4,5,6,7]; c0:bw=22,experts=[4,6]; c6:bw=29,experts=[3,4]; c2:bw=11,experts=[4]; c8:bw=23,experts=[4,6]
+   92 | 0.01000 |   0.7180 |   82.02% |   82.46% |    0:54.78
+      bandwidth/experts | c3:bw=28,experts=[4,6]; c7:bw=34,experts=[0,4,6]; c1:bw=20,experts=[4,6]; c0:bw=29,experts=[4,6]; c8:bw=19,experts=[4]; c6:bw=45,experts=[0,4,5,6]; c9:bw=56,experts=[0,3,4,5,6]; c2:bw=25,experts=[4,6]; c5:bw=66,experts=[0,1,4,5,6,7]; c4:bw=26,experts=[4,6]
+   93 | 0.01000 |   0.7154 |   81.82% |   82.46% |    0:54.92
+      bandwidth/experts | c1:bw=47,experts=[0,3,4,6]; c3:bw=31,experts=[0,4,6]; c7:bw=22,experts=[4,6]; c9:bw=58,experts=[0,4,5,6,7]; c6:bw=22,experts=[4,6]; c8:bw=10,experts=[7]; c5:bw=10,experts=[4]; c4:bw=32,experts=[0,4,6]; c0:bw=19,experts=[4]; c2:bw=51,experts=[0,2,4,5,6]
+   94 | 0.01000 |   0.7299 |   81.52% |   82.46% |    0:55.01
+      bandwidth/experts | c7:bw=45,experts=[0,4,5,6]; c2:bw=65,experts=[0,1,2,4,5,6]; c5:bw=41,experts=[0,4,5,6]; c4:bw=31,experts=[0,4,6]; c6:bw=30,experts=[0,4,6]; c9:bw=50,experts=[0,2,4,5,6]; c1:bw=70,experts=[0,1,3,4,5,6,7]; c8:bw=10,experts=[4]; c0:bw=55,experts=[0,1,4,5,6]; c3:bw=34,experts=[4,5,6]
+   95 | 0.01000 |   0.7156 |   82.51% |   82.51% |    0:53.14
+      bandwidth/experts | c7:bw=59,experts=[0,2,4,5,6]; c9:bw=42,experts=[0,4,5,6]; c4:bw=15,experts=[1]; c6:bw=40,experts=[1,2,4,6]; c0:bw=35,experts=[0,4,6]; c3:bw=41,experts=[2,3,4,6]; c1:bw=31,experts=[0,4,6]; c8:bw=76,experts=[0,2,3,4,5,6,7]; c2:bw=23,experts=[4,6]; c5:bw=10,experts=[2]
+   96 | 0.01000 |   0.7103 |   81.88% |   82.51% |    0:54.00
+      bandwidth/experts | c2:bw=65,experts=[0,3,4,5,6,7]; c9:bw=44,experts=[1,4,5,6]; c3:bw=46,experts=[0,4,6,7]; c1:bw=36,experts=[0,4,6]; c5:bw=60,experts=[0,1,4,5,6,7]; c4:bw=49,experts=[2,3,4,6]; c6:bw=31,experts=[0,4,6]; c7:bw=50,experts=[0,1,4,5,6]; c0:bw=36,experts=[3,4,6]; c8:bw=64,experts=[0,1,2,4,5,6]
+   97 | 0.01000 |   0.7090 |   81.76% |   82.51% |    1:01.81
+      bandwidth/experts | c0:bw=41,experts=[0,4,6,7]; c9:bw=43,experts=[0,4,5,6]; c8:bw=43,experts=[0,4,5,6]; c4:bw=16,experts=[4]; c7:bw=30,experts=[4,6,7]; c1:bw=50,experts=[0,3,4,5,6]; c3:bw=35,experts=[1,4,6]; c5:bw=46,experts=[0,3,4,6]; c6:bw=50,experts=[0,2,4,5,6]; c2:bw=54,experts=[0,2,4,5,6]
+   98 | 0.01000 |   0.7050 |   82.38% |   82.51% |    1:01.91
+      bandwidth/experts | c4:bw=52,experts=[0,4,5,6,7]; c8:bw=54,experts=[0,1,4,5,6]; c9:bw=27,experts=[4,6]; c7:bw=24,experts=[3,4]; c6:bw=36,experts=[4,6,7]; c5:bw=49,experts=[0,4,5,6]; c0:bw=33,experts=[2,4,6]; c3:bw=25,experts=[4,6]; c1:bw=26,experts=[4,6]; c2:bw=24,experts=[4,6]
+   99 | 0.01000 |   0.7071 |   82.59% |   82.59% |    1:00.85
+      bandwidth/experts | c8:bw=34,experts=[0,4,6]; c5:bw=49,experts=[0,4,5,6]; c7:bw=45,experts=[0,4,5,6]; c1:bw=59,experts=[0,2,4,5,6]; c3:bw=38,experts=[4,5,6]; c9:bw=20,experts=[4,6]; c4:bw=24,experts=[4,6]; c0:bw=40,experts=[0,4,5,6]; c2:bw=31,experts=[0,4,6]; c6:bw=35,experts=[3,4,6]
+  100 | 0.01000 |   0.7002 |   82.78% |   82.78% |    1:00.84
+      bandwidth/experts | c2:bw=30,experts=[0,4,6]; c8:bw=44,experts=[0,4,5,6]; c9:bw=53,experts=[0,3,4,5,6]; c5:bw=18,experts=[4]; c6:bw=44,experts=[0,4,5,6]; c1:bw=17,experts=[4]; c4:bw=65,experts=[0,3,4,5,6,7]; c7:bw=10,experts=[4]; c3:bw=42,experts=[0,4,5,6]; c0:bw=64,experts=[0,1,2,4,5,6]
+
+Done. Best Acc: 82.78% @ round 100
+Total time: 1:38:06.39
+[Export] 实验目录: /userhome/cs3/duanty/FedMoE/results/c10-e8-w1-posthoc/20260919-073238
+[Export] 每轮明细: /userhome/cs3/duanty/FedMoE/results/c10-e8-w1-posthoc/20260919-073238/rounds.xlsx
+[Export] 总体摘要: /userhome/cs3/duanty/FedMoE/results/c10-e8-w1-posthoc/20260919-073238/summary.xlsx
+[Plot] result = /userhome/cs3/duanty/FedMoE/results/c10-e8-w1-posthoc/20260919-073238
+[Plot] figures -> /userhome/cs3/duanty/FedMoE/results/c10-e8-w1-posthoc/20260919-073238/figure
+  fig01_test_accuracy.pdf
+  fig02_train_loss.pdf
+  fig03_acc_and_loss.pdf
+  fig04_bandwidth_and_k.pdf
+  fig05_expert_round_heatmap.pdf
+  fig06_client_expert_heatmap.pdf
+  fig07_expert_frequency.pdf
+  fig08_time_breakdown.pdf
+  fig09_accuracy_vs_communication.pdf
+  fig10_overview.pdf
+[Export] 图片目录: /userhome/cs3/duanty/FedMoE/results/c10-e8-w1-posthoc/20260919-073238/figure

@@ -1,0 +1,74 @@
+host=gpu-4090-112 gpu=0 date=Fri Sep 18 15:17:15 HKT 2026
+
+==================================================================
+ Ours  
+  Dataset=cifar10 | beta=0.1 | Backbone=resnet | Clients=10 | Experts=4
+  Select=ours | Merge=fedadam
+  Rounds=12 | LR=0.01
+  Bandwidth: expert_bw=10 | bw=[10, 40] | Rayleigh-Shannon, SNR=10 dB | k=floor(bw/10)
+==================================================================
+
+
+[Partition] Dirichlet beta=0.1, 10 clients
+  Client 0:   6071 samples | 3/10 classes
+  Client 1:  18481 samples | 7/10 classes
+  Client 2:    174 samples | 3/10 classes
+  Client 3:    462 samples | 3/10 classes
+  Client 4:   2759 samples | 3/10 classes
+  Client 5:   5740 samples | 7/10 classes
+  Client 6:   1703 samples | 4/10 classes
+  Client 7:   3407 samples | 7/10 classes
+  Client 8:   6483 samples | 7/10 classes
+  Client 9:   4720 samples | 10/10 classes
+
+[Upload] expert_bw=10 | available bw=[10, 40] | Rayleigh-Shannon, SNR=10 dB | upload k=floor(bw/10), cap=4 | probe gate scores, then train selected experts
+
+[Model] Total params: 12,242,024
+
+[Export] 本次实验目录: /userhome/cs3/duanty/FedMoE/results/20260918-151719-2
+
+Round |      LR |  AvgLoss |  TestAcc |     Best |  RoundTime
+--------------------------------------------------------------------------------
+    1 | 0.00208 |   1.4681 |   18.56% |   18.56% |    0:51.17
+      bandwidth/experts | c8:bw=31,experts=[0,1,2]; c1:bw=16,experts=[2]; c5:bw=25,experts=[1,2]; c0:bw=10,experts=[2]; c7:bw=11,experts=[2]; c2:bw=16,experts=[2]; c9:bw=25,experts=[1,2]; c4:bw=22,experts=[1,2]; c3:bw=28,experts=[1,2]; c6:bw=23,experts=[1,2]
+    2 | 0.00406 |   1.3506 |   19.88% |   19.88% |    0:50.23
+      bandwidth/experts | c0:bw=20,experts=[0,2]; c1:bw=23,experts=[0,2]; c8:bw=27,experts=[0,2]; c5:bw=38,experts=[0,1,2]; c3:bw=37,experts=[0,1,2]; c4:bw=17,experts=[0]; c7:bw=31,experts=[0,1,2]; c9:bw=26,experts=[0,2]; c6:bw=10,experts=[0]; c2:bw=12,experts=[2]
+    3 | 0.00604 |   1.2103 |   29.42% |   29.42% |    0:50.66
+      bandwidth/experts | c9:bw=26,experts=[0,2]; c2:bw=23,experts=[1,2]; c0:bw=28,experts=[0,2]; c6:bw=22,experts=[1,2]; c8:bw=17,experts=[1]; c5:bw=10,experts=[2]; c3:bw=14,experts=[1]; c7:bw=18,experts=[2]; c1:bw=10,experts=[2]; c4:bw=29,experts=[0,2]
+    4 | 0.00802 |   1.1881 |   26.88% |   29.42% |    0:50.76
+      bandwidth/experts | c1:bw=22,experts=[1,2]; c7:bw=25,experts=[1,2]; c6:bw=29,experts=[1,2]; c2:bw=33,experts=[0,1,2]; c8:bw=17,experts=[1]; c0:bw=33,experts=[0,1,2]; c3:bw=19,experts=[1]; c4:bw=31,experts=[0,1,2]; c5:bw=40,experts=[0,1,2,3]; c9:bw=12,experts=[2]
+    5 | 0.01000 |   1.1650 |   27.23% |   29.42% |    0:50.75
+      bandwidth/experts | c1:bw=11,experts=[2]; c5:bw=22,experts=[1,2]; c4:bw=27,experts=[1,2]; c8:bw=20,experts=[1,2]; c0:bw=28,experts=[1,2]; c7:bw=14,experts=[2]; c6:bw=29,experts=[1,2]; c3:bw=35,experts=[0,1,2]; c2:bw=10,experts=[1]; c9:bw=35,experts=[0,1,2]
+    6 | 0.01000 |   1.1183 |   27.04% |   29.42% |    0:50.48
+      bandwidth/experts | c8:bw=37,experts=[0,1,2]; c2:bw=23,experts=[1,2]; c5:bw=15,experts=[2]; c7:bw=32,experts=[0,1,2]; c3:bw=20,experts=[1,2]; c1:bw=18,experts=[2]; c9:bw=27,experts=[0,2]; c0:bw=17,experts=[2]; c4:bw=10,experts=[2]; c6:bw=11,experts=[2]
+    7 | 0.01000 |   1.1240 |   28.40% |   29.42% |    0:50.63
+      bandwidth/experts | c0:bw=20,experts=[1,2]; c5:bw=27,experts=[1,2]; c2:bw=22,experts=[1,2]; c6:bw=10,experts=[2]; c3:bw=15,experts=[1]; c7:bw=17,experts=[1]; c4:bw=10,experts=[1]; c1:bw=10,experts=[1]; c8:bw=32,experts=[0,1,2]; c9:bw=10,experts=[2]
+    8 | 0.01000 |   1.1576 |   37.32% |   37.32% |    0:50.35
+      bandwidth/experts | c4:bw=10,experts=[1]; c8:bw=20,experts=[1,2]; c1:bw=32,experts=[0,1,2]; c3:bw=21,experts=[1,2]; c0:bw=18,experts=[1]; c5:bw=16,experts=[1]; c2:bw=30,experts=[0,1,2]; c9:bw=33,experts=[0,1,2]; c7:bw=10,experts=[1]; c6:bw=23,experts=[0,1]
+    9 | 0.01000 |   1.0500 |   41.37% |   41.37% |    0:50.37
+      bandwidth/experts | c2:bw=12,experts=[1]; c0:bw=29,experts=[0,1]; c4:bw=33,experts=[0,1,2]; c9:bw=15,experts=[1]; c8:bw=10,experts=[1]; c6:bw=17,experts=[1]; c7:bw=25,experts=[1,2]; c5:bw=29,experts=[0,1]; c1:bw=10,experts=[1]; c3:bw=13,experts=[1]
+   10 | 0.01000 |   1.0454 |   51.85% |   51.85% |    0:50.40
+      bandwidth/experts | c4:bw=20,experts=[1,2]; c2:bw=19,experts=[1]; c7:bw=21,experts=[1,2]; c0:bw=33,experts=[0,1,2]; c6:bw=36,experts=[0,1,2]; c3:bw=26,experts=[1,2]; c5:bw=32,experts=[0,1,2]; c8:bw=20,experts=[1,2]; c9:bw=20,experts=[1,2]; c1:bw=23,experts=[1,2]
+   11 | 0.01000 |   1.0339 |   56.20% |   56.20% |    0:50.31
+      bandwidth/experts | c5:bw=15,experts=[1]; c2:bw=15,experts=[1]; c7:bw=24,experts=[1,2]; c3:bw=28,experts=[1,2]; c0:bw=16,experts=[1]; c8:bw=22,experts=[1,2]; c9:bw=18,experts=[1]; c6:bw=31,experts=[0,1,2]; c1:bw=22,experts=[1,2]; c4:bw=10,experts=[1]
+   12 | 0.01000 |   1.0129 |   57.40% |   57.40% |    0:50.22
+      bandwidth/experts | c1:bw=24,experts=[1,2]; c5:bw=31,experts=[0,1,2]; c2:bw=32,experts=[0,1,2]; c4:bw=16,experts=[1]; c3:bw=19,experts=[1]; c7:bw=16,experts=[1]; c9:bw=23,experts=[1,2]; c6:bw=16,experts=[1]; c8:bw=31,experts=[0,1,2]; c0:bw=27,experts=[1,2]
+
+Done. Best Acc: 57.40% @ round 12
+Total time: 10:06.68
+[Export] 实验目录: /userhome/cs3/duanty/FedMoE/results/20260918-151719-2
+[Export] 每轮明细: /userhome/cs3/duanty/FedMoE/results/20260918-151719-2/rounds.xlsx
+[Export] 总体摘要: /userhome/cs3/duanty/FedMoE/results/20260918-151719-2/summary.xlsx
+[Plot] result = /userhome/cs3/duanty/FedMoE/results/20260918-151719-2
+[Plot] figures -> /userhome/cs3/duanty/FedMoE/results/20260918-151719-2/figure
+  fig01_test_accuracy.pdf
+  fig02_train_loss.pdf
+  fig03_acc_and_loss.pdf
+  fig04_bandwidth_and_k.pdf
+  fig05_expert_round_heatmap.pdf
+  fig06_client_expert_heatmap.pdf
+  fig07_expert_frequency.pdf
+  fig08_time_breakdown.pdf
+  fig09_accuracy_vs_communication.pdf
+  fig10_overview.pdf
+[Export] 图片目录: /userhome/cs3/duanty/FedMoE/results/20260918-151719-2/figure

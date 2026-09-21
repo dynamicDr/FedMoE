@@ -116,6 +116,7 @@ As shwon in figure~\ref{Workflow}, we present a channel-aware probe-before-train
 \subsection{System Model}
 
 Federated learning (FL) is a distributed collaborative training paradigm in which multiple clients jointly learn a shared global model without exposing their raw data to the server. Federated learning proceeds iteratively between local training on edge clients and model aggregation on the server. In each communication round, the server first distributes the current global model to the clients participating in training. Then, each client trains its local model using its private local data and uploads the local model parameters or model updates to the server. After receiving updates from multiple clients, the server generates a new global model according to the aggregation strategy and sends it back to the clients for the next round of training. Let $\mathcal{I}=\left \{ 1,2,\dots ,n \right \} $ denote the set of participating clients, and let $\mathcal{D}_i$ be the local dataset of client $i$. The global objective is to minimize a weighted empirical risk over all clients:
+Federated learning (FL) is a distributed collaborative training paradigm in which multiple clients jointly learn a shared global model without exposing their raw data to the server. Federated learning proceeds iteratively between local training on edge clients and model aggregation on the server. In each communication round, the server first distributes the current global model to the clients participating in training. Then, each client trains its local model using its private local data and uploads the local model parameters or model updates to the server. After receiving updates from multiple clients, the server generates a new global model according to the aggregation strategy and sends it back to the clients for the next round of training. Let $\mathcal{I}=\left \{ 1,2,\dots ,n \right \} $ denote the set of participating clients, and let $\mathcal{D}_i$ be the local dataset of client $i$. The global objective is to minimize a weighted empirical risk over all clients:
 \begin{equation}
 \min_{\boldsymbol{\theta}} F(\boldsymbol{\theta})
 =
@@ -126,7 +127,9 @@ F_i(\boldsymbol{\theta}),
 n=\sum_{i\in\mathcal{I}} n_i ,
 \end{equation}
 where $F_i(\boldsymbol{\theta})$ denotes the empirical loss evaluated on $\mathcal{D}_i$. 
+where $F_i(\boldsymbol{\theta})$ denotes the empirical loss evaluated on $\mathcal{D}_i$. 
 
+Mixture-of-Experts (MoE) models use multiple expert modules and a gating network to enable conditional computation. For each input, the gate assigns routing weights to experts, allowing expert specialization and increasing the effective model capacity. In FL, MoE can naturally accommodate heterogeneous client data distributions. For client $i$ at communication round $r$, the gating output of the $\ell$-th MoE layer for input $x$ is defined as
 Mixture-of-Experts (MoE) models use multiple expert modules and a gating network to enable conditional computation. For each input, the gate assigns routing weights to experts, allowing expert specialization and increasing the effective model capacity. In FL, MoE can naturally accommodate heterogeneous client data distributions. For client $i$ at communication round $r$, the gating output of the $\ell$-th MoE layer for input $x$ is defined as
 \begin{equation}
 \mathbf{g}_{i,\ell}^{(r)}(x)
@@ -135,13 +138,16 @@ Mixture-of-Experts (MoE) models use multiple expert modules and a gating network
 g_{i,\ell,1}^{(r)}(x),
 \ldots,
 g_{i,\ell,e_\ell}^{(r)}(x)
+g_{i,\ell,e_\ell}^{(r)}(x)
 \bigr),
 \end{equation}
+where $g_{i,\ell,j}^{(r)}(x)$ represents the gating weight assigned to expert $j$ among the $e_\ell$ experts in the $\ell$-th MoE layer. For simplicity, we assume that $g_{i,\ell,j}^{(r)}(x)$ has been normalized within each MoE layer, and use $g_{i,j}^{(r)}(x)$ to denote the gating weight assigned to the $j$-th expert module of client $i$.
 where $g_{i,\ell,j}^{(r)}(x)$ represents the gating weight assigned to expert $j$ among the $e_\ell$ experts in the $\ell$-th MoE layer. For simplicity, we assume that $g_{i,\ell,j}^{(r)}(x)$ has been normalized within each MoE layer, and use $g_{i,j}^{(r)}(x)$ to denote the gating weight assigned to the $j$-th expert module of client $i$.
 
 %=========================================
 We study an edge FL framework for training a MoE model over edge clients with heterogeneous local data distributions and limited uplink communication resources. Due to the uplink transmission budget $B_i^{(r)}$, client $i$ is allowed to upload only a subset of expert parameters in communication round $r$. Let $\mathcal{E}=\{1,2,\ldots,n_e\}$ denote the set of expert modules, where $n_e$ is the total number of experts. For each client $i$, our objective is to find a feasible set of experts that satisfies the uplink communication budget while maximizing the local expert utilization:
 \begin{equation}
+\label{optimization objective}
 \label{optimization objective}
 \begin{aligned}
 \mathcal{S}_i^{(r),\star}
@@ -149,7 +155,13 @@ We study an edge FL framework for training a MoE model over edge clients with he
 \arg\max_{\mathcal{S}\subseteq \mathcal{E}}
 \quad &
 \sum_{j\in \mathcal{S}}\mu_{i,j}^{(r)}
+\mathcal{S}_i^{(r),\star}
+=
+\arg\max_{\mathcal{S}\subseteq \mathcal{E}}
+\quad &
+\sum_{j\in \mathcal{S}}\mu_{i,j}^{(r)}
 \\
+\mathrm{s.t.}
 \mathrm{s.t.}
 \quad
 &

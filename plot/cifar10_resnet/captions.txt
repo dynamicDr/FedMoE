@@ -1,0 +1,21 @@
+runs:
+  ours-ours  dir=20260918-070936-3  method=ours  backbone=resnet  select=ours  merge=ours  best_acc=81.37
+  posthoc-ours  dir=20260918-070936  method=ours  backbone=resnet  select=posthoc  merge=ours  best_acc=82.78
+  fedrolex-ours  dir=20260918-070936-2  method=ours  backbone=resnet  select=fedrolex  merge=ours  best_acc=84.02
+  snip-ours  dir=20260918-070936-4  method=ours  backbone=resnet  select=snip  merge=ours  best_acc=82.71
+  ours-fedavg  dir=20260918-083318  method=ours  backbone=resnet  select=ours  merge=fedavg  best_acc=82.65
+  ours-fedavgm  dir=20260918-152900  method=ours  backbone=resnet  select=ours  merge=fedavgm  best_acc=75.89
+  ours-fedadam  dir=20260918-152900-2  method=ours  backbone=resnet  select=ours  merge=fedadam  best_acc=79.16
+  ours-zerofill  dir=20260919-195021  method=ours  backbone=resnet  select=ours  merge=zerofill  best_acc=70.17
+
+fig01_test_accuracy: test accuracy vs round, one curve per run
+fig02_train_loss: local training loss vs round
+fig03_acc_and_loss: (a) accuracy (b) loss
+fig04_bandwidth_and_k: mean bandwidth and uploaded expert count
+fig05_expert_round_heatmap: total uploaded experts vs round
+fig06_client_expert_heatmap: total uploads per client
+fig07_expert_frequency: overall expert upload histogram
+fig08_time_breakdown: local / aggregation / evaluation time
+fig09_accuracy_vs_communication: accuracy vs cumulative expert uploads
+fig10_overview: four-panel summary figure
+fig11_avg_round_time: average wall time per round for each method

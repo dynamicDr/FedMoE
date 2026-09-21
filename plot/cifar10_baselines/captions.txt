@@ -1,0 +1,26 @@
+runs:
+  resnet-ours-ours  dir=20260918-070936-3  method=ours  backbone=resnet  select=ours  merge=ours  best_acc=81.37
+  resnet-posthoc-ours  dir=20260918-070936  method=ours  backbone=resnet  select=posthoc  merge=ours  best_acc=82.78
+  resnet-fedrolex-ours  dir=20260918-070936-2  method=ours  backbone=resnet  select=fedrolex  merge=ours  best_acc=84.02
+  resnet-snip-ours  dir=20260918-070936-4  method=ours  backbone=resnet  select=snip  merge=ours  best_acc=82.71
+  resnet-ours-fedavg  dir=20260918-083318  method=ours  backbone=resnet  select=ours  merge=fedavg  best_acc=82.65
+  resnet-ours-fedavgm  dir=20260918-083325  method=ours  backbone=resnet  select=ours  merge=fedavgm  best_acc=70.23
+  resnet-ours-fedadam  dir=20260918-083650  method=ours  backbone=resnet  select=ours  merge=fedadam  best_acc=15.41
+  vgg11-ours-ours  dir=20260918-083800  method=ours  backbone=vgg11  select=ours  merge=ours  best_acc=77.83
+  vgg11-posthoc-ours  dir=20260918-095437  method=ours  backbone=vgg11  select=posthoc  merge=ours  best_acc=80.32
+  vgg11-fedrolex-ours  dir=20260918-095610  method=ours  backbone=vgg11  select=fedrolex  merge=ours  best_acc=77.37
+  vgg11-snip-ours  dir=20260918-100051  method=ours  backbone=vgg11  select=snip  merge=ours  best_acc=79.19
+  vgg11-ours-fedavg  dir=20260918-100417  method=ours  backbone=vgg11  select=ours  merge=fedavg  best_acc=78.11
+  vgg11-ours-fedavgm  dir=20260918-110407  method=ours  backbone=vgg11  select=ours  merge=fedavgm  best_acc=73.18
+  vgg11-ours-fedadam  dir=20260918-110542  method=ours  backbone=vgg11  select=ours  merge=fedadam  best_acc=33.9
+
+fig01_test_accuracy: test accuracy vs round, one curve per run
+fig02_train_loss: local training loss vs round
+fig03_acc_and_loss: (a) accuracy (b) loss
+fig04_bandwidth_and_k: mean bandwidth and uploaded expert count
+fig05_expert_round_heatmap: total uploaded experts vs round
+fig06_client_expert_heatmap: total uploads per client
+fig07_expert_frequency: overall expert upload histogram
+fig08_time_breakdown: local / aggregation / evaluation time
+fig09_accuracy_vs_communication: accuracy vs cumulative expert uploads
+fig10_overview: four-panel summary figure

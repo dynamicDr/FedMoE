@@ -26,3 +26,20 @@ def weighted_mean(tensors, weights, dtype):
 
 def payload_sample_weight(payload):
     return max(float(payload['meta'].get('n_samples', 1)), 1.0)
+
+
+def collect_present_keys(payloads):
+    present = set()
+    for payload in payloads:
+        present.update(payload['state'].keys())
+    return present
+
+
+def trainable_param_names(model):
+    """Keys that may take a server optimizer step.
+
+    BatchNorm running stats and counters stay at the FedAvg result.
+    Applying momentum/Adam to running_var can make it negative, which
+    turns eval-mode BN into NaNs and collapses CIFAR-10 accuracy to 10%.
+    """
+    return {name for name, _ in model.named_parameters()}
