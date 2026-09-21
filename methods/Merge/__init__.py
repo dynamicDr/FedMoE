@@ -1,20 +1,20 @@
 from .base import MergeBase
 from .fedadam import FedAdam
 from .fedavg import FedAvg
+from .fedavg_old import FedAvgOld
 from .fedavgm import FedAvgM
 from .ours import Ours
-from .zerofill import ZeroFill
 
 MERGE_REGISTRY = {
     'ours': Ours,
     'fedavg': FedAvg,
+    'fedavg-old': FedAvgOld,
     'fedavgm': FedAvgM,
     'fedadam': FedAdam,
-    'zerofill': ZeroFill,
 }
 
 __all__ = [
-    'MergeBase', 'Ours', 'FedAvg', 'FedAvgM', 'FedAdam', 'ZeroFill',
+    'MergeBase', 'Ours', 'FedAvg', 'FedAvgOld', 'FedAvgM', 'FedAdam',
     'MERGE_REGISTRY', 'build_merger',
 ]
 

@@ -10,3 +10,4 @@ dependencies:
       - openpyxl
       - torch
       - torchvision
+      - scipy

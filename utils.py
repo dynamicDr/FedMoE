@@ -109,12 +109,26 @@ def _kv_df(data):
     return pd.DataFrame({'Key': list(data.keys()), 'Value': [str(v) for v in data.values()]})
 
 
+def _ensure_tmpdir():
+    tmp = os.environ.get('TMPDIR') or os.environ.get('TMP') or '/tmp'
+    os.makedirs(tmp, exist_ok=True)
+    return tmp
+
+
+def _to_excel(df, path, sheet_name):
+    _ensure_tmpdir()
+    try:
+        df.to_excel(path, sheet_name=sheet_name, index=False)
+    except OSError as exc:
+        print(f'[Export] skip xlsx ({path}: {exc})')
+
+
 def save_rounds(result_dir, records):
     rounds_df = pd.DataFrame(records)
     csv_path = os.path.join(result_dir, 'rounds.csv')
     xlsx_path = os.path.join(result_dir, 'rounds.xlsx')
     rounds_df.to_csv(csv_path, index=False, encoding='utf-8-sig')
-    rounds_df.to_excel(xlsx_path, sheet_name='rounds', index=False)
+    _to_excel(rounds_df, xlsx_path, 'rounds')
     return xlsx_path, csv_path
 
 
@@ -135,8 +149,8 @@ def export_experiment(result_dir, config, records):
     rounds_xlsx, rounds_csv = save_rounds(result_dir, records)
     summary_path = os.path.join(result_dir, 'summary.xlsx')
     config_path = os.path.join(result_dir, 'config.xlsx')
-    _kv_df(summary).to_excel(summary_path, sheet_name='summary', index=False)
-    _kv_df(config).to_excel(config_path, sheet_name='config', index=False)
+    _to_excel(_kv_df(summary), summary_path, 'summary')
+    _to_excel(_kv_df(config), config_path, 'config')
     json_path = os.path.join(result_dir, 'experiment.json')
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump({'summary': summary, 'config': config, 'rounds': records},

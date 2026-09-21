@@ -29,7 +29,7 @@ def get_args():
                    help='Expert selection: ours | posthoc | fedrolex | snip | '
                         'random | routingfreq | magnitude. Default: method preset.')
     p.add_argument('--merge', default=None, choices=sorted(MERGE_REGISTRY),
-                   help='Aggregation: ours | fedavg | fedavgm | fedadam | zerofill. '
+                   help='Aggregation: ours | fedavg | fedavg-old | fedavgm | fedadam. '
                         'Default: method preset.')
     p.add_argument('--dataset',       default='cifar10',
                    choices=['cifar10','cifar100','svhn','tinyimagenet','cinic-10','stl10'])
@@ -39,6 +39,10 @@ def get_args():
     p.add_argument('--backbone',      default='resnet',
                    choices=['resnet', 'vgg11'],
                    help='Shared feature extractor: resnet | vgg11.')
+    p.add_argument('--width_mult',    type=float, default=1.0,
+                   help='Backbone width multiplier only. ResNet base channels '
+                        'are 64-128-256-512; 0.5 -> 32-64-128-256. '
+                        'Expert FFN hidden size stays 512.')
     p.add_argument('--num_experts',   type=int,   default=4)
     p.add_argument('--topk',          type=int,   default=2)
     p.add_argument('--expert_bw',     type=int,   default=10,
@@ -67,12 +71,16 @@ def get_args():
     p.add_argument('--kron_samples',  type=int,   default=256)
     p.add_argument('--probe_batches', type=int,   default=2,
                    help='Probe batches before local training for ours/snip.')
+    p.add_argument('--n_ref', type=int, default=0,
+                   help='Expert refresh interval in rounds. '
+                        '0: auto (=num_experts, so N_ref*K>=M at K=1). '
+                        '<0: disable refresh.')
     p.add_argument('--server_momentum', type=float, default=0.9,
-                   help='FedAvgM server momentum.')
+                   help='FedAvgM server momentum on trainable params.')
     p.add_argument('--server_lr', type=float, default=1.0,
-                   help='FedAvgM server learning rate.')
+                   help='FedAvgM server learning rate on trainable params.')
     p.add_argument('--fedadam_lr', type=float, default=0.01,
-                   help='FedAdam server learning rate.')
+                   help='FedAdam server learning rate on trainable params.')
     p.add_argument('--fedadam_beta1', type=float, default=0.9,
                    help='FedAdam first-moment coefficient.')
     p.add_argument('--fedadam_beta2', type=float, default=0.99,
@@ -147,12 +155,17 @@ def main():
     print(f'\n{"="*66}')
     print(f' {method.name}  ')
     print(f'  Dataset={args.dataset} | beta={args.beta} | '
-          f'Backbone={args.backbone} | Clients={args.num_clients} | '
-          f'Experts={args.num_experts}')
+          f'Backbone={args.backbone} | width_mult={args.width_mult:g} | '
+          f'Clients={args.num_clients} | Experts={args.num_experts}')
     select_name = getattr(getattr(method, 'selector', None), 'name', None)
     merge_name = getattr(getattr(method, 'merger', None), 'name', None)
     if select_name or merge_name:
         print(f'  Select={select_name or "-"} | Merge={merge_name or "-"}')
+    if select_name == 'ours':
+        from methods.Select.ours import resolve_n_ref
+        n_ref_eff = resolve_n_ref(args)
+        n_ref_txt = 'off' if n_ref_eff < 0 else str(n_ref_eff)
+        print(f'  Expert refresh N_ref={n_ref_txt}')
     bw_min, bw_max, expert_bw = resolve_bw_range(args)
     print(f'  Rounds={args.rounds} | LR={args.lr}')
     fading = bw_min < bw_max
@@ -299,6 +312,7 @@ def main():
         'data_root': os.path.abspath(args.data_root),
         'num_clients': args.num_clients,
         'backbone': args.backbone,
+        'width_mult': args.width_mult,
         'num_experts': args.num_experts,
         'topk': args.topk,
         'expert_bw': args.expert_bw,
@@ -319,6 +333,13 @@ def main():
         'agg_lr': args.agg_lr,
         'kron_samples': args.kron_samples,
         'probe_batches': args.probe_batches,
+        'n_ref': int(getattr(args, 'n_ref', 0)),
+        'server_momentum': args.server_momentum,
+        'server_lr': args.server_lr,
+        'fedadam_lr': args.fedadam_lr,
+        'fedadam_beta1': args.fedadam_beta1,
+        'fedadam_beta2': args.fedadam_beta2,
+        'fedadam_tau': args.fedadam_tau,
         'label_smooth': args.label_smooth,
         'seed': args.seed,
         'device': str(device),

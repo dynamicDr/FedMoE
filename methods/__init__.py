@@ -1,12 +1,14 @@
 from methods.bla_fedmoe import BLAFedMoE
 from methods.moe import MoE
 from methods.ours import Ours
+from methods.random import Random
 
 
 METHOD_REGISTRY = {
     'bla-fedmoe': BLAFedMoE,
     'moe': MoE,
     'ours': Ours,
+    'random': Random,
 }
 
 

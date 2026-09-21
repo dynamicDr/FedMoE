@@ -100,6 +100,8 @@ def _ensure_stl10(root):
 
 
 def _ensure_svhn(root):
+    # torchvision.datasets.SVHN 在 root 下直接找 train/test_32x32.mat，
+    # 不进入子目录；因此要把文件放到 data_root/SVHN，并把该目录当作 root 传入。
     svhn_dir = os.path.join(root, 'SVHN')
     os.makedirs(svhn_dir, exist_ok=True)
     files = {
@@ -117,6 +119,7 @@ def _ensure_svhn(root):
         if os.path.exists(dest) and os.path.getsize(dest) > 1024:
             continue
         _download_file(urls, dest, min_bytes=10 * 1024 * 1024)
+    return svhn_dir
 
 
 def _prepare_tinyimagenet(root):
@@ -240,9 +243,12 @@ def get_dataset(name, data_root):
              transforms.ToTensor(),
              transforms.Normalize(mean, std)])
         te = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean, std)])
-        _ensure_svhn(data_root)
-        return (torchvision.datasets.SVHN(data_root, split='train', download=False, transform=tr),
-                torchvision.datasets.SVHN(data_root, split='test',  download=False, transform=te))
+        svhn_dir = _ensure_svhn(data_root)
+        try:
+            return (torchvision.datasets.SVHN(svhn_dir, split='train', download=False, transform=tr),
+                    torchvision.datasets.SVHN(svhn_dir, split='test',  download=False, transform=te))
+        except ImportError as e:
+            raise ImportError('Loading SVHN requires scipy. Install it with: pip install scipy') from e
     raise ValueError(f'Unsupported dataset: {name}')
 
 

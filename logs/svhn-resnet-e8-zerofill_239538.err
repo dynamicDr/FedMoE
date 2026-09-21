@@ -1,0 +1,12 @@
+/userhome/cs3/duanty/miniconda3/lib/python3.13/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.1) or chardet (6.0.0.post1)/charset_normalizer (3.4.4) doesn't match a supported version!
+  warnings.warn(
+Traceback (most recent call last):
+  File "main.py", line 380, in <module>
+    main()
+  File "main.py", line 178, in main
+    train_ds, test_ds = get_dataset(args.dataset, args.data_root)
+  File "/userhome/cs3/duanty/FedMoE/data_utils.py", line 244, in get_dataset
+    return (torchvision.datasets.SVHN(data_root, split='train', download=False, transform=tr),
+  File "/userhome/cs3/duanty/miniconda3/envs/moe/lib/python3.8/site-packages/torchvision/datasets/svhn.py", line 72, in __init__
+    raise RuntimeError("Dataset not found or corrupted. You can use download=True to download it")
+RuntimeError: Dataset not found or corrupted. You can use download=True to download it

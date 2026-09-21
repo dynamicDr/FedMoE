@@ -1,0 +1,14 @@
+---
+description: 新的实验提交脚本必须用 expNN_ 编号
+alwaysApply: true
+---
+
+# 实验脚本编号
+
+之后每写一组新的 Slurm 实验脚本，文件名用 `expNN_描述.sh`，NN 取现有 `exp*.sh` 的最大编号加一。不要覆盖旧的未编号脚本。
+
+当前已有：
+
+- `exp01_e8_baselines.sh`
+
+任务名和 `--output_dir` 也带上同一编号，避免和旧实验日志、结果目录撞名。

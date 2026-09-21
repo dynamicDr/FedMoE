@@ -32,6 +32,7 @@ class FederatedMethod:
             num_experts=self.args.num_experts,
             topk=self.args.topk,
             backbone=getattr(self.args, 'backbone', 'resnet'),
+            width_mult=getattr(self.args, 'width_mult', 1.0),
         ).to(self.device)
 
     def local_train(self, global_model, loader, lr, trainable_expert_ids=None,

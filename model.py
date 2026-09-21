@@ -26,21 +26,36 @@ class BasicBlock(nn.Module):
         return out
 
 
+# Base stage widths. width_mult=1 keeps 64-128-256-512;
+# width_mult=0.5 becomes 32-64-128-256. Experts are not scaled.
+RESNET_STAGE_WIDTHS = (64, 128, 256, 512)
+EXPERT_HIDDEN = 512
+
+
+def scale_channels(channels, width_mult):
+    mult = float(width_mult)
+    if mult <= 0:
+        raise ValueError(f'width_mult must be positive, got {width_mult}')
+    return tuple(max(1, int(round(float(c) * mult))) for c in channels)
+
+
 class ResNetBackbone(nn.Module):
-    def __init__(self, in_channels, img_size):
+    def __init__(self, in_channels, img_size, width_mult=1.0):
         super().__init__()
+        c1, c2, c3, c4 = scale_channels(RESNET_STAGE_WIDTHS, width_mult)
         stem_stride = 1 if img_size <= 32 else 2
         self.stem = nn.Sequential(
-            nn.Conv2d(in_channels, 64, 3, stride=stem_stride, padding=1, bias=False),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels, c1, 3, stride=stem_stride, padding=1, bias=False),
+            nn.BatchNorm2d(c1),
             nn.ReLU(inplace=True),
         )
-        self.layer1 = self._make_layer(64,  64,  stride=1)
-        self.layer2 = self._make_layer(64,  128, stride=2)
-        self.layer3 = self._make_layer(128, 256, stride=2)
-        self.layer4 = self._make_layer(256, 512, stride=2)
+        self.layer1 = self._make_layer(c1, c1, stride=1)
+        self.layer2 = self._make_layer(c1, c2, stride=2)
+        self.layer3 = self._make_layer(c2, c3, stride=2)
+        self.layer4 = self._make_layer(c3, c4, stride=2)
         self.pool = nn.AdaptiveAvgPool2d(1)
-        self.feat_dim = 512
+        self.feat_dim = c4
+        self.width_mult = float(width_mult)
 
     @staticmethod
     def _make_layer(in_ch, out_ch, stride):
@@ -64,21 +79,27 @@ VGG11_CFG = [64, 'M', 128, 'M', 256, 256, 'M', 512, 512, 'M', 512, 512, 'M']
 
 
 class VGG11Backbone(nn.Module):
-    def __init__(self, in_channels, img_size):
+    def __init__(self, in_channels, img_size, width_mult=1.0):
         super().__init__()
+        base = [v for v in VGG11_CFG if v != 'M']
+        scaled = {
+            old: new for old, new in zip(base, scale_channels(base, width_mult))
+        }
         layers = []
         ch = in_channels
         for v in VGG11_CFG:
             if v == 'M':
                 layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
                 continue
-            layers.append(nn.Conv2d(ch, v, kernel_size=3, padding=1, bias=False))
-            layers.append(nn.BatchNorm2d(v))
+            out_ch = scaled[v]
+            layers.append(nn.Conv2d(ch, out_ch, kernel_size=3, padding=1, bias=False))
+            layers.append(nn.BatchNorm2d(out_ch))
             layers.append(nn.ReLU(inplace=True))
-            ch = v
+            ch = out_ch
         self.features = nn.Sequential(*layers)
         self.pool = nn.AdaptiveAvgPool2d(1)
-        self.feat_dim = 512
+        self.feat_dim = ch
+        self.width_mult = float(width_mult)
         # img_size kept for the same constructor signature as ResNetBackbone.
 
     def forward(self, x):
@@ -93,7 +114,7 @@ BACKBONES = {
 }
 
 
-def build_backbone(name, in_channels, img_size):
+def build_backbone(name, in_channels, img_size, width_mult=1.0):
     key = str(name).lower()
     try:
         cls = BACKBONES[key]
@@ -101,7 +122,7 @@ def build_backbone(name, in_channels, img_size):
         raise ValueError(
             f'Unknown backbone: {name}. Available: {sorted(BACKBONES)}'
         ) from exc
-    return cls(in_channels, img_size)
+    return cls(in_channels, img_size, width_mult=width_mult)
 
 
 class ExpertFFN(nn.Module):
@@ -157,12 +178,18 @@ class MoELayer(nn.Module):
 
 class MoEFedModel(nn.Module):
     def __init__(self, in_channels, num_classes, img_size, num_experts, topk,
-                 backbone='resnet'):
+                 backbone='resnet', width_mult=1.0):
         super().__init__()
         self.backbone_name = str(backbone).lower()
-        self.backbone = build_backbone(self.backbone_name, in_channels, img_size)
+        self.width_mult = float(width_mult)
+        self.backbone = build_backbone(
+            self.backbone_name, in_channels, img_size, width_mult=self.width_mult,
+        )
         feat_dim = self.backbone.feat_dim
-        self.moe_head = MoELayer(feat_dim, 512, num_classes, num_experts, topk)
+        # Expert FFN hidden size stays fixed; only the backbone is scaled.
+        self.moe_head = MoELayer(
+            feat_dim, EXPERT_HIDDEN, num_classes, num_experts, topk,
+        )
 
     def forward(self, x):
         feat = self.backbone(x)
