@@ -14,6 +14,11 @@
 
 %以下为我自己使用的包
 \usepackage{duckuments}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newcommand{\xxx}{XXX}%本文方法名称
+
 \begin{document}
 
 \title{Conference Paper Title*\\
@@ -106,13 +111,11 @@ We propose a Proactive Channel-Aware Optimization for wireless federated MoE lea
 \end{figure}
 
 \section{Methodology}
-\label{sec:methodology}
 As shwon in figure~\ref{Workflow}, we present a channel-aware probe-before-train framework for federated MoE learning. The key idea is to move expert selection before local backpropagation: the wireless channel determines how many expert updates can be uploaded, while lightweight router probing identifies which experts are worth training. Hence, each client trains only the experts that are both useful for its local data and feasible for uplink transmission.
 
 \subsection{System Model}
-%We consider a channel-aware federated learning problem for training a mixture-of-experts (MoE) model over wireless edge clients under heterogeneous data distributions and uplink communication constraints.
 
-Federated learning (FL) is a distributed collaborative training paradigm in which multiple clients jointly learn a shared global model without exposing their raw data to the server. Let $\mathcal{I}=\left \{ 1,2,\dots ,n \right \} $ denote the set of participating clients, and let $\mathcal{D}_i$ be the local dataset of client $i \in \mathcal{I}$ with size $n_i$. The standard FL objective is to minimize a weighted empirical risk over all clients:
+Federated learning (FL) is a distributed collaborative training paradigm in which multiple clients jointly learn a shared global model without exposing their raw data to the server. Federated learning proceeds iteratively between local training on edge clients and model aggregation on the server. In each communication round, the server first distributes the current global model to the clients participating in training. Then, each client trains its local model using its private local data and uploads the local model parameters or model updates to the server. After receiving updates from multiple clients, the server generates a new global model according to the aggregation strategy and sends it back to the clients for the next round of training. Let $\mathcal{I}=\left \{ 1,2,\dots ,n \right \} $ denote the set of participating clients, and let $\mathcal{D}_i$ be the local dataset of client $i$. The global objective is to minimize a weighted empirical risk over all clients:
 \begin{equation}
 \min_{\boldsymbol{\theta}} F(\boldsymbol{\theta})
 =
@@ -122,363 +125,306 @@ F_i(\boldsymbol{\theta}),
 \quad
 n=\sum_{i\in\mathcal{I}} n_i ,
 \end{equation}
-where $F_i(\boldsymbol{\theta})$ denotes the empirical loss evaluated on $\mathcal{D}_i$.
+where $F_i(\boldsymbol{\theta})$ denotes the empirical loss evaluated on $\mathcal{D}_i$. 
 
-We consider an MoE-based global model, where multiple expert subnetworks are coordinated by a gating module. For an input sample $x$, the gate at MoE layer $\ell$ of client $i$ in communication round $r$ outputs a routing vector:
+Mixture-of-Experts (MoE) models use multiple expert modules and a gating network to enable conditional computation. For each input, the gate assigns routing weights to experts, allowing expert specialization and increasing the effective model capacity. In FL, MoE can naturally accommodate heterogeneous client data distributions. For client $i$ at communication round $r$, the gating output of the $\ell$-th MoE layer for input $x$ is defined as
 \begin{equation}
 \mathbf{g}_{i,\ell}^{(r)}(x)
 =
 \bigl(
 g_{i,\ell,1}^{(r)}(x),
 \ldots,
-g_{i,\ell,E_\ell}^{(r)}(x)
+g_{i,\ell,e_\ell}^{(r)}(x)
 \bigr),
 \end{equation}
-where $g_{i,\ell,e}^{(r)}(x)$ represents the routing preference assigned to expert $e$ among the $E_\ell$ experts in layer $\ell$. These routing statistics reflect the data-dependent importance of different experts and can be used to guide expert selection under limited communication resources.
+where $g_{i,\ell,j}^{(r)}(x)$ represents the gating weight assigned to expert $j$ among the $e_\ell$ experts in the $\ell$-th MoE layer. For simplicity, we assume that $g_{i,\ell,j}^{(r)}(x)$ has been normalized within each MoE layer, and use $g_{i,j}^{(r)}(x)$ to denote the gating weight assigned to the $j$-th expert module of client $i$.
 
-In each round, due to the channel-dependent uplink budget $B_i^{(r)}$, client $i$ can only train and upload a subset of expert parameters. Let $\mathcal{S}_i^{(r)}$ denote the selected expert set, $c_j$ be the upload cost of expert $j$, and $c_{\rm sh}$ be the cost of shared parameters. The channel-aware expert selection problem with starvation avoidance can be formulated as:
+%=========================================
+We study an edge FL framework for training a MoE model over edge clients with heterogeneous local data distributions and limited uplink communication resources. Due to the uplink transmission budget $B_i^{(r)}$, client $i$ is allowed to upload only a subset of expert parameters in communication round $r$. Let $\mathcal{E}=\{1,2,\ldots,n_e\}$ denote the set of expert modules, where $n_e$ is the total number of experts. For each client $i$, our objective is to find a feasible set of experts that satisfies the uplink communication budget while maximizing the local expert utilization:
 \begin{equation}
+\label{optimization objective}
 \begin{aligned}
-\max_{\{\mathcal{S}_i^{(r)}\}_{i\in\mathcal{I}}}
+\mathcal{S}_i^{(r),\star}
+=
+\arg\max_{\mathcal{S}\subseteq \mathcal{E}}
+\quad &
+\sum_{j\in \mathcal{S}}\mu_{i,j}^{(r)}
+\\
+\mathrm{s.t.}
 \quad
 &
-\sum_{i\in\mathcal{I}}
-\sum_{j\in \mathcal{S}_i^{(r)}}
-\mu_{i,j}^{(r)}
-\\
-\text{s.t.}
-\quad
-&
-\sum_{j\in \mathcal{S}_i^{(r)}} c_j + c_{\rm sh}
-\le B_i^{(r)},
-\quad \forall i\in\mathcal{I},
-\\
-&
-r-\tau_{i,j}^{(r)} \le N,
-\quad \forall i\in\mathcal{I},\ \forall j,
-\\
-&
-\mathcal{S}_i^{(r)} \subseteq \mathcal{E},
-\quad \forall i\in\mathcal{I},
+\sum_{j\in \mathcal{S}} c_j + c_{\rm sh}
+\le B_i^{(r)} ,
 \end{aligned}
 \end{equation}
-where $\mu_{i,j}^{(r)}$ denotes the estimated utility of expert $j$ on client $i$, $\tau_{i,j}^{(r)}$ is the most recent round before $r$ in which expert $j$ was selected by client $i$, $N$ is the maximum allowable staleness interval, and $\mathcal{E}$ denotes the full expert set.
+where $\mu_{i,j}^{(r)}=\mathbb{E}_{x\sim\mathcal{D}_i}[g_{i,j}^{(r)}(x)]$ denotes the expected utilization of expert $j$ by client $i$, $c_j$ denotes the upload cost of expert $j$, and $c_{\rm sh}$ denotes the upload cost of the shared parameters. By introducing a binary selection variable $z_{i,j}^{(r)}$, Eqn.~\eqref{optimization objective} can be equivalently formulated as a 0-1 knapsack problem:
+\begin{equation}
+\label{eq:knapsack_general}
+\begin{aligned}
+\{z_{i,j}^{(r),\star}\}_{j=1}^{n_e}
+=
+\arg\max_{\{z_{i,j}^{(r)}\}_{j=1}^{n_e}}
+\quad &
+\sum_{j=1}^{n_e} z_{i,j}^{(r)} \mu_{i,j}^{(r)}
+\\
+\mathrm{s.t.}
+\quad &
+\sum_{j=1}^{n_e} z_{i,j}^{(r)} c_j
+\le C_i^{(r)},
+\\
+&
+z_{i,j}^{(r)}\in\{0,1\},
+\quad j=1,\ldots,n_e ,
+\end{aligned}
+\end{equation}
+where $C_i^{(r)} = B_i^{(r)} - c_{\rm sh}$. The selected expert subset for client $i$ in communication round $r$ is then given by
+\begin{equation}
+    \mathcal{S}_i^{(r),\star}
+    =
+    \left\{j\,:\, z_{i,j}^{(r),\star}=1\right\}.
+\end{equation}
 
-\subsection{Channel-Constrained Expert Feasibility}
+\subsection{Adaptive Channel-Aware Expert Uploading}
+\label{subsec:proactive_channel_aware}
+Solving the knapsack problem in Eqn.~\eqref{eq:knapsack_general} requires each client to obtain the expected utilization $\mu_{i,j}^{(r)}$ of every expert at each communication round. Although the exact value of $\mu_{i,j}^{(r)}$ offers a precise characterization of client-specific expert preferences, evaluating it over the entire local dataset incurs significant computational overhead and latency on resource-constrained edge clients, especially when such evaluation is performed repeatedly across rounds. To reduce this overhead, we propose an adaptive channel-aware expert uploading mechanism in \xxx, which incrementally estimates expert utilizations from probe mini-batches and employs a lightweight DP oracle to determine the expert set to upload in the current round.
 
-Consider a federated system with clients $\mathcal{N}=\{1,\ldots,N\}$. The global MoE model consists of shared parameters, router parameters, and $M$ expert blocks:
+Specifically, let $Y_{i,j,m}^{(r)}$ denote the observed utilization of expert $j$ at probing step $m$. It is computed as the average normalized gating weight assigned to expert $j$ over the samples in the probing mini-batch:
 \begin{equation}
-\theta=
-\left(
-\theta_{\mathrm{sh}},
-\theta_{\mathrm{rt}},
-\{\theta_j\}_{j=1}^{M}
-\right).
-\end{equation}
-At communication round $r$, client $i$ has an uplink budget $B_i^{(r)}$, determined by its current wireless channel state. Let $c_j$ be the upload cost of expert block $j$, and let $c_{\mathrm{sh}}$ be the cost of uploading the shared and router updates. The feasible expert subsets are
-\begin{equation}
-\mathcal{F}_i^{(r)}
+Y_{i,j,m}^{(r)}
 =
-\left\{
-S\subseteq [M]:
-\sum_{j\in S} c_j
-\le
-B_i^{(r)}-c_{\mathrm{sh}}
-\right\}.
-\label{eq:feasible_set}
+\frac{1}{|\mathcal{B}_{i,m}^{(r)}|}
+\sum_{x\in \mathcal{B}_{i,m}^{(r)}}
+g_{i,j}^{(r)}(x),
 \end{equation}
-If all experts have the same size $c_{\mathrm{ex}}$, this reduces to a cardinality constraint with
+where $\mathcal{B}_{i,m}^{(r)} \subseteq \mathcal{D}_i$ denotes the probing mini-batch sampled at probing step $m$. By randomly sampling $\mathcal{B}_{i,m}^{(r)}$ from the local dataset $\mathcal{D}_i$, $Y_{i,j,m}^{(r)}$ provides an unbiased estimate of the expected expert utilization $\mu_{i,j}^{(r)}$. Client $i$ then computes the empirical utilization estimate
 \begin{equation}
-K_i^{(r)}
+\widehat{\mu}_{i,j}^{(r)}(m)
 =
-\left\lfloor
-\frac{B_i^{(r)}-c_{\mathrm{sh}}}{c_{\mathrm{ex}}}
-\right\rfloor .
-\label{eq:uploadable_k}
+\frac{1}{m}
+\sum_{b=1}^{m} Y_{i,j,b}^{(r)} ,
 \end{equation}
-Thus, the physical layer specifies the feasible budget, whereas the learning layer selects the actual expert subset.
-
-\subsection{Probe-Before-Train Expert Identification}
-
-A conventional train-then-upload strategy first trains all locally activated experts and then uploads only a subset of them. Although it reduces communication, it still computes gradients for experts that are eventually discarded. To avoid such wasted computation, we let each client perform lightweight probing before local training.
-
-Specifically, client $i$ samples a few local mini-batches and only runs forward routing to estimate expert utilities. For expert $j$, let $h_{i,j}^{(r)}(x)\in[0,1]$ denote a utility proxy, such as the soft gating weight, Top-$k$ activation indicator, or executed token ratio. The true local utility is
+and the corresponding confidence interval is given by
+\begin{align}
+L_{i,j}^{(r)}(m)
+&=
+\widehat{\mu}_{i,j}^{(r)}(m)
+-
+\beta_{i,j}^{(r)}(m),
+\\
+U_{i,j}^{(r)}(m)
+&=
+\widehat{\mu}_{i,j}^{(r)}(m)
++
+\beta_{i,j}^{(r)}(m),
+\end{align}
+where $\beta_{i,j}^{(r)}(m)$ is the confidence radius. Unlike Hoeffding-type radii~\cite{auer2002finite}, UCB-V-style empirical Bernstein radii~\cite{audibert2009exploration} adapt to the empirical variance of each expert, yielding tighter bounds for low-variance experts while maintaining sufficient exploration for high-variance ones. Accordingly, we use the following empirical-Bernstein confidence radius:
 \begin{equation}
-\mu_{i,j}^{(r)}
-=
-\mathbb{E}_{x\sim\mathcal{D}_i}
-\left[
-h_{i,j}^{(r)}(x)
-\right].
-\label{eq:utility}
-\end{equation}
-For the $b$-th probing mini-batch with token set $\mathcal{T}_{i,b}$, the observation of expert $j$ is
-\begin{equation}
-Y_{i,j,b}^{(r)}
-=
-\frac{1}{|\mathcal{T}_{i,b}|}
-\sum_{t\in\mathcal{T}_{i,b}}
-h_{i,j}^{(r)}(t).
-\label{eq:batch_obs}
-\end{equation}
-Since the router typically computes scores for all experts before Top-$k$ routing, one probing pass yields the full vector
-\begin{equation}
-\mathbf{Y}_{i,b}^{(r)}
-=
-\left(
-Y_{i,1,b}^{(r)},\ldots,Y_{i,M,b}^{(r)}
-\right),
-\end{equation}
-which gives vector full-information feedback rather than single-arm bandit feedback. After $n$ probing batches,
-\begin{equation}
-\widehat{\mu}_{i,j}^{(r)}(n)
-=
-\frac{1}{n}
-\sum_{b=1}^{n}
-Y_{i,j,b}^{(r)} .
-\label{eq:emp_mean}
-\end{equation}
-The target expert subset is the best feasible combination:
-\begin{equation}
-S_i^{\star,(r)}
-=
-\arg\max_{S\in\mathcal{F}_i^{(r)}}
-\sum_{j\in S}\mu_{i,j}^{(r)} .
-\label{eq:cpe}
-\end{equation}
-For equal-size experts, this becomes a Top-$K_i^{(r)}$ identification problem.
-
-\subsection{Confidence-Based Stopping and Expert Refreshing}
-
-To reduce probing overhead, each client stops probing once the selected experts are sufficiently separated from the unselected ones. We maintain an empirical-Bernstein confidence interval
-\begin{equation}
-L_{i,j}^{(r)}(n)
-=
-\widehat{\mu}_{i,j}^{(r)}(n)-\beta_{i,j}^{(r)}(n),
-\quad
-U_{i,j}^{(r)}(n)
-=
-\widehat{\mu}_{i,j}^{(r)}(n)+\beta_{i,j}^{(r)}(n),
-\end{equation}
-where, under full-information feedback,
-\begin{equation}
-\beta_{i,j}^{(r)}(n)
+\beta_{i,j}^{(r)}(m)
 =
 \sqrt{
 \frac{
-2\widehat{V}_{i,j}^{(r)}(n)\log n
-}{n}
+2\widehat{\sigma}_{i,j}^{(r)}(m)\log m
+}{m}
 }
 +
-\frac{3\log n}{n}.
-\label{eq:beta}
+\frac{3\log m}{m},
 \end{equation}
-Here $\widehat{V}_{i,j}^{(r)}(n)$ is the empirical variance of expert $j$'s observations. For equal-size experts, let
+where $\widehat{\sigma}_{i,j}^{(r)}(m)$ is the empirical variance of 
+$\{Y_{i,j,b}^{(r)}\}_{b=1}^{m}$. 
+
+The resulting empirical estimates are then used as surrogate utilities to determine the set of experts uploaded under the current uplink budget. Let $V_{i,m}^{(r)}(j,q)$ denote the maximum empirical utility obtained byselecting a subset from the first $j$ experts under upload budget $q$, where $q=0,1,\ldots,C_i^{(r)}$. The candidate empirical utility associated with including expert $j$ under budget $q$ is defined as
 \begin{equation}
-\widehat{S}_{i}^{(r)}(n)
+\label{eq:dp_take_value_xxx}
+T_{i,m}^{(r)}(j,q)
 =
-\operatorname{Top}K_i^{(r)}
+V_{i,m}^{(r)}(j-1,q-c_j)
++
+\widehat{\mu}_{i,j}^{(r)}(m),
+\end{equation}
+and the DP recursion is then given by
+\begin{equation}
+\label{eq:dp_recursion_empirical_xxx}
+V_{i,m}^{(r)}(j,q)
+=
+\begin{cases}
+V_{i,m}^{(r)}(j-1,q), & q<c_j,\\
+\max\{V_{i,m}^{(r)}(j-1,q),T_{i,m}^{(r)}(j,q)\}, & q\geq c_j ,
+\end{cases}
+\end{equation}
+with initialization $V_{i,m}^{(r)}(0,q)=0$, for $q=0,1,\ldots,C_i^{(r)}$. 
+
+The selected empirical expert subset $\widehat{\mathcal{S}}_{i,m}^{(r)}$ is recovered by traversing the DP table in reverse and inferring the inclusion decisions from the optimal value differences. With the initial state $(j,q)=(n_e,C_i^{(r)})$, expert $j$ is selected if
+\begin{equation}
+\label{eq:dp_backtracking_condition_xxx}
+V_{i,m}^{(r)}(j,q)
+\neq
+V_{i,m}^{(r)}(j-1,q),
+\end{equation}
+in which case the remaining budget is updated as
+\begin{equation}
+\label{eq:dp_backtracking_budget_update_xxx}
+q \leftarrow q-c_j .
+\end{equation}
+Otherwise, expert $j$ is not selected. In either case, the index is decremented as $j \leftarrow j-1$, and the backtracking continues until $j=0$.
+
+After obtaining the current empirical expert subset $\widehat{\mathcal{S}}_{i,m}^{(r)}$, client $i$ evaluates whether this subset is sufficiently reliable under the current confidence intervals. Since the expert uploading problem is a knapsack problem, certifying every selected expert against every unselected expert is overly restrictive and does not directly characterize the stability of the selected subset. Meanwhile, certifying the current solution against all feasible competing subsets would require solving an additional knapsack-type optimization problem at each probing step. Therefore, \xxx further adopts a lightweight local confidence certification criterion based on feasible single-swap alternatives. Let $\mathcal{F}_i^{(r)}$ denote the collection of all feasible expert subsets under the current uplink budget:
+\begin{equation}
+\label{eq:feasible_subset_family_xxx}
+\mathcal{F}_i^{(r)}
+=
+\left\{
+\mathcal{S}\subseteq \mathcal{E}
+:
+\sum_{j\in\mathcal{S}} c_j
+\leq C_i^{(r)}
+\right\}.
+\end{equation}
+For the current empirical solution $\widehat{\mathcal{S}}_{i,m}^{(r)}$, its lower-confidence utility is defined as
+\begin{equation}
+\label{eq:selected_subset_lcb_xxx}
+\mathrm{LCB}_{i,m}^{(r)}
 \left(
-\{\widehat{\mu}_{i,j}^{(r)}(n)\}_{j=1}^{M}
-\right).
+\widehat{\mathcal{S}}_{i,m}^{(r)}
+\right)
+=
+\sum_{j\in \widehat{\mathcal{S}}_{i,m}^{(r)}}
+L_{i,j}^{(r)}(m).
 \end{equation}
-The probing stage terminates if
+For any feasible subset $\mathcal{S}\in \mathcal{F}_i^{(r)}$, its upper-confidence utility is defined as
 \begin{equation}
-\min_{j\in\widehat{S}_{i}^{(r)}(n)}
-L_{i,j}^{(r)}(n)
+\label{eq:competing_subset_ucb_xxx}
+\mathrm{UCB}_{i,m}^{(r)}(\mathcal{S})
+=
+\sum_{j\in \mathcal{S}}
+U_{i,j}^{(r)}(m).
+\end{equation}
+Instead of comparing the current solution with all feasible subsets in $\mathcal{F}_i^{(r)}$, \xxx only considers its feasible single-swap neighborhood. For any selected expert $a\in\widehat{\mathcal{S}}_{i,m}^{(r)}$ and any unselected expert $b\in\mathcal{E}\setminus\widehat{\mathcal{S}}_{i,m}^{(r)}$, define
+\begin{equation}
+\label{eq:single_swap_subset_xxx}
+\mathcal{S}_{a,b}
+=
+\widehat{\mathcal{S}}_{i,m}^{(r)}
+\setminus \{a\}
+\cup \{b\}.
+\end{equation}
+Then, the feasible single-swap neighborhood is
+\begin{equation}
+\label{eq:single_swap_neighbor_xxx}
+\mathcal{N}
+\left(
+\widehat{\mathcal{S}}_{i,m}^{(r)}
+\right)
+=
+\left\{
+\mathcal{S}_{a,b}
+:
+\mathcal{S}_{a,b}\in\mathcal{F}_i^{(r)}
+\right\},
+\end{equation}
+where $a$ and $b$ range over
+$a\in\widehat{\mathcal{S}}_{i,m}^{(r)}$ and
+$b\in\mathcal{E}\setminus\widehat{\mathcal{S}}_{i,m}^{(r)}$, respectively.
+The probing process terminates if
+\begin{equation}
+\label{eq:single_swap_stop_xxx}
+\mathrm{LCB}_{i,m}^{(r)}
+\left(
+\widehat{\mathcal{S}}_{i,m}^{(r)}
+\right)
 >
-\max_{q\notin\widehat{S}_{i}^{(r)}(n)}
-U_{i,q}^{(r)}(n),
-\label{eq:stop}
+\max_{\mathcal{S}\in
+\mathcal{N}
+\left(
+\widehat{\mathcal{S}}_{i,m}^{(r)}
+\right)}
+\mathrm{UCB}_{i,m}^{(r)}(\mathcal{S}),
 \end{equation}
-or when a maximum probing budget $N_{\max}$ is reached. For general heterogeneous expert sizes, the Top-$K$ rule is replaced by maximizing $\sum_{j\in S}\widehat{\mu}_{i,j}^{(r)}(n)$ over $S\in\mathcal{F}_i^{(r)}$.
+or if the maximum probing budget $M_{\max}$ is reached. This condition states that, even under the most pessimistic utility estimate of the selected subset and the most optimistic utility estimate of any feasible single-swap alternative, the current empirical solution remains strictly better. Therefore, the selected expert subset passes a local confidence-based stability test under the current confidence intervals. Compared with exact subset-level certification over $\mathcal{F}_i^{(r)}$, the proposed single-swap stopping rule avoids enumerating all feasible subsets or invoking an additional knapsack DP oracle. Its evaluation only requires checking pairwise replacements between selected and unselected experts, leading to a complexity of $O(|\widehat{\mathcal{S}}_{i,m}^{(r)}|(n_e-|\widehat{\mathcal{S}}_{i,m}^{(r)}|))$ in the worst case. Although this local rule does not certify global optimality over the entire feasible family $\mathcal{F}_i^{(r)}$, it provides an efficient confidence-based stability test and is complemented by the hard probing limit $M_{\max}$.
 
-Pure utility-based selection may starve low-frequency experts. Therefore, each client maintains $\tau_{i,j}^{(r)}$, the latest round in which expert $j$ was locally trained. Given a refresh interval $N_{\mathrm{ref}}$, the mandatory set is
+Finally, suppose the probing process terminates at $m=m_i^{(r)}$. Client
+$i$ then outputs the empirical DP solution as its upload expert subset:
 \begin{equation}
-\mathcal{M}_i^{(r)}
+\label{eq:final_selected_subset_xxx}
+\mathcal{S}_i^{(r)}
 =
-\left\{
-j:r-\tau_{i,j}^{(r)}\ge N_{\mathrm{ref}}
-\right\}.
+\widehat{\mathcal{S}}_{i,m_i^{(r)}}^{(r)} .
 \end{equation}
-If $|\mathcal{M}_i^{(r)}|\le K_i^{(r)}$, all mandatory experts are selected first, and the remaining budget is filled using the highest estimated utilities. Otherwise, the client selects the $K_i^{(r)}$ stalest experts in $\mathcal{M}_i^{(r)}$. After training, $\tau_{i,j}^{(r)}$ is updated for selected experts. A necessary feasibility condition for refreshing every local expert at least once within $N_{\mathrm{ref}}$ rounds is $N_{\mathrm{ref}}K_i\ge M$.
+Only the local updates of experts in $\mathcal{S}_i^{(r)}$ are uploaded to
+the edge server, while the remaining expert updates are skipped in the current
+round. Therefore, \xxx reduces local utilization-evaluation overhead through
+adaptive mini-batch probing and reduces uplink communication overhead through
+channel-aware sparse expert uploading. This design is particularly suitable for
+wireless edge learning scenarios where clients experience heterogeneous and
+time-varying uplink conditions.
 
-\subsection{Sparse Local Training and Aggregation}
+\subsection{Expert-Wise Sparse Expert Aggregation}
 
-Let $\widehat{S}_{i}^{(r)}$ denote the final selected expert subset after probing and refreshing. During local training, client $i$ freezes all unselected experts:
+Since clients may select different expert subsets due to heterogeneous data distributions and time-varying channel budgets, the server performs aggregation in a sparse, expert-wise manner. For expert \(j\), define the set of clients that upload its update in round \(r\) as
 \begin{equation}
-\nabla_{\theta_j}\ell_i^{(r)}=\mathbf{0},
-\quad j\notin \widehat{S}_{i}^{(r)}.
-\end{equation}
-The uploaded update is
-\begin{equation}
-\Delta_i^{(r)}
-=
-\left\{
-\Delta_{\mathrm{sh},i}^{(r)},
-\Delta_{\mathrm{rt},i}^{(r)},
-\Delta_{i,j}^{(r)}:j\in\widehat{S}_{i}^{(r)}
-\right\}.
-\label{eq:upload}
-\end{equation}
-Unselected experts may still remain in the forward graph to preserve the MoE function, but their gradients and optimizer states are not materialized.
-
-At the server, expert aggregation is performed only over clients that upload the corresponding expert. Define
-\begin{equation}
+\label{eq:client_set_expert}
 \mathcal{C}_j^{(r)}
 =
 \left\{
-i:j\in\widehat{S}_{i}^{(r)}
-\right\}.
+i\in\mathcal{I}^{(r)}:
+j\in\widehat{\mathcal{S}}_i^{(r)}
+\right\},
 \end{equation}
-The global update for expert $j$ is
+where \(\mathcal{I}^{(r)}\) is the set of clients participating in round \(r\). The server aggregates expert \(j\) only over \(\mathcal{C}_j^{(r)}\), rather than treating missing expert updates as zeros. Specifically, the aggregated expert update is
 \begin{equation}
+\label{eq:expert_sparse_agg}
 \Delta_j^{(r)}
 =
 \frac{
 \sum_{i\in\mathcal{C}_j^{(r)}}
-w_{i,j}^{(r)}\Delta_{i,j}^{(r)}
+\omega_{i,j}^{(r)}\Delta_{i,j}^{(r)}
 }{
 \sum_{i\in\mathcal{C}_j^{(r)}}
-w_{i,j}^{(r)}
-}.
-\label{eq:expert_agg}
+\omega_{i,j}^{(r)}
+},
+\qquad
+\mathcal{C}_j^{(r)}\ne\varnothing .
 \end{equation}
-We set $w_{i,j}^{(r)}=n_{i,j}^{(r)}$, where $n_{i,j}^{(r)}$ is the number of tokens actually executed on expert $j$ at client $i$. The shared and router parameters are aggregated using standard sample-size-weighted federated averaging. This expert-wise aggregation avoids treating missing expert updates as zero updates and better matches the sparse training structure of MoE models under non-IID data.
+If \(\mathcal{C}_j^{(r)}=\varnothing\), expert \(j\) is kept unchanged in the current round. The aggregation weight \(\omega_{i,j}^{(r)}\) should reflect the effective contribution of client \(i\) to expert \(j\). Instead of using only the total local sample size \(n_i\), we adopt the number of tokens actually routed to and executed by expert \(j\), denoted by \(n_{i,j}^{(r)}\), i.e.,
+\begin{equation}
+\label{eq:expert_weight}
+\omega_{i,j}^{(r)} = n_{i,j}^{(r)} .
+\end{equation}
+This expert-aware weighting allows each expert to be mainly updated by clients that have sufficient local evidence for that expert, which is consistent with the conditional-computation structure of MoE models under non-IID data.
 
-\section{Evaluation}
-\label{sec:evaluation}
+The global expert parameters are then updated as
+\begin{equation}
+\label{eq:expert_update}
+\boldsymbol{\theta}_{j}^{(r+1)}
+=
+\boldsymbol{\theta}_{j}^{(r)}
++
+\eta_{\rm g}\Delta_j^{(r)},
+\end{equation}
+where \(\eta_{\rm g}\) is the server-side update step size. For the shared parameters, the server applies standard federated aggregation over all clients that upload the shared update:
+\begin{equation}
+\label{eq:shared_agg}
+\Delta_{\rm sh}^{(r)}
+=
+\frac{
+\sum_{i\in\mathcal{I}^{(r)}}
+n_i\Delta_{{\rm sh},i}^{(r)}
+}{
+\sum_{i\in\mathcal{I}^{(r)}} n_i
+},
+\end{equation}
+followed by
+\begin{equation}
+\label{eq:shared_update}
+\boldsymbol{\theta}_{\rm sh}^{(r+1)}
+=
+\boldsymbol{\theta}_{\rm sh}^{(r)}
++
+\eta_{\rm g}\Delta_{\rm sh}^{(r)} .
+\end{equation}
+Finally, the updated shared parameters and expert parameters form the new global MoE model, which is broadcast to clients in the next round. In this way, the proposed method closes the loop from wireless-channel-aware budget construction, to confidence-guided local expert identification, to sparse expert-wise server aggregation.
 
-We evaluate probe-before-train under wireless federated MoE training. Numerical entries are placeholders and will be filled after the experiments are completed.
+\input{evaluation}
 
-\subsection{Experimental Setup}
-
-We use four Dirichlet-partitioned image benchmarks: CIFAR-10/100~\cite{krizhevsky2009learning}, CINIC-10~\cite{darlow2018cinic}, and SVHN~\cite{netzer2011reading}. The shared backbone is ResNet-18~\cite{he2016deep} or VGG11~\cite{simonyan2015very}, each followed by a sparse MoE head of $M=4$ FFN experts and Top-$2$ routing. Local class proportions follow $\mathrm{Dir}(\alpha)$~\cite{hsu2019measuring} with $\alpha\in\{0.1,0.3,0.5\}$.
-
-The uplink follows the standard block-fading Shannon model used in wireless FL~\cite{xu2021client,zhou2022time}. In round $r$, client $i$ draws an independent Rayleigh coefficient $h_i^{(r)}\sim\mathcal{CN}(0,1)$, held constant within the round. With mean SNR $\bar{\gamma}=10$\,dB, the bit budget is $B_i^{(r)}=\bigl\lfloor C\log_2\bigl(1+\bar{\gamma}|h_i^{(r)}|^2\bigr)\bigr\rfloor$, clipped to $[B_{\min},B_{\max}]$. We set $C$ so that a mean-power channel ($|h|^2=1$) maps to the midpoint of this interval, and set the endpoints to the budgets of $K=1$ and $K=M$ experts. All clients participate; the channel only determines how many equal-size experts can be uploaded, with $K_i^{(r)}=\lfloor(B_i^{(r)}-c_{\mathrm{sh}})/c_{\mathrm{ex}}\rfloor$ as in Section~\ref{sec:methodology}. Unless noted, $h_i^{(r)}$ is redrawn every round, so the uplink budget and $K_i^{(r)}\in\{1,\ldots,M\}$ vary over time. We also report a static sweep $K\in\{1,2,3,4\}$.
-
-To isolate the two modules, we freeze the architecture, optimizer, budget, and partition. With Token-Weighted Aggregation fixed, we replace the selector by \textbf{Post-hoc Sparse Upload} (train all routed experts, then keep $K_i^{(r)}$ by the same utility~\cite{konecny2016federated}), \textbf{FedRolex Rolling} (a cyclic window of $K_i^{(r)}$ experts~\cite{alam2022fedrolex}), and \textbf{SNIP} (probe a few mini-batches with backpropagation and rank experts by connection sensitivity~\cite{lee2019snip}). With probe-before-train fixed, we replace the aggregator by sample-size-weighted \textbf{FedAvg}~\cite{mcmahan2017communication}, \textbf{FedAvgM} (server momentum~\cite{hsu2019measuring}), and \textbf{FedAdam}~\cite{reddi2021adaptive}. Missing expert updates are skipped rather than imputed as zeros. Table~\ref{tab:baselines} summarizes these methods. A method has a value score if it ranks experts by an explicit utility before deciding which ones to train or upload.
-
-\begin{table*}[!t]
-\caption{Compared methods. Value score: whether expert selection uses an explicit utility ranking.}
-\label{tab:baselines}
-\centering
-\renewcommand{\arraystretch}{1.18}
-\footnotesize
-\begin{tabular}{|l|p{7.4cm}|c|c|}
-\hline
-\textbf{Name} & \textbf{Description} & \textbf{Reference} & \textbf{Value score} \\
-\hline
-\multicolumn{4}{|l|}{\textit{Expert selection}} \\
-\hline
-Probe-before-train (Ours)
-& Forward-only probing of soft gate utilities; train and upload the Top-$K_i^{(r)}$ experts.
-& Proposed
-& Yes \\
-\hline
-Post-hoc Sparse Upload
-& Train all routed experts, then upload Top-$K_i^{(r)}$ by the same gate utility.
-& \cite{konecny2016federated}
-& Yes \\
-\hline
-FedRolex Rolling
-& Cycle a window of $K_i^{(r)}$ consecutive experts across rounds, without a utility score.
-& \cite{alam2022fedrolex}
-& No \\
-\hline
-SNIP
-& Probe a few mini-batches with backpropagation; rank experts by $\lvert w\odot\nabla_w\ell\rvert$, then train/upload Top-$K$.
-& \cite{lee2019snip}
-& Yes \\
-\hline
-\multicolumn{4}{|l|}{\textit{Aggregation}} \\
-\hline
-Token-Weighted (Ours)
-& Skip missing experts; weight uploaded expert tensors by routed-token counts.
-& Proposed
-& --- \\
-\hline
-FedAvg
-& Sample-size-weighted average of uploaded tensors; skip missing experts.
-& \cite{mcmahan2017communication}
-& --- \\
-\hline
-FedAvgM
-& Skip-missing FedAvg, then apply server momentum only to uploaded tensors.
-& \cite{hsu2019measuring}
-& --- \\
-\hline
-FedAdam
-& Skip-missing FedAvg, then apply server Adam only to uploaded tensors.
-& \cite{reddi2021adaptive}
-& --- \\
-\hline
-\end{tabular}
-\end{table*}
-
-Unless noted, $N=10$ clients join each of 100 rounds, with 2 local epochs, batch size 64, and SGD (momentum $0.9$, weight decay $10^{-4}$, learning rate $0.01$). Probing uses up to 2 forward mini-batches and may stop early via~\eqref{eq:stop}. The refresh interval satisfies $N_{\mathrm{ref}}K_i\ge M$. Shared and router parameters are always uploaded.
-
-\subsection{Main Results}
-
-Fig.~\ref{fig:main_acc} reports test accuracy under $\alpha=0.1$ and a time-varying uplink, on both ResNet-18 and VGG11. The proposed method is the strongest budgeted federated MoE approach on all four datasets, with an average margin of $xx.x$ points over the second-best baseline. The gain holds on both coarse (CIFAR-10, CINIC-10, SVHN) and fine-grained (CIFAR-100) tasks. Post-hoc Sparse Upload trails under the same instantaneous $K_i^{(r)}$: experts that cannot be transmitted still consume local gradients, so the trained trajectory is misaligned with the sparse update that enters aggregation. Under the same uplink cardinality, the proposed method reduces local expert-training cost by $xx.x\%$ relative to Post-hoc Sparse Upload, which still backpropagates through all activated experts.
-
-\begin{figure*}[!t]
-\centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.6cm}
-{\small Placeholder for accuracy curves across four datasets and two backbones under $\alpha=0.1$.}\\[0.4em]
-{\scriptsize Proposed method, Post-hoc Sparse Upload, FedRolex Rolling, SNIP, FedAvg, FedAvgM, and FedAdam.}
-\vspace{2.6cm}}}
-\caption{Test accuracy comparison across CIFAR-10, CIFAR-100, CINIC-10, and SVHN under $\alpha=0.1$, using ResNet-18 and VGG11. Numerical curves will be inserted after experiments.}
-\label{fig:main_acc}
-\end{figure*}
-
-\subsection{Scalability Analysis}
-
-Fig.~\ref{fig:clients} varies the number of clients on CIFAR-10, CIFAR-100, and CINIC-10 with $\alpha=0.1$ and $N\in\{20,35,50\}$. The proposed method remains the strongest among the compared baselines at all three scales. Larger $N$ fragments each local distribution; restricting both training and aggregation to probed, communication-feasible experts avoids mixing inconsistent truncated updates.
-
-\begin{figure*}[!t]
-\centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.4cm}
-{\small Placeholder for accuracy curves at $N\in\{20,35,50\}$ on CIFAR-10, CIFAR-100, and CINIC-10.}
-\vspace{2.4cm}}}
-\caption{Test accuracy under varying numbers of clients with $\alpha=0.1$. Numerical curves will be inserted after experiments.}
-\label{fig:clients}
-\end{figure*}
-
-Fig.~\ref{fig:noniid} varies $\alpha\in\{0.1,0.3,0.5\}$ under the same time-varying uplink. The method is comparable to existing approaches at $\alpha=0.5$ and pulls ahead as the split becomes more skewed. Smaller $\alpha$ peaks local gating, so a few forward passes suffice to identify a feasible expert subset before gradient descent.
-
-Fig.~\ref{fig:budget} varies $K\in\{1,2,3,4\}$ and a time-varying $B_i^{(r)}$. All methods improve as more experts can be transmitted, but the proposed method degrades more slowly at $K\in\{1,2\}$, because~\eqref{eq:feasible_set} is applied before training. Per-round probing also tracks fluctuating channels rather than relying on a static expert allocation.
-
-\begin{figure*}[!t]
-\centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.4cm}
-{\small Placeholder for accuracy curves at $\alpha\in\{0.1,0.3,0.5\}$ on CIFAR-10, CIFAR-100, and CINIC-10.}
-\vspace{2.4cm}}}
-\caption{Test accuracy under varying non-IID levels with a time-varying uplink budget. Numerical curves will be inserted after experiments.}
-\label{fig:noniid}
-\end{figure*}
-
-\begin{figure*}[!t]
-\centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.4cm}
-{\small Placeholder for accuracy curves under $K\in\{1,2,3,4\}$ and a time-varying uplink budget.}
-\vspace{2.4cm}}}
-\caption{Test accuracy under varying uplink budgets with $\alpha=0.1$. Numerical curves will be inserted after experiments.}
-\label{fig:budget}
-\end{figure*}
-
-\subsection{Ablation Studies}
-
-Fig.~\ref{fig:ablation} ablates the two modules on CIFAR-10 and CIFAR-100 under $\alpha\in\{0.1,0.3,0.5\}$. Replacing probe-before-train with Post-hoc, FedRolex Rolling, or SNIP lowers accuracy by $xx.x\%$ / $xx.x\%$ on CIFAR-10 / CIFAR-100 relative to the strongest alternative: a cyclic window covers experts evenly but ignores local utility, post-hoc truncation misaligns trained and uploaded experts, and a backward SNIP probe is more expensive than forward gate scores. Replacing Token-Weighted Aggregation with FedAvg, FedAvgM, or FedAdam drops CIFAR-10 accuracy by $xx.x\%$, $xx.x\%$, and $xx.x\%$. Server momentum and Adam improve over vanilla FedAvg, but neither replaces token-count weights that match sparse MoE routing. Disabling refresh reduces accuracy by $xx.x\%$ and $xx.x\%$, especially at $\alpha=0.1$, since rare experts otherwise starve.
-
-\begin{figure*}[!t]
-\centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.6cm}
-{\small Placeholder for ablation bars: selector variants (Post-hoc, FedRolex, SNIP), aggregator variants (FedAvg, FedAvgM, FedAdam), and w/o expert refresh, on CIFAR-10/100 with $\alpha\in\{0.1,0.3,0.5\}$.}
-\vspace{2.6cm}}}
-\caption{Ablation study of probe-before-train selection, token-weighted aggregation, and expert refreshing. Numerical results will be inserted after experiments.}
-\label{fig:ablation}
-\end{figure*}
 
 \section*{Acknowledgment}
 
