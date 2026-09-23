@@ -1,0 +1,17 @@
+method: Ours
+dataset: cifar100
+clients: 30
+experts: 8
+rounds: 100
+best_acc: 45.77
+
+fig01_test_accuracy: test accuracy and best-so-far vs round
+fig02_train_loss: local training loss vs round
+fig03_acc_and_loss: paper two-panel of (a) accuracy (b) loss
+fig04_bandwidth_and_k: available bandwidth and uploaded expert count
+fig05_expert_round_heatmap: how often each expert is uploaded each round
+fig06_client_expert_heatmap: client-expert upload frequency
+fig07_expert_frequency: overall expert upload histogram
+fig08_time_breakdown: local / aggregation / evaluation time
+fig09_accuracy_vs_communication: accuracy vs cumulative expert uploads
+fig10_overview: four-panel summary figure

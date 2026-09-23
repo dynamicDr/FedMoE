@@ -1,0 +1,2 @@
+smoothing: centered rolling mean, window=21
+faint lines: raw; solid lines: smoothed

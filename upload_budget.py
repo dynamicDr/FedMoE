@@ -49,6 +49,18 @@ def upload_expert_count(bandwidth, expert_bw, num_experts):
     return int(min(num_experts, max(0, int(bandwidth) // expert_bw)))
 
 
+def apply_drop_expert(k, prob, seed, client_id, round_id):
+    """With probability `prob`, upload one fewer expert. K stays at least 0."""
+    k = int(max(0, k))
+    prob = float(prob or 0.0)
+    if k <= 0 or prob <= 0.0:
+        return k
+    rng = _rng(seed, round_id, client_id, 'drop-expert')
+    if float(rng.rand()) < prob:
+        return k - 1
+    return k
+
+
 def random_select_experts(num_experts, k, seed, client_id, round_id, salt):
     k = int(max(0, min(k, num_experts)))
     if k <= 0:

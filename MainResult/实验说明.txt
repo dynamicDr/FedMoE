@@ -1,0 +1,293 @@
+主实验（Main Result）
+====================
+
+本组图是论文主实验的 baseline 对比，来自 exp01（8 专家、带宽随专家数放大）。
+图例方法名：Ours, FedRolex, Random, FedAvg, FedAdam。
+结果目录：主对比为 MainResult/main_<dataset>_<backbone>/，消融为 MainResult/Ablation_<condition>/。主图为 fig01_test_accuracy。
+
+方法名与实现
+------------
+图例      选择器 --select    聚合 --merge     说明
+Ours      ours              ours            探测门控后选 Top-K 专家训练；服务器按路由 token 加权，跳过未上传专家
+FedRolex  fedrolex          ours            滚动窗口选 K 个专家；聚合与 Ours 相同
+Random    random            ours            均匀随机选 K 个专家；聚合与 Ours 相同
+FedAvg    ours              fedavg          选择与 Ours 相同；未上传专家权重填 0，再按样本量对全部客户端平均（原 Zero-fill）
+FedAdam   ours              fedadam         选择与 Ours 相同；skip-missing FedAvg 后，服务器对可训练参数做 Adam
+
+FedAdam 超参（主实验采用 tau=0.01 这一组，不是默认 tau=0.001）
+  --fedadam_lr     0.01
+  --fedadam_beta1  0.9
+  --fedadam_beta2  0.99
+  --fedadam_tau    0.01
+对应结果目录后缀：exp01-*-fedadam-tau1e2
+
+共用训练设置
+------------
+  脚本              exp01_e8_baselines.sh
+  专家数            8
+  Top-K             2
+  客户端            10，每轮全参与 frac=1.0
+  数据划分          Dirichlet beta=0.1
+  通信轮数          100
+  本地 epoch        2
+  batch size        64
+  学习率            0.01，warmup 5 轮，lr_min=1e-4
+  SGD momentum      0.9
+  weight decay      1e-4
+  label smoothing   0.1
+  seed              42
+  骨干宽度          width_mult=1.0
+  专家刷新          n_ref=0（自动 = num_experts = 8）
+  探测 batch        probe_batches=2（ours 选择器用）
+
+带宽
+----
+  expert_bw=10，--bw_max -1  =>  bw=[10, 80]
+  即 K = floor(bw/10) ∈ [1, 8]，上界可上传全部专家。
+  时变：Rayleigh-Shannon，SNR=10 dB。
+
+设置网格
+--------
+  数据集   CIFAR-10, CIFAR-100, SVHN, STL-10
+  骨干     ResNet, VGG11
+  共 4×2=8 组对比，每组 5 条 baseline。
+
+最佳测试精度（%）
+----------------
+设置                         Ours FedRolex   Random   FedAvg  FedAdam
+CIFAR-10 / ResNet        82.23   82.20   79.20   81.02   79.60
+CIFAR-10 / VGG11         81.09   76.08   78.74   78.08   73.49
+CIFAR-100 / ResNet       66.83   62.29   63.68   60.74   58.94
+CIFAR-100 / VGG11        60.91   60.31   60.75   57.95   54.06
+SVHN / ResNet            96.41   96.35   96.47   96.46   96.08
+SVHN / VGG11             95.40   95.42   95.72   95.56   94.95
+STL-10 / ResNet          45.29   41.46   36.79   42.66   35.77
+STL-10 / VGG11           54.58   52.40   53.01   47.40   47.98
+
+原始结果目录
+------------
+每条曲线对应 results/exp01-<dtag>-<backbone>-e8-<method>/ 下的一次完整 100 轮实验。
+method 标签：ours, fedrolex, random, zerofill, fedadam-tau1e2。
+
+未纳入主实验图的 exp01 变体（仅作消融，不在本组图中）
+  FedAdam 默认 tau=0.001
+  FedAdam lr=0.001
+  FedAdam beta2=0.999
+
+[CIFAR-10 / ResNet]  图目录 MainResult/main_cifar10_resnet/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp01-c10-resnet-e8-ours/20260921-052753
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp01-c10-resnet-e8-fedrolex/20260921-052756
+  Random    /userhome/cs3/duanty/FedMoE/results/exp01-c10-resnet-e8-random/20260921-052756
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp01-c10-resnet-e8-zerofill/20260921-052753
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp01-c10-resnet-e8-fedadam-tau1e2/20260921-065743
+
+[CIFAR-10 / VGG11]  图目录 MainResult/main_cifar10_vgg11/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp01-c10-vgg11-e8-ours/20260921-081723
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp01-c10-vgg11-e8-fedrolex/20260921-082015
+  Random    /userhome/cs3/duanty/FedMoE/results/exp01-c10-vgg11-e8-random/20260921-082747
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp01-c10-vgg11-e8-zerofill/20260921-085300
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp01-c10-vgg11-e8-fedadam-tau1e2/20260921-094018
+
+[CIFAR-100 / ResNet]  图目录 MainResult/main_cifar100_resnet/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp01-c100-resnet-e8-ours/20260921-103621
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp01-c100-resnet-e8-fedrolex/20260921-103632
+  Random    /userhome/cs3/duanty/FedMoE/results/exp01-c100-resnet-e8-random/20260921-105050
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp01-c100-resnet-e8-zerofill/20260921-114718
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp01-c100-resnet-e8-fedadam-tau1e2/20260921-121510
+
+[CIFAR-100 / VGG11]  图目录 MainResult/main_cifar100_vgg11/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp01-c100-vgg11-e8-ours/20260921-133836
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp01-c100-vgg11-e8-fedrolex/20260921-133854
+  Random    /userhome/cs3/duanty/FedMoE/results/exp01-c100-vgg11-e8-random/20260921-134805
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp01-c100-vgg11-e8-zerofill/20260921-145210
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp01-c100-vgg11-e8-fedadam-tau1e2/20260921-150136
+
+[SVHN / ResNet]  图目录 MainResult/main_svhn_resnet/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp01-svhn-resnet-e8-ours/20260921-160801
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp01-svhn-resnet-e8-fedrolex/20260921-161341
+  Random    /userhome/cs3/duanty/FedMoE/results/exp01-svhn-resnet-e8-random/20260921-162904
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp01-svhn-resnet-e8-zerofill/20260921-171214
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp01-svhn-resnet-e8-fedadam-tau1e2/20260921-184916
+
+[SVHN / VGG11]  图目录 MainResult/main_svhn_vgg11/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp01-svhn-vgg11-e8-ours/20260921-202952
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp01-svhn-vgg11-e8-fedrolex/20260921-212154
+  Random    /userhome/cs3/duanty/FedMoE/results/exp01-svhn-vgg11-e8-random/20260921-212357
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp01-svhn-vgg11-e8-zerofill/20260921-213234
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp01-svhn-vgg11-e8-fedadam-tau1e2/20260921-231942
+
+[STL-10 / ResNet]  图目录 MainResult/main_stl10_resnet/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp01-stl10-resnet-e8-ours/20260921-235455
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp01-stl10-resnet-e8-fedrolex/20260922-001438
+  Random    /userhome/cs3/duanty/FedMoE/results/exp01-stl10-resnet-e8-random/20260922-003310
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp01-stl10-resnet-e8-zerofill/20260922-005231
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp01-stl10-resnet-e8-fedadam-tau1e2/20260922-012403
+
+[STL-10 / VGG11]  图目录 MainResult/main_stl10_vgg11/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp01-stl10-vgg11-e8-ours/20260922-014116
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp01-stl10-vgg11-e8-fedrolex/20260922-015125
+  Random    /userhome/cs3/duanty/FedMoE/results/exp01-stl10-vgg11-e8-random/20260922-015138
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp01-stl10-vgg11-e8-zerofill/20260922-015915
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp01-stl10-vgg11-e8-fedadam-tau1e2/20260922-021118
+
+exp02（TinyImageNet / CINIC-10）
+==============================
+来自 exp02_tiny_cinic_baselines.sh。方法、超参、带宽与上面 exp01 主实验相同，只换数据集。
+FedAvg / FedAdam 的结果目录后缀是 fedavg、fedadam（FedAdam 仍是 --fedadam_tau 0.01）。
+2 个数据集 × 2 个骨干 × 5 种方法都已跑完，已画入 MainResult。
+
+最佳测试精度（%）
+----------------
+设置                         Ours FedRolex   Random   FedAvg  FedAdam
+TinyImageNet / ResNet    51.63   48.23   48.24   47.55   44.97
+TinyImageNet / VGG11     50.87   49.97   49.66   46.49   46.72
+CINIC-10 / ResNet        73.73   72.26   71.44   71.35   71.04
+CINIC-10 / VGG11         70.55   67.25   68.46   67.66   66.45
+
+[TinyImageNet / ResNet]  图目录 MainResult/main_tinyimagenet_resnet/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp02-tiny-resnet-e8-ours/20260922-053026
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp02-tiny-resnet-e8-fedrolex/20260922-053026
+  Random    /userhome/cs3/duanty/FedMoE/results/exp02-tiny-resnet-e8-random/20260922-053026
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp02-tiny-resnet-e8-fedavg/20260922-053026
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp02-tiny-resnet-e8-fedadam/20260922-100920
+
+[TinyImageNet / VGG11]  图目录 MainResult/main_tinyimagenet_vgg11/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp02-tiny-vgg11-e8-ours/20260922-102409
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp02-tiny-vgg11-e8-fedrolex/20260922-103416
+  Random    /userhome/cs3/duanty/FedMoE/results/exp02-tiny-vgg11-e8-random/20260922-103749
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp02-tiny-vgg11-e8-fedavg/20260922-151011
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp02-tiny-vgg11-e8-fedadam/20260922-152524
+
+[CINIC-10 / ResNet]  图目录 MainResult/main_cinic10_resnet/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp02-cinic-resnet-e8-ours/20260922-160101
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp02-cinic-resnet-e8-fedrolex/20260922-160645
+  Random    /userhome/cs3/duanty/FedMoE/results/exp02-cinic-resnet-e8-random/20260922-194931
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp02-cinic-resnet-e8-fedavg/20260922-202500
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp02-cinic-resnet-e8-fedadam/20260922-215147
+
+[CINIC-10 / VGG11]  图目录 MainResult/main_cinic10_vgg11/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp02-cinic-vgg11-e8-ours/20260922-221558
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp02-cinic-vgg11-e8-fedrolex/20260923-005739
+  Random    /userhome/cs3/duanty/FedMoE/results/exp02-cinic-vgg11-e8-random/20260923-020422
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp02-cinic-vgg11-e8-fedavg/20260923-025421
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp02-cinic-vgg11-e8-fedadam/20260923-030142
+
+exp03 已完成部分（CIFAR-100 / ResNet 规模消融）
+==============================================
+来自 exp03_c100_resnet_scalability.sh。每个条件一张图，图内 5 条 baseline。
+不包含主实验点（带宽 [10, 80]、8 专家、10 终端），该点已在 MainResult/main_cifar100_resnet。
+9 个条件 × 5 种方法都已跑完，已画入 MainResult。
+
+条件
+----
+  bw [10, 40]   8 专家，10 终端，--bw_min 10 --bw_max 40
+  bw [1, 50]    8 专家，10 终端，--bw_min 1  --bw_max 50
+  bw [20, 80]   8 专家，10 终端，--bw_min 20 --bw_max 80
+  4 experts     --bw_max -1 => bw=[10, 40]，10 终端
+  16 experts    --bw_max -1 => bw=[10, 160]，10 终端
+  32 experts    --bw_max -1 => bw=[10, 320]，10 终端
+  20 clients    8 专家，带宽 [10, 80]
+  30 clients    8 专家，带宽 [10, 80]
+  50 clients    8 专家，带宽 [10, 80]
+
+最佳测试精度（%）
+----------------
+设置                              Ours FedRolex   Random   FedAvg  FedAdam
+CIFAR-100 / ResNet, bw [10, 40]  64.37   61.51   59.47   14.86   57.62
+CIFAR-100 / ResNet, bw [1, 50]   64.43   59.08   59.94   10.45   56.64
+CIFAR-100 / ResNet, bw [20, 80]  67.72   63.56   64.63   63.50   58.46
+CIFAR-100 / ResNet, 4 experts    66.31   63.57   63.52   43.62   57.66
+CIFAR-100 / ResNet, 16 experts   66.28   62.91   64.70   64.32   58.02
+CIFAR-100 / ResNet, 32 experts   66.92   62.89   63.35   66.43   58.71
+CIFAR-100 / ResNet, 20 clients   62.10   56.84   58.31   54.03   51.94
+CIFAR-100 / ResNet, 30 clients   59.05   51.52   51.45   43.59   45.77
+CIFAR-100 / ResNet, 50 clients   53.11   45.90   45.85   32.22   38.73
+
+[CIFAR-100 / ResNet, bw [10, 40]]  图目录 MainResult/Ablation_cifar100_resnet_bw10-40/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw10-40-ours/20260923-053850
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw10-40-fedrolex/20260923-070233
+  Random    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw10-40-random/20260923-070410
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw10-40-fedavg/20260923-074004
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw10-40-fedadam/20260923-075420
+
+[CIFAR-100 / ResNet, bw [1, 50]]  图目录 MainResult/Ablation_cifar100_resnet_bw1-50/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw1-50-ours/20260923-082618
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw1-50-fedrolex/20260923-084515
+  Random    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw1-50-random/20260923-093753
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw1-50-fedavg/20260923-091148
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw1-50-fedadam/20260923-094945
+
+[CIFAR-100 / ResNet, bw [20, 80]]  图目录 MainResult/Ablation_cifar100_resnet_bw20-80/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw20-80-ours/20260923-102630
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw20-80-fedrolex/20260923-104933
+  Random    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw20-80-random/20260923-110501
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw20-80-fedavg/20260923-111529
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-bw20-80-fedadam/20260923-121444
+
+[CIFAR-100 / ResNet, 4 experts]  图目录 MainResult/Ablation_cifar100_resnet_e4/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e4-ours/20260923-122301
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e4-fedrolex/20260923-122942
+  Random    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e4-random/20260923-124728
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e4-fedavg/20260923-134834
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e4-fedadam/20260923-135239
+
+[CIFAR-100 / ResNet, 16 experts]  图目录 MainResult/Ablation_cifar100_resnet_e16/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e16-ours/20260923-140459
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e16-fedrolex/20260923-141014
+  Random    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e16-random/20260923-151800
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e16-fedavg/20260923-151950
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e16-fedadam/20260923-153627
+
+[CIFAR-100 / ResNet, 32 experts]  图目录 MainResult/Ablation_cifar100_resnet_e32/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e32-ours/20260923-160209
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e32-fedrolex/20260923-164355
+  Random    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e32-random/20260923-170055
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e32-fedavg/20260923-171533
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-e32-fedadam/20260923-180033
+
+[CIFAR-100 / ResNet, 20 clients]  图目录 MainResult/Ablation_cifar100_resnet_n20/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n20-ours/20260923-181154
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n20-fedrolex/20260923-183146
+  Random    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n20-random/20260923-185640
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n20-fedavg/20260923-194423
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n20-fedadam/20260923-200027
+
+[CIFAR-100 / ResNet, 30 clients]  图目录 MainResult/Ablation_cifar100_resnet_n30/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n30-ours/20260923-200645
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n30-fedrolex/20260923-202231
+  Random    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n30-random/20260923-211757
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n30-fedavg/20260923-213004
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n30-fedadam/20260923-214836
+
+[CIFAR-100 / ResNet, 50 clients]  图目录 MainResult/Ablation_cifar100_resnet_n50/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n50-ours/20260923-221256
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n50-fedrolex/20260923-224827
+  Random    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n50-random/20260923-231350
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n50-fedavg/20260923-232336
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp03-c100-resnet-n50-fedadam/20260924-002854
+
+exp04（CIFAR-100 / ResNet 带宽对照）
+====================================
+来自 exp04_c100_resnet_bw.sh。8 专家、10 终端，两个带宽各 5 种方法。
+[10, 40] 与 exp03 同一设置，exp03 的图仍在 Ablation_cifar100_resnet_bw10-40/。
+exp04 这次重跑单独放在 Ablation_cifar100_resnet_bw10-40_exp04/，没有覆盖旧图。
+
+最佳测试精度（%）
+----------------
+设置                              Ours FedRolex   Random   FedAvg  FedAdam
+CIFAR-100 / ResNet, bw [10, 40]  65.30   60.05   60.24   14.89   57.58
+CIFAR-100 / ResNet, bw [40, 80]  66.86   64.49   64.70   66.76   58.11
+
+[CIFAR-100 / ResNet, bw [10, 40], exp04]  图目录 MainResult/Ablation_cifar100_resnet_bw10-40_exp04/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw10-40-ours/20260924-003851
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw10-40-fedrolex/20260924-004216
+  Random    /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw10-40-random/20260924-010422
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw10-40-fedavg/20260924-020622
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw10-40-fedadam/20260924-021645
+
+[CIFAR-100 / ResNet, bw [40, 80]]  图目录 MainResult/Ablation_cifar100_resnet_bw40-80/
+  Ours      /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw40-80-ours/20260924-022029
+  FedRolex  /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw40-80-fedrolex/20260924-023046
+  Random    /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw40-80-random/20260924-034101
+  FedAvg    /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw40-80-fedavg/20260924-035408
+  FedAdam   /userhome/cs3/duanty/FedMoE/results/exp04-c100-resnet-bw40-80-fedadam/20260924-035452

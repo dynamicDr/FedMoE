@@ -1,0 +1,22 @@
+runs:
+  Ours  dir=20260921-052753  method=ours  backbone=resnet  select=ours  merge=ours  best_acc=82.23
+  FedRolex  dir=20260921-052756  method=ours  backbone=resnet  select=fedrolex  merge=ours  best_acc=82.2
+  Random  dir=20260921-052756  method=ours  backbone=resnet  select=random  merge=ours  best_acc=79.2
+  Zero-fill  dir=20260921-052753  method=ours  backbone=resnet  select=ours  merge=fedavg  best_acc=81.02
+  FedAdam  dir=20260921-065047  method=ours  backbone=resnet  select=ours  merge=fedadam  best_acc=82.76
+  FedAdam-lr1e3  dir=20260921-065105  method=ours  backbone=resnet  select=ours  merge=fedadam  best_acc=77.02
+  FedAdam-tau1e2  dir=20260921-065743  method=ours  backbone=resnet  select=ours  merge=fedadam  best_acc=79.6
+  FedAdam-b2999  dir=20260921-070705  method=ours  backbone=resnet  select=ours  merge=fedadam  best_acc=79.98
+
+fig01_test_accuracy: test accuracy vs round, one curve per run
+fig02_test_accuracy_vs_time: test accuracy vs wall-clock time
+fig02_train_loss: local training loss vs round
+fig03_acc_and_loss: (a) accuracy (b) loss
+fig04_bandwidth_and_k: mean bandwidth and uploaded expert count
+fig05_expert_round_heatmap: total uploaded experts vs round
+fig06_client_expert_heatmap: total uploads per client
+fig07_expert_frequency: overall expert upload histogram
+fig08_time_breakdown: local / aggregation / evaluation time
+fig09_accuracy_vs_communication: accuracy vs cumulative expert uploads
+fig10_overview: four-panel summary figure
+fig11_avg_round_time: average wall time per round for each method

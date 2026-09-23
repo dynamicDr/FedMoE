@@ -1,0 +1,22 @@
+runs:
+  Ours  dir=20260922-014116  method=ours  backbone=vgg11  select=ours  merge=ours  best_acc=54.575
+  FedRolex  dir=20260922-015125  method=ours  backbone=vgg11  select=fedrolex  merge=ours  best_acc=52.4
+  Random  dir=20260922-015138  method=ours  backbone=vgg11  select=random  merge=ours  best_acc=53.0125
+  Zero-fill  dir=20260922-015915  method=ours  backbone=vgg11  select=ours  merge=fedavg  best_acc=47.4
+  FedAdam  dir=20260922-015959  method=ours  backbone=vgg11  select=ours  merge=fedadam  best_acc=59.3375
+  FedAdam-lr1e3  dir=20260922-020923  method=ours  backbone=vgg11  select=ours  merge=fedadam  best_acc=49.45
+  FedAdam-tau1e2  dir=20260922-021118  method=ours  backbone=vgg11  select=ours  merge=fedadam  best_acc=47.975
+  FedAdam-b2999  dir=20260922-021635  method=ours  backbone=vgg11  select=ours  merge=fedadam  best_acc=61.2125
+
+fig01_test_accuracy: test accuracy vs round, one curve per run
+fig02_test_accuracy_vs_time: test accuracy vs wall-clock time
+fig02_train_loss: local training loss vs round
+fig03_acc_and_loss: (a) accuracy (b) loss
+fig04_bandwidth_and_k: mean bandwidth and uploaded expert count
+fig05_expert_round_heatmap: total uploaded experts vs round
+fig06_client_expert_heatmap: total uploads per client
+fig07_expert_frequency: overall expert upload histogram
+fig08_time_breakdown: local / aggregation / evaluation time
+fig09_accuracy_vs_communication: accuracy vs cumulative expert uploads
+fig10_overview: four-panel summary figure
+fig11_avg_round_time: average wall time per round for each method

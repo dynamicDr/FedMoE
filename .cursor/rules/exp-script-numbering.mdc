@@ -10,5 +10,9 @@ alwaysApply: true
 当前已有：
 
 - `exp01_e8_baselines.sh`
+- `exp02_tiny_cinic_baselines.sh`
+- `exp03_c100_resnet_scalability.sh`
+- `exp04_c100_resnet_bw.sh`
+- `exp05_ablation_fedavg_old.sh`
 
 任务名和 `--output_dir` 也带上同一编号，避免和旧实验日志、结果目录撞名。

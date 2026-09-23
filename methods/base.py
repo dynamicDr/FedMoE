@@ -3,7 +3,9 @@ import torch
 from methods.Merge import build_merger
 from methods.Select import build_selector
 from model import MoEFedModel
-from upload_budget import filter_expert_state, sample_bandwidth, upload_expert_count
+from upload_budget import (
+    apply_drop_expert, filter_expert_state, sample_bandwidth, upload_expert_count,
+)
 from utils import cpu_state_dict, evaluate, release_cuda, run_local_sgd
 
 
@@ -54,6 +56,10 @@ class FederatedMethod:
         bandwidth = sample_bandwidth(args, client_id, round_id)
         upload_k = upload_expert_count(
             bandwidth, args.expert_bw, args.num_experts,
+        )
+        upload_k = apply_drop_expert(
+            upload_k, getattr(args, 'drop_expert_prob', 0.0),
+            args.seed, client_id, round_id,
         )
         n_samples = len(loader.dataset)
         usage = {}

@@ -1,0 +1,44 @@
+Main Raw：fig01_max_smooth 的复现材料
+====================================
+
+这个文件夹可以单独重画出主实验 2×5 总图。
+不需要 results/ 里的实验目录，也不需要仓库里的其它画图脚本。
+
+复现
+----
+在本目录执行：
+
+    python plot_fig01_max_smooth.py
+
+依赖：Python 3，numpy，pandas，matplotlib。
+脚本会在本目录写出 fig01_max_smooth.png / .pdf，并覆盖
+MainResult/smooth_pick/ 下的同名图。
+
+图
+--
+2 行 × 5 列，整体宽度按每列 3.15 英寸。
+上排 ResNet，下排 VGG11。
+列从左到右：CIFAR-10，CIFAR-100，STL-10，TinyImageNet，CINIC-10。
+每条曲线是测试精度的中心滑动平均，只画平滑后的实线。
+图例在上方，带黑框，横排：Ours，FedRolex，Random，FedAvg，FedAdam。
+颜色依次为 #0072B2，#D55E00，#009E73，#CC79A7，#56B4E9。
+
+平滑窗口（中心滑动平均）
+------------------------
+  CIFAR-10        31
+  CIFAR-100       15
+  STL-10          41
+  TinyImageNet    15
+  CINIC-10        21
+
+同一数据集的 ResNet 和 VGG11 用同一个窗口。
+实现是 pandas Series.rolling(window, center=True, min_periods=1).mean()。
+纵轴范围按该子图平滑后曲线的最小、最大值，上下各留 6%（至少 0.4 个百分点）。
+
+数据
+----
+data/<数据集>/<骨干>/<方法>.csv
+列只有 Round 和 TestAcc。TestAcc 已经是百分数，每个文件 100 轮。
+方法文件名：ours，fedrolex，random，fedavg，fedadam。
+这 50 个文件是从对应实验的 rounds.csv 抽出的这两列。
+每条曲线对应的原始 rounds.csv 路径写在 sources.csv。

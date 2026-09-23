@@ -56,6 +56,10 @@ def get_args():
     p.add_argument('--snr_db',        type=float, default=10.0,
                    help='Mean SNR (dB) for Rayleigh-Shannon fading when '
                         'bw_min < bw_max.')
+    p.add_argument('--drop_expert_prob', type=float, default=0.0,
+                   help='Per client per round, probability of uploading '
+                        'one fewer expert than the bandwidth budget. '
+                        '0 disables it.')
     p.add_argument('--rounds',        type=int,   default=100)
     p.add_argument('--frac',          type=float, default=1.0)
     p.add_argument('--local_epochs',  type=int,   default=2)
@@ -171,8 +175,10 @@ def main():
     fading = bw_min < bw_max
     fade_txt = (f'Rayleigh-Shannon, SNR={args.snr_db:g} dB'
                 if fading else 'static')
+    drop_prob = float(getattr(args, 'drop_expert_prob', 0.0) or 0.0)
+    drop_txt = f' | drop-one p={drop_prob:g}' if drop_prob > 0 else ''
     print(f'  Bandwidth: expert_bw={expert_bw} | bw=[{bw_min}, {bw_max}] '
-          f'| {fade_txt} | k=floor(bw/{expert_bw})')
+          f'| {fade_txt} | k=floor(bw/{expert_bw}){drop_txt}')
     print(f'{"="*66}\n')
 
     train_ds, test_ds = get_dataset(args.dataset, args.data_root)
@@ -319,6 +325,7 @@ def main():
         'bw_min': bw_min,
         'bw_max': bw_max,
         'snr_db': args.snr_db,
+        'drop_expert_prob': float(getattr(args, 'drop_expert_prob', 0.0) or 0.0),
         'rounds': args.rounds,
         'frac': args.frac,
         'local_epochs': args.local_epochs,
