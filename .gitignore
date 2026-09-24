@@ -9,7 +9,7 @@ venv/
 env/
 
 # Datasets downloaded locally (e.g. Tiny-ImageNet)
-data/
+/data/
 data.tar
 *.tar
 
