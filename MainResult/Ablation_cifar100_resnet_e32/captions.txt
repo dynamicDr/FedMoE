@@ -4,6 +4,8 @@ runs:
   Random  dir=20260923-170055  method=ours  backbone=resnet  select=random  merge=ours  best_acc=63.35
   FedAvg  dir=20260923-171533  method=ours  backbone=resnet  select=ours  merge=fedavg  best_acc=66.43
   FedAdam  dir=20260923-180033  method=ours  backbone=resnet  select=ours  merge=fedadam  best_acc=58.71
+  FedAvg-old  dir=20260924-114135  method=ours  backbone=resnet  select=ours  merge=fedavg-old  best_acc=67.36
+  FedAvg-old-drop25  dir=20260924-114456  method=ours  backbone=resnet  select=ours  merge=fedavg-old  best_acc=67.2
 
 fig01_test_accuracy: test accuracy vs round, one curve per run
 fig02_test_accuracy_vs_time: test accuracy vs wall-clock time

@@ -29,7 +29,7 @@ def get_args():
                    help='Expert selection: ours | posthoc | fedrolex | snip | '
                         'random | routingfreq | magnitude. Default: method preset.')
     p.add_argument('--merge', default=None, choices=sorted(MERGE_REGISTRY),
-                   help='Aggregation: ours | fedavg | fedavg-old | fedavgm | fedadam. '
+                   help='Aggregation: ours | fedavg | fedavg-old | fedavg-old-bias | fedavgm | fedadam. '
                         'Default: method preset.')
     p.add_argument('--dataset',       default='cifar10',
                    choices=['cifar10','cifar100','svhn','tinyimagenet','cinic-10','stl10'])

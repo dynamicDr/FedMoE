@@ -1,0 +1,62 @@
+========================================
+Job    : exp09-c100-resnet-e32-k12-posthoc
+Host   : gpu-4090-a01
+Date   : Fri Sep 25 04:36:26 HKT 2026
+GPU    : 0
+Python : /userhome/cs3/duanty/miniconda3/envs/moe/bin/python
+Command: python -u main.py --method ours --dataset cifar100 --backbone resnet --select posthoc --merge ours --device cuda --num_experts 32 --bw_min 10 --bw_max 20 --output_dir ./results/exp09-c100-resnet-e32-k12-posthoc
+========================================
+
+==================================================================
+ Ours  
+  Dataset=cifar100 | beta=0.1 | Backbone=resnet | width_mult=1 | Clients=10 | Experts=32
+  Select=posthoc | Merge=ours
+  Rounds=100 | LR=0.01
+  Bandwidth: expert_bw=10 | bw=[10, 20] | Rayleigh-Shannon, SNR=10 dB | k=floor(bw/10)
+==================================================================
+
+
+[Partition] Dirichlet beta=0.1, 10 clients
+  Client 0:   4573 samples | 45/100 classes
+  Client 1:   4218 samples | 54/100 classes
+  Client 2:   3656 samples | 48/100 classes
+  Client 3:   5018 samples | 43/100 classes
+  Client 4:   6664 samples | 52/100 classes
+  Client 5:   6137 samples | 45/100 classes
+  Client 6:   6582 samples | 49/100 classes
+  Client 7:   4512 samples | 39/100 classes
+  Client 8:   5219 samples | 46/100 classes
+  Client 9:   3421 samples | 100/100 classes
+
+[Upload] expert_bw=10 | available bw=[10, 20] | Rayleigh-Shannon, SNR=10 dB | upload k=floor(bw/10), cap=32 | train all experts, then upload top-k by gate scores
+
+[Model] Total params: 21,231,808
+
+[Export] 本次实验目录: /userhome/cs3/duanty/FedMoE/results/exp09-c100-resnet-e32-k12-posthoc/20260925-043635
+
+Round |      LR |  AvgLoss |  TestAcc |     Best |  RoundTime
+--------------------------------------------------------------------------------
+    1 | 0.00208 |   3.7978 |    1.60% |    1.60% |    1:04.91
+      bandwidth/experts | c8:bw=18,experts=[4]; c1:bw=10,experts=[4]; c5:bw=15,experts=[4]; c0:bw=10,experts=[4]; c7:bw=10,experts=[6]; c2:bw=10,experts=[4]; c9:bw=15,experts=[4]; c4:bw=13,experts=[4]; c3:bw=17,experts=[4]; c6:bw=14,experts=[6]
+    2 | 0.00406 |   3.3099 |    4.68% |    4.68% |    1:01.91
+      bandwidth/experts | c0:bw=12,experts=[4]; c1:bw=14,experts=[4]; c8:bw=16,experts=[4]; c5:bw=20,experts=[4,6]; c3:bw=20,experts=[4,6]; c4:bw=10,experts=[4]; c7:bw=18,experts=[4]; c9:bw=15,experts=[4]; c6:bw=10,experts=[4]; c2:bw=10,experts=[4]
+    3 | 0.00604 |   3.1962 |    6.62% |    6.62% |    1:01.91
+      bandwidth/experts | c9:bw=16,experts=[4]; c2:bw=14,experts=[4]; c0:bw=17,experts=[4]; c6:bw=13,experts=[4]; c8:bw=10,experts=[4]; c5:bw=10,experts=[4]; c3:bw=10,experts=[4]; c7:bw=11,experts=[4]; c1:bw=10,experts=[4]; c4:bw=17,experts=[4]
+    4 | 0.00802 |   3.1001 |    9.63% |    9.63% |    1:01.79
+      bandwidth/experts | c1:bw=13,experts=[4]; c7:bw=15,experts=[4]; c6:bw=18,experts=[4]; c2:bw=20,experts=[4,6]; c8:bw=10,experts=[4]; c0:bw=20,experts=[4,6]; c3:bw=11,experts=[4]; c4:bw=19,experts=[4]; c5:bw=20,experts=[4,6]; c9:bw=10,experts=[4]
+    5 | 0.01000 |   3.0067 |   12.67% |   12.67% |    1:03.84
+      bandwidth/experts | c1:bw=10,experts=[4]; c5:bw=13,experts=[4]; c4:bw=16,experts=[4]; c8:bw=12,experts=[4]; c0:bw=17,experts=[4]; c7:bw=10,experts=[4]; c6:bw=18,experts=[4]; c3:bw=20,experts=[4,6]; c2:bw=10,experts=[4]; c9:bw=20,experts=[4,6]
+    6 | 0.01000 |   2.8886 |   15.28% |   15.28% |    1:05.63
+      bandwidth/experts | c8:bw=20,experts=[4,6]; c2:bw=14,experts=[4]; c5:bw=10,experts=[4]; c7:bw=19,experts=[4]; c3:bw=12,experts=[4]; c1:bw=11,experts=[4]; c9:bw=16,experts=[4]; c0:bw=10,experts=[4]; c4:bw=10,experts=[4]; c6:bw=10,experts=[4]
+    7 | 0.01000 |   2.7694 |   18.42% |   18.42% |    1:05.79
+      bandwidth/experts | c0:bw=12,experts=[4]; c5:bw=16,experts=[4]; c2:bw=13,experts=[4]; c6:bw=10,experts=[4]; c3:bw=10,experts=[4]; c7:bw=10,experts=[4]; c4:bw=10,experts=[4]; c1:bw=10,experts=[4]; c8:bw=19,experts=[4]; c9:bw=10,experts=[4]
+    8 | 0.01000 |   2.6669 |   19.39% |   19.39% |    1:06.03
+      bandwidth/experts | c4:bw=10,experts=[4]; c8:bw=12,experts=[4]; c1:bw=19,experts=[4]; c3:bw=12,experts=[4]; c0:bw=11,experts=[4]; c5:bw=10,experts=[4]; c2:bw=18,experts=[4]; c9:bw=20,experts=[4,6]; c7:bw=10,experts=[4]; c6:bw=14,experts=[4]
+    9 | 0.01000 |   2.5757 |   22.80% |   22.80% |    1:05.76
+      bandwidth/experts | c2:bw=10,experts=[4]; c0:bw=17,experts=[4]; c4:bw=20,experts=[4,6]; c9:bw=10,experts=[4]; c8:bw=10,experts=[4]; c6:bw=10,experts=[4]; c7:bw=15,experts=[4]; c5:bw=17,experts=[4]; c1:bw=10,experts=[4]; c3:bw=10,experts=[4]
+   10 | 0.01000 |   2.4982 |   25.38% |   25.38% |    1:05.29
+      bandwidth/experts | c4:bw=12,experts=[4]; c2:bw=11,experts=[4]; c7:bw=12,experts=[4]; c0:bw=20,experts=[4,6]; c6:bw=20,experts=[4,6]; c3:bw=15,experts=[4]; c5:bw=19,experts=[4]; c8:bw=12,experts=[4]; c9:bw=12,experts=[4]; c1:bw=14,experts=[4]
+   11 | 0.01000 |   2.4239 |   27.11% |   27.11% |    1:05.64
+      bandwidth/experts | c5:bw=10,experts=[4]; c2:bw=10,experts=[4]; c7:bw=15,experts=[4]; c3:bw=17,experts=[4]; c0:bw=10,experts=[4]; c8:bw=13,experts=[4]; c9:bw=11,experts=[4]; c6:bw=18,experts=[4]; c1:bw=13,experts=[4]; c4:bw=10,experts=[4]
+   12 | 0.01000 |   2.3657 |   28.81% |   28.81% |    1:05.65
+      bandwidth/experts | c1:bw=14,experts=[4]; c5:bw=19,experts=[4]; c2:bw=19,experts=[4]; c4:bw=10,experts=[4]; c3:bw=12,experts=[4]; c7:bw=10,experts=[4]; c9:bw=14,experts=[4]; c6:bw=10,experts=[4]; c8:bw=18,experts=[4]; c0:bw=16,experts=[4]

@@ -1,0 +1,49 @@
+========================================
+Job    : exp07-c100-vgg11-e8-ours
+Host   : gpu-4090-102
+Date   : Thu Sep 24 17:37:08 HKT 2026
+GPU    : 0
+Python : /userhome/cs3/duanty/miniconda3/envs/moe/bin/python
+Command: python -u main.py --method ours --dataset cifar100 --backbone vgg11 --select ours --merge ours --device cuda --num_experts 8 --bw_max -1 --output_dir ./results/exp07-c100-vgg11-e8-ours
+========================================
+
+==================================================================
+ Ours  
+  Dataset=cifar100 | beta=0.1 | Backbone=vgg11 | width_mult=1 | Clients=10 | Experts=8
+  Select=ours | Merge=ours
+  Expert refresh N_ref=8
+  Rounds=100 | LR=0.01
+  Bandwidth: expert_bw=10 | bw=[10, 80] | Rayleigh-Shannon, SNR=10 dB | k=floor(bw/10)
+==================================================================
+
+
+[Partition] Dirichlet beta=0.1, 10 clients
+  Client 0:   4573 samples | 45/100 classes
+  Client 1:   4218 samples | 54/100 classes
+  Client 2:   3656 samples | 48/100 classes
+  Client 3:   5018 samples | 43/100 classes
+  Client 4:   6664 samples | 52/100 classes
+  Client 5:   6137 samples | 45/100 classes
+  Client 6:   6582 samples | 49/100 classes
+  Client 7:   4512 samples | 39/100 classes
+  Client 8:   5219 samples | 46/100 classes
+  Client 9:   3421 samples | 100/100 classes
+
+[Upload] expert_bw=10 | available bw=[10, 80] | Rayleigh-Shannon, SNR=10 dB | upload k=floor(bw/10), cap=8 | probe gate scores, refresh stale experts, then train selected
+
+[Model] Total params: 11,738,976
+
+[Export] 本次实验目录: /userhome/cs3/duanty/FedMoE/results/exp07-c100-vgg11-e8-ours/20260924-173713
+
+Round |      LR |  AvgLoss |  TestAcc |     Best |  RoundTime
+--------------------------------------------------------------------------------
+    1 | 0.00208 |   3.5481 |    1.94% |    1.94% |    0:46.75
+      bandwidth/experts | c8:bw=55,experts=[0,2,3,4,5]; c1:bw=29,experts=[2,3]; c5:bw=44,experts=[0,2,3,5]; c0:bw=10,experts=[3]; c7:bw=20,experts=[2,3]; c2:bw=29,experts=[2,3]; c9:bw=45,experts=[0,2,3,5]; c4:bw=40,experts=[0,2,3,5]; c3:bw=51,experts=[0,2,3,4,5]; c6:bw=41,experts=[0,2,3,5]
+    2 | 0.00406 |   3.1917 |    5.10% |    5.10% |    0:47.19
+      bandwidth/experts | c0:bw=36,experts=[0,2,3]; c1:bw=41,experts=[0,2,3,4]; c8:bw=48,experts=[0,2,3,6]; c5:bw=69,experts=[0,1,2,3,4,6]; c3:bw=67,experts=[0,2,3,4,6,7]; c4:bw=30,experts=[0,2,3]; c7:bw=55,experts=[0,2,3,4,6]; c9:bw=46,experts=[0,2,3,6]; c6:bw=17,experts=[2]; c2:bw=22,experts=[2,3]
+    3 | 0.00604 |   3.0819 |    9.17% |    9.17% |    0:47.27
+      bandwidth/experts | c9:bw=48,experts=[0,2,3,4]; c2:bw=42,experts=[0,2,3,4]; c0:bw=50,experts=[0,1,2,3,4]; c6:bw=40,experts=[0,2,3,4]; c8:bw=30,experts=[0,2,3]; c5:bw=13,experts=[3]; c3:bw=26,experts=[2,3]; c7:bw=33,experts=[0,2,3]; c1:bw=13,experts=[3]; c4:bw=52,experts=[0,1,2,3,4]
+    4 | 0.00802 |   2.9858 |    9.06% |    9.17% |    0:48.00
+      bandwidth/experts | c1:bw=40,experts=[0,2,3,4]; c7:bw=45,experts=[0,2,3,4]; c6:bw=53,experts=[0,1,2,3,4]; c2:bw=60,experts=[0,1,2,3,4,7]; c8:bw=31,experts=[0,2,3]; c0:bw=59,experts=[0,1,2,3,4]; c3:bw=34,experts=[0,2,3]; c4:bw=56,experts=[0,1,2,3,4]; c5:bw=73,experts=[0,1,2,3,4,5,6]; c9:bw=22,experts=[2,3]
+    5 | 0.01000 |   2.9109 |    9.75% |    9.75% |    0:51.01
+      bandwidth/experts | c1:bw=20,experts=[2,3]; c5:bw=40,experts=[0,2,3,4]; c4:bw=48,experts=[0,2,3,4]; c8:bw=37,experts=[0,2,3]; c0:bw=50,experts=[0,1,2,3,4]; c7:bw=24,experts=[2,3]; c6:bw=53,experts=[0,1,2,3,4]; c3:bw=63,experts=[0,1,2,3,4,7]; c2:bw=10,experts=[3]; c9:bw=62,experts=[0,1,2,3,4,7]

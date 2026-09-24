@@ -21,8 +21,10 @@ def cpu_state_dict(model):
 
 def run_local_sgd(global_model, loader, device, local_epochs, lr,
                   momentum, weight_decay, label_smooth,
-                  trainable_expert_ids=None, expert_usage_out=None):
+                  trainable_expert_ids=None, expert_usage_out=None,
+                  dense_experts=False):
     model = copy.deepcopy(global_model).to(device)
+    model.moe_head.dense_experts = bool(dense_experts)
     if trainable_expert_ids is not None:
         keep = set(int(i) for i in trainable_expert_ids)
         for i, expert in enumerate(model.moe_head.experts):

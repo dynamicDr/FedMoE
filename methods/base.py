@@ -38,7 +38,7 @@ class FederatedMethod:
         ).to(self.device)
 
     def local_train(self, global_model, loader, lr, trainable_expert_ids=None,
-                    expert_usage_out=None):
+                    expert_usage_out=None, dense_experts=False):
         args = self.args
         model, loss = run_local_sgd(
             global_model, loader, self.device,
@@ -46,6 +46,7 @@ class FederatedMethod:
             args.weight_decay, args.label_smooth,
             trainable_expert_ids=trainable_expert_ids,
             expert_usage_out=expert_usage_out,
+            dense_experts=dense_experts,
         )
         return model, loss
 
@@ -67,6 +68,7 @@ class FederatedMethod:
         if after_train:
             model, loss = self.local_train(
                 global_model, loader, lr, expert_usage_out=usage,
+                dense_experts=bool(getattr(self.selector, 'dense_experts', False)),
             )
             expert_ids = self.selector.select(
                 model=model,

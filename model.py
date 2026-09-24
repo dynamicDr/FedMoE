@@ -161,10 +161,18 @@ class MoELayer(nn.Module):
         self.experts = nn.ModuleList([
             ExpertFFN(in_dim, hidden_dim, out_dim) for _ in range(num_experts)
         ])
+        # Post-hoc sets this so every expert is forwarded and backpropped.
+        self.dense_experts = False
 
     def forward(self, x):
         weights, topk_idx = self.gating(x)
         out = torch.zeros(x.size(0), self.experts[0].fc2.out_features, device=x.device, dtype=x.dtype)
+
+        if self.dense_experts:
+            for i, expert in enumerate(self.experts):
+                expert_output = expert(x)
+                out = out + expert_output * weights[:, i].unsqueeze(-1)
+            return out
 
         for i, expert in enumerate(self.experts):
             batch_mask = (topk_idx == i).any(dim=-1)

@@ -1,0 +1,50 @@
+Efficiency：先选再训练 vs 先训再丢 vs 随机选 的复现材料
+============================================================
+
+这个文件夹可以单独重画出 CIFAR-100 上的效率对比图。
+不需要 results/ 里的实验目录，也不需要仓库里的其它画图脚本。
+
+复现
+----
+在本目录执行：
+
+    python plot_fig01_efficiency.py
+
+依赖：Python 3，numpy，pandas，matplotlib。
+脚本会在本目录写出：
+    fig01_test_accuracy.png / .pdf
+    fig02_accuracy_vs_local_time.png / .pdf
+
+图
+--
+1 行 × 2 列。CIFAR-100，8 专家，Top-2，10 客户端，Dirichlet 0.1，
+带宽 [10, 80]，聚合均为 token-weighted（ours）。
+左：ResNet。右：VGG11。
+每条曲线是原始测试精度，不平滑。
+图例在上方，带黑框，横排：Ours，Post-hoc，Random。
+颜色依次为 #0072B2，#D55E00，#009E73。
+纵轴范围按该子图全部曲线的最小、最大值，上下各留 6%（至少 0.4 个百分点）。
+
+fig01 横轴是通信轮次。
+fig02 横轴是累计本地训练时间（分钟），由 LocalTrainTimeSec 逐轮累加后再除以 60。
+不含聚合时间，也不含测试时间。
+
+三条曲线
+--------
+  Ours      先探测，再只训练选中的专家。来自 exp01。
+  Post-hoc  先训练全部专家，再按同一门控分数上传 Top-K。来自 exp08。
+  Random    随机选 K 个专家再训练。来自 exp01。
+
+数据
+----
+data/cifar100/<骨干>/<方法>.csv
+骨干：resnet，vgg11。方法：ours，posthoc，random。
+每个文件 100 轮。列：
+  Round, TestAcc, AvgLoss,
+  LocalTrainTimeSec, AggTimeSec, EvalTimeSec, RoundTimeSec,
+  ClientTrainTimesSec
+TestAcc 已经是百分数。时间单位是秒。
+ClientTrainTimesSec 是该轮 10 个客户端的本地训练时间，逗号分隔，
+其和与 LocalTrainTimeSec 一致。
+这 6 个文件是从对应实验的 rounds.csv 抽出的这些列。
+每条曲线对应的原始 rounds.csv 路径写在 sources.csv。

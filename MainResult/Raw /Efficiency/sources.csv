@@ -1,0 +1,7 @@
+dataset,backbone,method,csv,n_rounds,source
+CIFAR-100,ResNet,Ours,data/cifar100/resnet/ours.csv,100,/userhome/cs3/duanty/FedMoE/results/exp01-c100-resnet-e8-ours/20260921-103621/rounds.csv
+CIFAR-100,ResNet,Random,data/cifar100/resnet/random.csv,100,/userhome/cs3/duanty/FedMoE/results/exp01-c100-resnet-e8-random/20260921-105050/rounds.csv
+CIFAR-100,ResNet,Post-hoc,data/cifar100/resnet/posthoc.csv,100,/userhome/cs3/duanty/FedMoE/results/exp08-c100-resnet-e8-posthoc/20260924-205958/rounds.csv
+CIFAR-100,VGG11,Ours,data/cifar100/vgg11/ours.csv,100,/userhome/cs3/duanty/FedMoE/results/exp01-c100-vgg11-e8-ours/20260921-133836/rounds.csv
+CIFAR-100,VGG11,Random,data/cifar100/vgg11/random.csv,100,/userhome/cs3/duanty/FedMoE/results/exp01-c100-vgg11-e8-random/20260921-134805/rounds.csv
+CIFAR-100,VGG11,Post-hoc,data/cifar100/vgg11/posthoc.csv,100,/userhome/cs3/duanty/FedMoE/results/exp08-c100-vgg11-e8-posthoc/20260924-211723/rounds.csv

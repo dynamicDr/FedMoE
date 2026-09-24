@@ -2,6 +2,7 @@ from .base import MergeBase
 from .fedadam import FedAdam
 from .fedavg import FedAvg
 from .fedavg_old import FedAvgOld
+from .fedavg_old_bias import FedAvgOldBias
 from .fedavgm import FedAvgM
 from .ours import Ours
 
@@ -9,12 +10,13 @@ MERGE_REGISTRY = {
     'ours': Ours,
     'fedavg': FedAvg,
     'fedavg-old': FedAvgOld,
+    'fedavg-old-bias': FedAvgOldBias,
     'fedavgm': FedAvgM,
     'fedadam': FedAdam,
 }
 
 __all__ = [
-    'MergeBase', 'Ours', 'FedAvg', 'FedAvgOld', 'FedAvgM', 'FedAdam',
+    'MergeBase', 'Ours', 'FedAvg', 'FedAvgOld', 'FedAvgOldBias', 'FedAvgM', 'FedAdam',
     'MERGE_REGISTRY', 'build_merger',
 ]
 

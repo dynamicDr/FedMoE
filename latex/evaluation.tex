@@ -1,76 +1,32 @@
 \section{Evaluation}
 \label{sec:evaluation}
 
-We evaluate probe-before-train under wireless federated MoE training. Numerical entries are placeholders and will be filled after the experiments are completed.
+We evaluate probe-before-train under wireless federated MoE training. This section reports the main comparison. All runs share the same architecture, optimizer, uplink model, and data partition, and differ only in expert selection or server aggregation.
 
 \subsection{Experimental Setup}
 
-We use four Dirichlet-partitioned image benchmarks: CIFAR-10/100~\cite{krizhevsky2009learning}, CINIC-10~\cite{darlow2018cinic}, and SVHN~\cite{netzer2011reading}. The shared backbone is ResNet-18~\cite{he2016deep} or VGG11~\cite{simonyan2015very}, each followed by a sparse MoE head of $M=4$ FFN experts and Top-$2$ routing. Local class proportions follow $\mathrm{Dir}(\alpha)$~\cite{hsu2019measuring} with $\alpha\in\{0.1,0.3,0.5\}$.
+We use five image benchmarks with Dirichlet label partitions at $\alpha=0.1$~\cite{hsu2019measuring}: CIFAR-10 and CIFAR-100~\cite{krizhevsky2009learning}, STL-10~\cite{coates2011analysis}, Tiny-ImageNet~\cite{le2015tiny}, and CINIC-10~\cite{darlow2018cinic}. The backbone is ResNet-18~\cite{he2016deep} or VGG11~\cite{simonyan2015very}, followed by a sparse MoE head of $M=8$ feed-forward experts and Top-$2$ routing. All $N=10$ clients participate in every round.
 
-The uplink follows the standard block-fading Shannon model used in wireless FL~\cite{xu2021client,zhou2022time}. In round $r$, client $i$ draws an independent Rayleigh coefficient $h_i^{(r)}\sim\mathcal{CN}(0,1)$, held constant within the round. With mean SNR $\bar{\gamma}=10$\,dB, the bit budget is $B_i^{(r)}=\bigl\lfloor C\log_2\bigl(1+\bar{\gamma}|h_i^{(r)}|^2\bigr)\bigr\rfloor$, clipped to $[B_{\min},B_{\max}]$. We set $C$ so that a mean-power channel ($|h|^2=1$) maps to the midpoint of this interval, and set the endpoints to the budgets of $K=1$ and $K=M$ experts. All clients participate; the channel only determines how many equal-size experts can be uploaded, with $K_i^{(r)}=\lfloor(B_i^{(r)}-c_{\mathrm{sh}})/c_{\mathrm{ex}}\rfloor$ as in Section~\ref{sec:methodology}. Unless noted, $h_i^{(r)}$ is redrawn every round, so the uplink budget and $K_i^{(r)}\in\{1,\ldots,M\}$ vary over time. We also report a static sweep $K\in\{1,2,3,4\}$.
+The uplink follows the block-fading Shannon model used in wireless federated learning~\cite{xu2021client,zhou2022time}. In each round, client $i$ draws an independent Rayleigh coefficient that stays fixed for that round. At a mean SNR of $10$\,dB, the bit budget is clipped to $[10,80]$, and the scaling constant is set so that a unit-power channel falls at the midpoint of this range. Each expert costs $10$ units, so the client uploads $K_i^{(r)}\in\{1,\ldots,8\}$ experts. The shared backbone and the router are always uploaded. Because the channel is redrawn every round, $K_i^{(r)}$ changes over time.
 
-The main comparison freezes the architecture, optimizer, budget, and partition, and swaps one competing policy at a time. With Token-Weighted Aggregation fixed, we replace probe-before-train by \textbf{Random} (a uniformly sampled feasible subset of $K_i^{(r)}$ experts) and \textbf{FedRolex Rolling} (a cyclic window of $K_i^{(r)}$ experts~\cite{alam2022fedrolex}). With probe-before-train fixed, we replace the aggregator by sample-size-weighted \textbf{FedAvg}~\cite{mcmahan2017communication} and \textbf{FedAdam}~\cite{reddi2021adaptive}. Missing expert updates are skipped rather than imputed as zeros. Table~\ref{tab:baselines} summarizes these methods. A later subsection compares probe-before-train with \textbf{Post-hoc Sparse Upload} (train all routed experts, then keep $K_i^{(r)}$ by the same gate utility~\cite{konecny2016federated}) on cumulative local training time rather than round index.
+Expert selection and server aggregation are varied one at a time. Under token-weighted aggregation, probe-before-train is compared with Random and FedRolex~\cite{alam2022fedrolex}. Random draws $K_i^{(r)}$ experts uniformly from the feasible set, then trains and uploads only that subset, without using the local router. FedRolex advances a window of $K_i^{(r)}$ consecutive experts from round to round and likewise ignores per-client utility. Under probe-before-train, token-weighted aggregation is compared with FedAvg~\cite{mcmahan2017communication} and FedAdam~\cite{reddi2021adaptive}. FedAvg writes every missing expert update as a zero tensor and then averages clients by local sample size. FedAdam omits missing experts from that average and applies server Adam only to the uploaded tensors, with step size $0.01$, decay rates $0.9$ and $0.99$, and stability constant $0.01$.
 
-\begin{table*}[!t]
-\caption{Compared methods in the main experiments. Value score: whether expert selection uses an explicit utility ranking.}
-\label{tab:baselines}
-\centering
-\renewcommand{\arraystretch}{1.18}
-\footnotesize
-\begin{tabular}{|l|p{7.4cm}|c|c|}
-\hline
-\textbf{Name} & \textbf{Description} & \textbf{Reference} & \textbf{Value score} \\
-\hline
-\multicolumn{4}{|l|}{\textit{Expert selection}} \\
-\hline
-Probe-before-train (Ours)
-& Forward-only probing of soft gate utilities; train and upload the Top-$K_i^{(r)}$ experts.
-& Proposed
-& Yes \\
-\hline
-Random
-& Sample a feasible subset of $K_i^{(r)}$ experts uniformly, then train and upload that subset.
-& ---
-& No \\
-\hline
-FedRolex Rolling
-& Cycle a window of $K_i^{(r)}$ consecutive experts across rounds, without a utility score.
-& \cite{alam2022fedrolex}
-& No \\
-\hline
-\multicolumn{4}{|l|}{\textit{Aggregation}} \\
-\hline
-Token-Weighted (Ours)
-& Skip missing experts; weight uploaded expert tensors by routed-token counts.
-& Proposed
-& --- \\
-\hline
-FedAvg
-& Sample-size-weighted average of uploaded tensors; skip missing experts.
-& \cite{mcmahan2017communication}
-& --- \\
-\hline
-FedAdam
-& Skip-missing FedAvg, then apply server Adam only to uploaded tensors.
-& \cite{reddi2021adaptive}
-& --- \\
-\hline
-\end{tabular}
-\end{table*}
-
-Unless noted, $N=10$ clients join each of 100 rounds, with 2 local epochs, batch size 64, and SGD (momentum $0.9$, weight decay $10^{-4}$, learning rate $0.01$). Probing uses 2 forward mini-batches. Shared and router parameters are always uploaded.
+Training runs for $100$ rounds. Each client uses two local epochs, batch size $64$, and SGD with momentum $0.9$ and weight decay $10^{-4}$. The learning rate rises linearly from $10^{-4}$ to $0.01$ over the first five rounds and then stays at $0.01$. The loss uses label smoothing of $0.1$. Probing uses two forward mini-batches. Every run uses seed $42$.
 
 \subsection{Main Results}
 
-Fig.~\ref{fig:main_acc} reports test accuracy under $\alpha=0.1$ and a time-varying uplink, on both ResNet-18 and VGG11. The proposed method is the strongest budgeted federated MoE approach on all four datasets, with an average margin of $xx.x$ points over the second-best baseline. The gain holds on both coarse (CIFAR-10, CINIC-10, SVHN) and fine-grained (CIFAR-100) tasks. Random under the same $K_i^{(r)}$ ignores local gating, so the trained experts need not match the client's data. FedRolex Rolling covers experts evenly across rounds but still ignores per-client utility, so a client may spend its tight uplink on experts that its router rarely uses. Replacing token-weighted aggregation by FedAvg or FedAdam, while keeping probe-before-train, drops accuracy by $xx.x$ and $xx.x$ points: sample-size weights and server Adam do not substitute routed-token counts that follow sparse MoE execution.
+Over 100 rounds, probe-before-train with token-weighted aggregation attains the highest best test accuracy in all ten dataset--backbone settings. Its mean best accuracy is $63.77\%$, and the mean gap to the per-setting runner-up is $1.77$ points. The corresponding means are $61.25\%$ for FedRolex, $61.00\%$ for Random, $60.09\%$ for FedAvg, and $57.90\%$ for FedAdam. The proposed peaks are $82.23\%$ and $81.09\%$ on CIFAR-10, $66.83\%$ and $60.91\%$ on CIFAR-100, $45.29\%$ and $54.58\%$ on STL-10, $51.63\%$ and $50.87\%$ on Tiny-ImageNet, and $73.73\%$ and $70.55\%$ on CINIC-10, for ResNet-18 and VGG11 respectively.
+
+The gap to the runner-up depends on the task. It is $0.03$ points on CIFAR-10 with ResNet-18, where FedRolex reaches $82.20\%$, and $0.16$ points on CIFAR-100 with VGG11, where Random reaches $60.75\%$. It is larger when the label space is finer: $3.15$ points on CIFAR-100 with ResNet-18 and $3.39$ points on Tiny-ImageNet with ResNet-18, both against Random. On STL-10 with ResNet-18 the runner-up is FedAvg at $42.66\%$ ($2.63$ points behind); FedRolex and Random reach $41.46\%$ and $36.79\%$. The proposed method leads on both backbones. STL-10 is the hardest benchmark, and VGG11 is ahead of ResNet-18 there ($54.58\%$ versus $45.29\%$ for the proposed method).
+
+Fig.~\ref{fig:main_acc} plots a centered moving average of the same runs. The proposed curve is the upper one on most panels, which matches the best-accuracy ranking and also shows that the lead is not a single-round spike. On CIFAR-10 with ResNet-18, FedRolex reaches $82.20\%$ at round 100, next to the proposed peak of $82.23\%$, yet its mean over the last 10 rounds is $76.56\%$, against $80.91\%$ for the proposed method. On CIFAR-10 with VGG11 the late curves are closer: FedAvg averages $76.88\%$ over the last 10 rounds and the proposed method $74.70\%$, while the proposed peak remains higher ($81.09\%$ versus $78.08\%$).
+
+Two controls isolate where the gain comes from. With token-weighted aggregation fixed, FedRolex and Random ignore the probe. Random uploads a feasible subset drawn uniformly, so the trained experts need not be the ones the local router uses. FedRolex cycles a window of $K_i^{(r)}$ experts and likewise ignores per-client utility, so a tight uplink can be spent on experts that the client rarely routes to. Against the stronger of these two, probe-before-train gains $1.89$ points on average. With probe-before-train fixed, FedAvg and FedAdam change only the server update. FedAvg imputes missing experts as zeros, so an expert is pulled toward clients that did not train it in that round; this costs $3.68$ points on average. FedAdam then applies server Adam to the uploaded tensors and is the weakest method on average, trailing by $5.87$ points, including $9.51$ points on STL-10 with ResNet-18 ($45.29$ versus $35.78$). Routed-token weights follow which experts actually ran; sample size and server Adam do not replace that count.
 
 \begin{figure*}[!t]
 \centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.6cm}
-{\small Placeholder for accuracy curves across four datasets and two backbones under $\alpha=0.1$.}\\[0.4em]
-{\scriptsize Proposed method, Random, FedRolex Rolling, FedAvg, and FedAdam.}
-\vspace{2.6cm}}}
-\caption{Test accuracy comparison across CIFAR-10, CIFAR-100, CINIC-10, and SVHN under $\alpha=0.1$, using ResNet-18 and VGG11. Numerical curves will be inserted after experiments.}
+\includegraphics[width=\textwidth]{fig01_max_smooth.pdf}
+\caption{Smoothed test accuracy under $\alpha=0.1$ and a time-varying uplink. Top: ResNet-18. Bottom: VGG11. Each curve is a centered moving average of the per-round test accuracy.}
 \label{fig:main_acc}
 \end{figure*}
 

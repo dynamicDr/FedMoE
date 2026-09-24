@@ -1,0 +1,36 @@
+Ablation：fig01_test_accuracy 的复现材料
+==========================================
+
+这个文件夹可以单独重画出消融 2×5 总图。
+不需要 results/ 里的实验目录，也不需要仓库里的其它画图脚本。
+
+复现
+----
+在本目录执行：
+
+    python plot_fig01_ablation.py
+
+依赖：Python 3，numpy，pandas，matplotlib。
+脚本会在本目录写出 fig01_test_accuracy.png / .pdf。
+
+图
+--
+3 行 × 3 列。CIFAR-100 / ResNet。不含 bw [40, 80]。
+上排：bw [10, 40]，bw [1, 50]，bw [20, 80]。
+中排：4 experts，16 experts，32 experts。
+下排：20 clients，30 clients，50 clients。
+每条曲线是原始测试精度，不平滑。
+图例在上方，带黑框，横排：Ours，FedRolex，Random，FedAvg，FedAdam。
+颜色依次为 #0072B2，#D55E00，#009E73，#CC79A7，#56B4E9。
+图上的 FedAvg 都是粉色。bw [10, 40]、bw [1, 50]、4 experts 用的是
+FedAvg-old-drop25 的数据，其余子图用原来的 FedAvg。
+纵轴范围按该子图全部曲线的最小、最大值，上下各留 6%（至少 0.4 个百分点）。
+
+数据
+----
+data/<条件>/<方法>.csv
+列只有 Round 和 TestAcc。TestAcc 已经是百分数，每个文件 100 轮。
+这 70 个文件是从对应实验的 rounds.csv 抽出的这两列。
+每条曲线对应的原始 rounds.csv 路径写在 sources.csv。
+bw [40, 80] 的前五种方法来自 exp04，其余前五种来自 exp03。
+FedAvg-old 与 FedAvg-old-drop25 来自 exp05。

@@ -7,3 +7,4 @@ class Posthoc(Ours):
     name = 'posthoc'
     description = 'train all experts, then upload top-k by gate scores'
     after_train = True
+    dense_experts = True
