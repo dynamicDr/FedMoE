@@ -11,16 +11,17 @@ Main Raw：fig01_max_smooth 的复现材料
     python plot_fig01_max_smooth.py
 
 依赖：Python 3，numpy，pandas，matplotlib。
-脚本会在本目录写出 fig01_max_smooth.png / .pdf，并覆盖
-MainResult/smooth_pick/ 下的同名图。
+脚本会在本目录写出 Main Results.png / .pdf。
+脚本同时把同一份 PDF 写到 latex/Main Results.pdf。
 
 图
 --
-2 行 × 5 列，整体宽度按每列 3.15 英寸。
+2 行 × 5 列，整体宽度按每列 4.7 英寸。
 上排 ResNet，下排 VGG11。
 列从左到右：CIFAR-10，CIFAR-100，STL-10，TinyImageNet，CINIC-10。
-每条曲线是测试精度的中心滑动平均，只画平滑后的实线。
-图例在上方，带黑框，横排：Ours，FedRolex，Random，FedAvg，FedAdam。
+每条曲线是测试精度的中心滑动平均。每 10 轮打一个标记，五种方法依次为圆、上三角、方、菱形、下三角。
+横轴为 Training Round。每个子图四边都有灰色矩形边框。
+图例在上方居中，宽度略窄于整图，白底、灰色圆角边框，横排：Ours，FedRolex，Random，FedAvg，FedAdam。
 颜色依次为 #0072B2，#D55E00，#009E73，#CC79A7，#56B4E9。
 
 平滑窗口（中心滑动平均）

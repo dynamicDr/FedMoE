@@ -11,20 +11,23 @@ Ablation：fig01_test_accuracy 的复现材料
     python plot_fig01_ablation.py
 
 依赖：Python 3，numpy，pandas，matplotlib。
-脚本会在本目录写出 fig01_test_accuracy.png / .pdf。
+脚本会在本目录写出 Sensitivity.png / .pdf。
+脚本同时把同一份 PDF 写到 latex/Sensitivity.pdf。
 
 图
 --
 3 行 × 3 列。CIFAR-100 / ResNet。不含 bw [40, 80]。
-上排：bw [10, 40]，bw [1, 50]，bw [20, 80]。
-中排：4 experts，16 experts，32 experts。
-下排：20 clients，30 clients，50 clients。
-每条曲线是原始测试精度，不平滑。
-图例在上方，带黑框，横排：Ours，FedRolex，Random，FedAvg，FedAdam。
+上排：Uplink Budget $B\in[10, 40]$，$B\in[1, 50]$，$B\in[20, 80]$。
+中排：Number of Experts $n_e=4$，$n_e=16$，$n_e=32$。
+下排：Number of Clients $n=20$，$n=30$，$n=50$。
+整体宽度按每列 4.7 英寸，单格长宽比与主图接近。
+每条曲线是测试精度的中心滑动平均，窗口为 15，与主图 CIFAR-100 相同。每 10 轮打一个标记，五种方法依次为圆、上三角、方、菱形、下三角。
+横轴为 Training Round。每个子图四边都有灰色矩形边框。
+图例在上方居中，白底、灰色圆角边框，横排：Ours，FedRolex，Random，FedAvg，FedAdam。
 颜色依次为 #0072B2，#D55E00，#009E73，#CC79A7，#56B4E9。
 图上的 FedAvg 都是粉色。bw [10, 40]、bw [1, 50]、4 experts 用的是
 FedAvg-old-drop25 的数据，其余子图用原来的 FedAvg。
-纵轴范围按该子图全部曲线的最小、最大值，上下各留 6%（至少 0.4 个百分点）。
+纵轴范围按该子图平滑后曲线的最小、最大值，上方留 8%（至少 0.6 个百分点）。
 
 数据
 ----

@@ -21,11 +21,7 @@
 
 \begin{document}
 
-\title{Conference Paper Title*\\
-{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured for https://ieeexplore.ieee.org  and
-should not be used}
-\thanks{Identify applicable funding agency here. If none, delete this.}
-}
+\title{From Post-Hoc Upload to Proactive Expert Selection: Channel-Aware Sparse Expert Aggregation for Wireless Federated MoE}
 
 \author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
 \IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
@@ -67,9 +63,8 @@ email address or ORCID}
 \maketitle
 
 \begin{abstract}
-This document is a model and instructions for \LaTeX.
-This and the IEEEtran.cls file define the components of your paper [title, text, heads, etc.]. *CRITICAL: Do Not Use Symbols, Special Characters, Footnotes, 
-or Math in Paper Title or Abstract.
+Federated learning (FL) over wireless edge networks suffers from the mismatch between large-scale model updates and time-varying communication resources.  While Mixture-of-Experts (MoE) models achieve scalable capacity through sparse activation, each client still update many experts during local training, leading to substantial wasted computation when only a limited subset of expert updates can be uploaded. To address this challenge, we propose PCASE, a Proactive Channel-Aware Sparse Expert aggregation framework for federated MoE learning under constrained wireless communication budgets. To address these challenges, we propose PCASE, a Proactive Channel-Aware Sparse Expert aggregation framework for federated MoE learning under constrained wireless communication budgets. Unlike post-hoc sparse upload methods, PCASE accounts for communication constraints prior to local training and trains only a budget-feasible subset of experts. Each client performs lightweight forward-pass probing to estimate local expert utilities and constructs empirical Bernstein confidence intervals to balance probing latency and selection reliability. Under the current communication budget, each client employs a dynamic programming oracle to identify a high-utility feasible subset of experts, while a single-swap confidence criterion enables efficient reliability verification without exhaustively enumerating all feasible subsets. The server then performs sparse expert-wise aggregation over the selected experts and applies FedAvg to shared parameters.
+%实验结果显示...
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -78,28 +73,21 @@ component, formatting, style, styling, insert.
 
 \section{Introduction}
 
-Federated learning (FL) enables edge clients to collaboratively train a model without exposing raw data, making it attractive for wireless edge intelligence across mobile devices, vehicles, sensors, and access points. However, wireless FL is inherently constrained by time-varying uplink channels, heterogeneous client resources, and non-independent and identically distributed (non-IID) data. In each communication round, a client can upload only a limited number of bits determined by its instantaneous channel state, power budget, bandwidth allocation, and latency requirement. As foundation models continue to scale, this mismatch between model size and wireless uplink capacity becomes a fundamental bottleneck.
+Federated learning (FL) enables edge clients to collaboratively train a model without exposing raw data, making it attractive for wireless edge intelligence across mobile devices. However, wireless FL is inherently constrained by time-varying uplink channels, heterogeneous client resources, and non-independent and identically distributed (non-IID) data. In each communication round, a client can upload only a limited number of bits determined by its instantaneous channel state, power budget, bandwidth allocation, and latency requirement. As foundation models continue to scale, this mismatch between model size and wireless uplink capacity becomes a fundamental bottleneck.
 
 Mixture-of-Experts (MoE) models offer a promising way to scale model capacity through conditional computation. By routing each input to only a small subset of experts, MoE models can maintain large parameter capacity while activating only part of the model per sample. This sparse structure is particularly appealing for federated learning, where different clients may favor different experts according to their local data distributions. Nevertheless, wireless federated MoE learning faces a unique communication-computation mismatch: although each input activates only a few experts, local training over multiple mini-batches may generate updates for many experts, while the client may only be able to upload a small subset of them under its current uplink budget.
 
 Existing communication-efficient FL methods typically follow a post-hoc sparse upload paradigm. The client trains all routed experts locally but transmits only a budget-feasible subset of expert updates afterwards. While this reduces the number of uploaded bits, it does not prevent redundant computation. If an expert is updated locally but eventually not transmitted, its backpropagation, optimizer update, and memory usage do not directly contribute to global aggregation. This inefficiency becomes increasingly severe when the uplink budget is small, the number of experts is large, or local devices are burdened by concurrent application workloads.
 
-To address this challenge, our key insight is that instead of treating the wireless channel as a post-training upload constraint, we inject the channel condition before local backpropagation and use it to shape the local trainable expert subspace. An MoE model already provides informative expert-preference signals before full local training. By running a small number of forward-only probing mini-batches, each client estimates the local utility of every expert using the average router-derived utility over the tokens in each probing mini-batch. Compared with full local training, such probing is inexpensive because it does not require backpropagation through expert blocks or materialization of expert optimizer states. Moreover, since the router typically computes scores for all experts before sparse dispatching, a single probing pass can produce vector-valued feedback over the entire expert pool. This allows the client to compare multiple candidate expert subsets before committing computational resources to local optimization.
+To reduce unnecessary local computation, our key insight is that instead of treating the wireless channel as a post-training upload constraint, we inject the channel condition before local backpropagation and select a subset of experts for training. An MoE model already provides informative expert-preference signals before full local training. By running a small number of forward-only probing mini-batches, each client estimates the local utility of every expert using the average utility over the tokens in each probing mini-batch. Moreover, since the router typically computes scores for all experts before sparse dispatching, a single probing pass can produce feedback over the entire expert pool. This allows the client to compare multiple candidate expert subsets before committing computational resources to local optimization.
 
-We propose a Proactive Channel-Aware Optimization for wireless federated MoE learning, the instantaneous uplink channel determines a client-specific communication budget, which induces a feasible family of uploadable expert subsets. The client then performs lightweight router probing on a few local mini-batches to estimate expert utilities, selects a subset that is both locally useful and communication-feasible, and freezes the remaining experts during formal local training. After training, the client uploads the shared components and the selected expert updates. The server performs expert-wise sparse aggregation over only the clients that upload each corresponding expert. Therefore, the set of trained experts is explicitly aligned with the set of uploaded experts.
+However, this idea introduces two key challenges. The first is latency--reliability tradeoff in expert utility estimation. Estimating expert utilities over the entire local dataset can provide accurate client-specific preference information, but it incurs excessive probing latency and computation overhead on resource-constrained edge devices. In contrast, relying on only a few probing mini-batches substantially reduces overhead, but may lead to unstable expert selection, especially under non-IID data distributions. The second is combinatorial certification complexity. To rigorously verify whether the selected expert subset is superior to all other feasible subsets, a client would need to compare it against every subset satisfying the current uplink constraint. Since the number of feasible expert subsets grows exponentially with the number of experts, exhaustively evaluating them leads to excessive computational overhead and latency.
 
-% The main contributions of this paper are summarized as follows:
-% \begin{itemize}
-%     \item We introduce \emph{Proactive Channel-Aware Optimization} for wireless federated MoE learning, where the uplink channel shapes the trainable expert subspace before local backpropagation rather than merely constraining post-training upload.
-%     \item We propose a channel-aware probe-before-train framework that exploits lightweight router probing to identify experts that are both locally useful and communication-feasible.
-%     \item We formulate pre-training expert identification as a budget-constrained combinatorial pure exploration problem with vector full-information feedback, enabling a principled tradeoff between probing overhead and selection reliability.
-%     \item We develop sparse local training and expert-wise federated aggregation mechanisms that align trained experts with uploaded experts, reducing redundant computation and communication under time-varying wireless uplink constraints.
-% \end{itemize}
+To address these challenges, we propose PCASE, a Proactive Channel-Aware Sparse Expert aggregation framework for federated MoE learning under constrained communication budgets. PCASE proactively selects a high-utility expert subset for each client under the current communication budget, thereby reducing redundant expert training while preserving client-specific expert specialization. For balancing latency and reliability in expert utility estimation, PCASE incrementally estimates expert utilities of each client using lightweight probing mini-batches that require only forward passes. It then constructs empirical-Bernstein confidence intervals to adapt the probing effort to estimation uncertainty. Given the estimated utilities and the current communication budget, the client employs a dynamic programming oracle to select a subset of experts and trains only the selected experts. For reducing combinatorial certification complexity, PCASE further introduces a local confidence criterion based on feasible single-swap alternatives, avoiding exhaustive enumeration over all feasible subsets while retaining a practical reliability check for each client’s selected expert set. After local training, PCASE performs server-side sparse expert-wise aggregation, in which each expert is updated using only the parameter uploaded by clients that selected that expert, while the shared parameters are aggregated via standard FedAvg.
+%实验结果显示...
 
-\newpage
-\section{Related Work}
-\newpage
-
+%\section{Related Work}
+%ICC论文没related work
 \begin{figure}[!t]
   \centering
     \includegraphics[width=0.93\linewidth]{example-image-duck}
@@ -111,11 +99,10 @@ We propose a Proactive Channel-Aware Optimization for wireless federated MoE lea
 \end{figure}
 
 \section{Methodology}
-As shwon in figure~\ref{Workflow}, we present a channel-aware probe-before-train framework for federated MoE learning. The key idea is to move expert selection before local backpropagation: the wireless channel determines how many expert updates can be uploaded, while lightweight router probing identifies which experts are worth training. Hence, each client trains only the experts that are both useful for its local data and feasible for uplink transmission.
+As shwon in figure~\ref{Workflow}, ...
 
 \subsection{System Model}
 
-Federated learning (FL) is a distributed collaborative training paradigm in which multiple clients jointly learn a shared global model without exposing their raw data to the server. Federated learning proceeds iteratively between local training on edge clients and model aggregation on the server. In each communication round, the server first distributes the current global model to the clients participating in training. Then, each client trains its local model using its private local data and uploads the local model parameters or model updates to the server. After receiving updates from multiple clients, the server generates a new global model according to the aggregation strategy and sends it back to the clients for the next round of training. Let $\mathcal{I}=\left \{ 1,2,\dots ,n \right \} $ denote the set of participating clients, and let $\mathcal{D}_i$ be the local dataset of client $i$. The global objective is to minimize a weighted empirical risk over all clients:
 Federated learning (FL) is a distributed collaborative training paradigm in which multiple clients jointly learn a shared global model without exposing their raw data to the server. Federated learning proceeds iteratively between local training on edge clients and model aggregation on the server. In each communication round, the server first distributes the current global model to the clients participating in training. Then, each client trains its local model using its private local data and uploads the local model parameters or model updates to the server. After receiving updates from multiple clients, the server generates a new global model according to the aggregation strategy and sends it back to the clients for the next round of training. Let $\mathcal{I}=\left \{ 1,2,\dots ,n \right \} $ denote the set of participating clients, and let $\mathcal{D}_i$ be the local dataset of client $i$. The global objective is to minimize a weighted empirical risk over all clients:
 \begin{equation}
 \min_{\boldsymbol{\theta}} F(\boldsymbol{\theta})
@@ -127,9 +114,7 @@ F_i(\boldsymbol{\theta}),
 n=\sum_{i\in\mathcal{I}} n_i ,
 \end{equation}
 where $F_i(\boldsymbol{\theta})$ denotes the empirical loss evaluated on $\mathcal{D}_i$. 
-where $F_i(\boldsymbol{\theta})$ denotes the empirical loss evaluated on $\mathcal{D}_i$. 
 
-Mixture-of-Experts (MoE) models use multiple expert modules and a gating network to enable conditional computation. For each input, the gate assigns routing weights to experts, allowing expert specialization and increasing the effective model capacity. In FL, MoE can naturally accommodate heterogeneous client data distributions. For client $i$ at communication round $r$, the gating output of the $\ell$-th MoE layer for input $x$ is defined as
 Mixture-of-Experts (MoE) models use multiple expert modules and a gating network to enable conditional computation. For each input, the gate assigns routing weights to experts, allowing expert specialization and increasing the effective model capacity. In FL, MoE can naturally accommodate heterogeneous client data distributions. For client $i$ at communication round $r$, the gating output of the $\ell$-th MoE layer for input $x$ is defined as
 \begin{equation}
 \mathbf{g}_{i,\ell}^{(r)}(x)
@@ -138,30 +123,19 @@ Mixture-of-Experts (MoE) models use multiple expert modules and a gating network
 g_{i,\ell,1}^{(r)}(x),
 \ldots,
 g_{i,\ell,e_\ell}^{(r)}(x)
-g_{i,\ell,e_\ell}^{(r)}(x)
 \bigr),
 \end{equation}
-where $g_{i,\ell,j}^{(r)}(x)$ represents the gating weight assigned to expert $j$ among the $e_\ell$ experts in the $\ell$-th MoE layer. For simplicity, we assume that $g_{i,\ell,j}^{(r)}(x)$ has been normalized within each MoE layer, and use $g_{i,j}^{(r)}(x)$ to denote the gating weight assigned to the $j$-th expert module of client $i$.
 where $g_{i,\ell,j}^{(r)}(x)$ represents the gating weight assigned to expert $j$ among the $e_\ell$ experts in the $\ell$-th MoE layer. For simplicity, we assume that $g_{i,\ell,j}^{(r)}(x)$ has been normalized within each MoE layer, and use $g_{i,j}^{(r)}(x)$ to denote the gating weight assigned to the $j$-th expert module of client $i$.
 
 %=========================================
 We study an edge FL framework for training a MoE model over edge clients with heterogeneous local data distributions and limited uplink communication resources. Due to the uplink transmission budget $B_i^{(r)}$, client $i$ is allowed to upload only a subset of expert parameters in communication round $r$. Let $\mathcal{E}=\{1,2,\ldots,n_e\}$ denote the set of expert modules, where $n_e$ is the total number of experts. For each client $i$, our objective is to find a feasible set of experts that satisfies the uplink communication budget while maximizing the local expert utilization:
 \begin{equation}
 \label{optimization objective}
-\label{optimization objective}
 \begin{aligned}
-\mathcal{S}_i^{(r),\star}
-=
-\arg\max_{\mathcal{S}\subseteq \mathcal{E}}
-\quad &
-\sum_{j\in \mathcal{S}}\mu_{i,j}^{(r)}
-\mathcal{S}_i^{(r),\star}
-=
-\arg\max_{\mathcal{S}\subseteq \mathcal{E}}
+\max_{\mathcal{S}\subseteq \mathcal{E}}
 \quad &
 \sum_{j\in \mathcal{S}}\mu_{i,j}^{(r)}
 \\
-\mathrm{s.t.}
 \mathrm{s.t.}
 \quad
 &
@@ -173,9 +147,7 @@ where $\mu_{i,j}^{(r)}=\mathbb{E}_{x\sim\mathcal{D}_i}[g_{i,j}^{(r)}(x)]$ denote
 \begin{equation}
 \label{eq:knapsack_general}
 \begin{aligned}
-\{z_{i,j}^{(r),\star}\}_{j=1}^{n_e}
-=
-\arg\max_{\{z_{i,j}^{(r)}\}_{j=1}^{n_e}}
+\max_{\{z_{i,j}^{(r)}\}_{j=1}^{n_e}}
 \quad &
 \sum_{j=1}^{n_e} z_{i,j}^{(r)} \mu_{i,j}^{(r)}
 \\
@@ -189,12 +161,7 @@ z_{i,j}^{(r)}\in\{0,1\},
 \quad j=1,\ldots,n_e ,
 \end{aligned}
 \end{equation}
-where $C_i^{(r)} = B_i^{(r)} - c_{\rm sh}$. The selected expert subset for client $i$ in communication round $r$ is then given by
-\begin{equation}
-    \mathcal{S}_i^{(r),\star}
-    =
-    \left\{j\,:\, z_{i,j}^{(r),\star}=1\right\}.
-\end{equation}
+where $C_i^{(r)} = B_i^{(r)} - c_{\rm sh}$. 
 
 \subsection{Adaptive Channel-Aware Expert Uploading}
 \label{subsec:proactive_channel_aware}
@@ -279,7 +246,8 @@ q \leftarrow q-c_j .
 \end{equation}
 Otherwise, expert $j$ is not selected. In either case, the index is decremented as $j \leftarrow j-1$, and the backtracking continues until $j=0$.
 
-After obtaining the current empirical expert subset $\widehat{\mathcal{S}}_{i,m}^{(r)}$, client $i$ evaluates whether this subset is sufficiently reliable under the current confidence intervals. Since the expert uploading problem is a knapsack problem, certifying every selected expert against every unselected expert is overly restrictive and does not directly characterize the stability of the selected subset. Meanwhile, certifying the current solution against all feasible competing subsets would require solving an additional knapsack-type optimization problem at each probing step. Therefore, \xxx further adopts a lightweight local confidence certification criterion based on feasible single-swap alternatives. Let $\mathcal{F}_i^{(r)}$ denote the collection of all feasible expert subsets under the current uplink budget:
+After obtaining the current empirical expert subset 
+$\widehat{\mathcal{S}}_{i,m}^{(r)}$, client $i$ evaluates whether the subset is sufficiently reliable under the current confidence intervals. Ideally, such reliability could be certified by comparing $\widehat{\mathcal{S}}_{i,m}^{(r)}$ against the best alternative expert subset that satisfies the uplink budget constraint. Nevertheless, when the uplink budget is not highly restrictive, the feasible subset family can be exponentially large in the number of experts, making subset-level certification computationally prohibitive during probing. Therefore, we propose a local confidence certification criterion based on feasible single-swap alternatives in \xxx. Specifically, let $\mathcal{F}_i^{(r)}$ denote the collection of all feasible expert subsets under the current uplink budget:
 \begin{equation}
 \label{eq:feasible_subset_family_xxx}
 \mathcal{F}_i^{(r)}
@@ -291,7 +259,7 @@ After obtaining the current empirical expert subset $\widehat{\mathcal{S}}_{i,m}
 \leq C_i^{(r)}
 \right\}.
 \end{equation}
-For the current empirical solution $\widehat{\mathcal{S}}_{i,m}^{(r)}$, its lower-confidence utility is defined as
+The lower-confidence utility of the current empirical subset is defined as
 \begin{equation}
 \label{eq:selected_subset_lcb_xxx}
 \mathrm{LCB}_{i,m}^{(r)}
@@ -310,6 +278,7 @@ For any feasible subset $\mathcal{S}\in \mathcal{F}_i^{(r)}$, its upper-confiden
 \sum_{j\in \mathcal{S}}
 U_{i,j}^{(r)}(m).
 \end{equation}
+
 Instead of comparing the current solution with all feasible subsets in $\mathcal{F}_i^{(r)}$, \xxx only considers its feasible single-swap neighborhood. For any selected expert $a\in\widehat{\mathcal{S}}_{i,m}^{(r)}$ and any unselected expert $b\in\mathcal{E}\setminus\widehat{\mathcal{S}}_{i,m}^{(r)}$, define
 \begin{equation}
 \label{eq:single_swap_subset_xxx}
@@ -319,7 +288,7 @@ Instead of comparing the current solution with all feasible subsets in $\mathcal
 \setminus \{a\}
 \cup \{b\}.
 \end{equation}
-Then, the feasible single-swap neighborhood is
+Then, the feasible single-swap neighborhood is given by
 \begin{equation}
 \label{eq:single_swap_neighbor_xxx}
 \mathcal{N}
@@ -351,89 +320,85 @@ The probing process terminates if
 \right)}
 \mathrm{UCB}_{i,m}^{(r)}(\mathcal{S}),
 \end{equation}
-or if the maximum probing budget $M_{\max}$ is reached. This condition states that, even under the most pessimistic utility estimate of the selected subset and the most optimistic utility estimate of any feasible single-swap alternative, the current empirical solution remains strictly better. Therefore, the selected expert subset passes a local confidence-based stability test under the current confidence intervals. Compared with exact subset-level certification over $\mathcal{F}_i^{(r)}$, the proposed single-swap stopping rule avoids enumerating all feasible subsets or invoking an additional knapsack DP oracle. Its evaluation only requires checking pairwise replacements between selected and unselected experts, leading to a complexity of $O(|\widehat{\mathcal{S}}_{i,m}^{(r)}|(n_e-|\widehat{\mathcal{S}}_{i,m}^{(r)}|))$ in the worst case. Although this local rule does not certify global optimality over the entire feasible family $\mathcal{F}_i^{(r)}$, it provides an efficient confidence-based stability test and is complemented by the hard probing limit $M_{\max}$.
-
-Finally, suppose the probing process terminates at $m=m_i^{(r)}$. Client
-$i$ then outputs the empirical DP solution as its upload expert subset:
-\begin{equation}
-\label{eq:final_selected_subset_xxx}
-\mathcal{S}_i^{(r)}
-=
-\widehat{\mathcal{S}}_{i,m_i^{(r)}}^{(r)} .
-\end{equation}
-Only the local updates of experts in $\mathcal{S}_i^{(r)}$ are uploaded to
-the edge server, while the remaining expert updates are skipped in the current
-round. Therefore, \xxx reduces local utilization-evaluation overhead through
-adaptive mini-batch probing and reduces uplink communication overhead through
-channel-aware sparse expert uploading. This design is particularly suitable for
-wireless edge learning scenarios where clients experience heterogeneous and
-time-varying uplink conditions.
+or if the maximum probing budget $M_{\max}$ is reached. Subsequently, once the stopping criterion is satisfied, only the experts selected in $\widehat{\mathcal{S}}_{i,m}^{(r)}$ participate in local training and upload their updates to the server in the current round, whereas the remaining experts are excluded from training.
 
 \subsection{Expert-Wise Sparse Expert Aggregation}
+\label{subsec:expert_sparse_aggregation}
 
-Since clients may select different expert subsets due to heterogeneous data distributions and time-varying channel budgets, the server performs aggregation in a sparse, expert-wise manner. For expert \(j\), define the set of clients that upload its update in round \(r\) as
+Given the client-specific expert subsets uploaded to the server, \xxx performs sparse expert-wise aggregation by updating each expert only with local updates from the corresponding clients, while aggregating the shared parameters using FedAvg~\cite{mcmahan2017communication}. For each expert $j$, we define the set of clients uploading its update in communication round $r$ as
 \begin{equation}
 \label{eq:client_set_expert}
-\mathcal{C}_j^{(r)}
+\mathcal{I}_j^{(r)}
 =
 \left\{
-i\in\mathcal{I}^{(r)}:
-j\in\widehat{\mathcal{S}}_i^{(r)}
+i\in\mathcal{I}:
+j\in
+\widehat{\mathcal{S}}_{i,m}^{(r)}
 \right\},
 \end{equation}
-where \(\mathcal{I}^{(r)}\) is the set of clients participating in round \(r\). The server aggregates expert \(j\) only over \(\mathcal{C}_j^{(r)}\), rather than treating missing expert updates as zeros. Specifically, the aggregated expert update is
+
+The server aggregates expert $j$ only over the clients in $\mathcal{I}_j^{(r)}$, rather than treating the missing expert updates from other clients as zero updates. Let $\Delta_{i,j}^{(r)}$ denote the local update of expert $j$ uploaded by client $i$ in round $r$, where $i\in\mathcal{I}_j^{(r)}$. The sparse aggregated update for expert $j$ is computed as
 \begin{equation}
 \label{eq:expert_sparse_agg}
 \Delta_j^{(r)}
 =
 \frac{
-\sum_{i\in\mathcal{C}_j^{(r)}}
-\omega_{i,j}^{(r)}\Delta_{i,j}^{(r)}
+\sum_{i\in\mathcal{I}_j^{(r)}}
+n_{i,j}^{(r)}
+\Delta_{i,j}^{(r)}
 }{
-\sum_{i\in\mathcal{C}_j^{(r)}}
-\omega_{i,j}^{(r)}
+\sum_{i\in\mathcal{I}_j^{(r)}}
+n_{i,j}^{(r)}
 },
 \qquad
-\mathcal{C}_j^{(r)}\ne\varnothing .
+\mathcal{I}_j^{(r)}\ne\varnothing .
 \end{equation}
-If \(\mathcal{C}_j^{(r)}=\varnothing\), expert \(j\) is kept unchanged in the current round. The aggregation weight \(\omega_{i,j}^{(r)}\) should reflect the effective contribution of client \(i\) to expert \(j\). Instead of using only the total local sample size \(n_i\), we adopt the number of tokens actually routed to and executed by expert \(j\), denoted by \(n_{i,j}^{(r)}\), i.e.,
-\begin{equation}
-\label{eq:expert_weight}
-\omega_{i,j}^{(r)} = n_{i,j}^{(r)} .
-\end{equation}
-This expert-aware weighting allows each expert to be mainly updated by clients that have sufficient local evidence for that expert, which is consistent with the conditional-computation structure of MoE models under non-IID data.
-
-The global expert parameters are then updated as
+where $n_{i,j}^{(r)}$ denote the number of tokens routed to and processed by expert $j$ during client $i$'s local training in round $r$. After obtaining $\Delta_j^{(r)}$, the server updates the global parameters of expert $j$ as
 \begin{equation}
 \label{eq:expert_update}
 \boldsymbol{\theta}_{j}^{(r+1)}
 =
 \boldsymbol{\theta}_{j}^{(r)}
 +
-\eta_{\rm g}\Delta_j^{(r)},
+\eta_{\rm g}
+\Delta_j^{(r)},
+\qquad
+\mathcal{I}_j^{(r)}\ne\varnothing ,
 \end{equation}
-where \(\eta_{\rm g}\) is the server-side update step size. For the shared parameters, the server applies standard federated aggregation over all clients that upload the shared update:
+where $\eta_{\rm g}$ is the server-side update step size. If $\mathcal{I}_j^{(r)}=\varnothing$, the corresponding expert parameters remain unchanged:
+\begin{equation}
+\label{eq:expert_no_update}
+\boldsymbol{\theta}_{j}^{(r+1)}
+=
+\boldsymbol{\theta}_{j}^{(r)}.
+\end{equation}
+
+Since all clients train and upload the shared parameters, the server updates the shared parameters via FedAvg over the participating clients. Let $\Delta_{{\rm sh},i}^{(r)}$ denote the shared parameter update uploaded by client $i$. The aggregated shared update is computed as
 \begin{equation}
 \label{eq:shared_agg}
 \Delta_{\rm sh}^{(r)}
 =
 \frac{
-\sum_{i\in\mathcal{I}^{(r)}}
-n_i\Delta_{{\rm sh},i}^{(r)}
+\sum_{i\in\mathcal{I}}
+n_i
+\Delta_{{\rm sh},i}^{(r)}
 }{
-\sum_{i\in\mathcal{I}^{(r)}} n_i
+\sum_{i\in\mathcal{I}}
+n_i
 },
 \end{equation}
-followed by
+where $n_i=|\mathcal{D}_i|$ denotes the local dataset size of client $i$. The global shared parameters are then updated by
 \begin{equation}
 \label{eq:shared_update}
 \boldsymbol{\theta}_{\rm sh}^{(r+1)}
 =
 \boldsymbol{\theta}_{\rm sh}^{(r)}
 +
-\eta_{\rm g}\Delta_{\rm sh}^{(r)} .
+\eta_{\rm g}
+\Delta_{\rm sh}^{(r)} .
 \end{equation}
-Finally, the updated shared parameters and expert parameters form the new global MoE model, which is broadcast to clients in the next round. In this way, the proposed method closes the loop from wireless-channel-aware budget construction, to confidence-guided local expert identification, to sparse expert-wise server aggregation.
+
+Finally, the updated shared parameters $\boldsymbol{\theta}_{\rm sh}^{(r+1)}$ and expert parameters $\{\boldsymbol{\theta}_{j}^{(r+1)}\}_{j=1}^{n_e}$ are assembled into the updated global MoE model, which is then broadcast to all clients in the next communication round.
 
 \input{evaluation}
 

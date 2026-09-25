@@ -5,11 +5,11 @@ We evaluate probe-before-train under wireless federated MoE training. This secti
 
 \subsection{Experimental Setup}
 
-We use five image benchmarks with Dirichlet label partitions at $\alpha=0.1$~\cite{hsu2019measuring}: CIFAR-10 and CIFAR-100~\cite{krizhevsky2009learning}, STL-10~\cite{coates2011analysis}, Tiny-ImageNet~\cite{le2015tiny}, and CINIC-10~\cite{darlow2018cinic}. The backbone is ResNet-18~\cite{he2016deep} or VGG11~\cite{simonyan2015very}, followed by a sparse MoE head of $M=8$ feed-forward experts and Top-$2$ routing. All $N=10$ clients participate in every round.
+We use five image benchmarks with Dirichlet label partitions at $\alpha=0.1$~\cite{hsu2019measuring}: CIFAR-10 and CIFAR-100~\cite{krizhevsky2009learning}, STL-10~\cite{coates2011analysis}, Tiny-ImageNet~\cite{le2015tiny}, and CINIC-10~\cite{darlow2018cinic}. The backbone is ResNet-18~\cite{he2016deep} or VGG11~\cite{simonyan2015very}, followed by a sparse MoE head of $n_e=8$ feed-forward experts and Top-$2$ routing. All $n=10$ clients participate in every round.
 
-The uplink follows the block-fading Shannon model used in wireless federated learning~\cite{xu2021client,zhou2022time}. In each round, client $i$ draws an independent Rayleigh coefficient that stays fixed for that round. At a mean SNR of $10$\,dB, the bit budget is clipped to $[10,80]$, and the scaling constant is set so that a unit-power channel falls at the midpoint of this range. Each expert costs $10$ units, so the client uploads $K_i^{(r)}\in\{1,\ldots,8\}$ experts. The shared backbone and the router are always uploaded. Because the channel is redrawn every round, $K_i^{(r)}$ changes over time.
+The uplink follows the block-fading Shannon model used in wireless federated learning~\cite{xu2021client,zhou2022time}. In each round, client $i$ draws an independent Rayleigh coefficient that stays fixed for that round. At a mean SNR of $10$\,dB, the bit budget is clipped to $[10,80]$, and the scaling constant is set so that a unit-power channel falls at the midpoint of this range. Each expert costs $10$ units, so the client uploads $|\widehat{\mathcal{S}}_{i,m}^{(r)}|\in\{1,\ldots,n_e\}$ experts. The shared backbone and the router are always uploaded. Because the channel is redrawn every round, $|\widehat{\mathcal{S}}_{i,m}^{(r)}|$ changes over time.
 
-Expert selection and server aggregation are varied one at a time. Under token-weighted aggregation, probe-before-train is compared with Random and FedRolex~\cite{alam2022fedrolex}. Random draws $K_i^{(r)}$ experts uniformly from the feasible set, then trains and uploads only that subset, without using the local router. FedRolex advances a window of $K_i^{(r)}$ consecutive experts from round to round and likewise ignores per-client utility. Under probe-before-train, token-weighted aggregation is compared with FedAvg~\cite{mcmahan2017communication} and FedAdam~\cite{reddi2021adaptive}. FedAvg writes every missing expert update as a zero tensor and then averages clients by local sample size. FedAdam omits missing experts from that average and applies server Adam only to the uploaded tensors, with step size $0.01$, decay rates $0.9$ and $0.99$, and stability constant $0.01$.
+Expert selection and server aggregation are varied one at a time. Under token-weighted aggregation, probe-before-train is compared with Random and FedRolex~\cite{alam2022fedrolex}. Random draws $|\widehat{\mathcal{S}}_{i,m}^{(r)}|$ experts uniformly from the feasible set, then trains and uploads only that subset, without using the local router. FedRolex advances a window of $|\widehat{\mathcal{S}}_{i,m}^{(r)}|$ consecutive experts from round to round and likewise ignores per-client utility. Under probe-before-train, token-weighted aggregation is compared with FedAvg~\cite{mcmahan2017communication} and FedAdam~\cite{reddi2021adaptive}. FedAvg writes every missing expert update as a zero tensor and then averages clients by local sample size. FedAdam omits missing experts from that average and applies server Adam only to the uploaded tensors, with step size $0.01$, decay rates $0.9$ and $0.99$, and stability constant $0.01$.
 
 Training runs for $100$ rounds. Each client uses two local epochs, batch size $64$, and SGD with momentum $0.9$ and weight decay $10^{-4}$. The learning rate rises linearly from $10^{-4}$ to $0.01$ over the first five rounds and then stays at $0.01$. The loss uses label smoothing of $0.1$. Probing uses two forward mini-batches. Every run uses seed $42$.
 
@@ -21,54 +21,30 @@ The gap to the runner-up depends on the task. It is $0.03$ points on CIFAR-10 wi
 
 Fig.~\ref{fig:main_acc} plots a centered moving average of the same runs. The proposed curve is the upper one on most panels, which matches the best-accuracy ranking and also shows that the lead is not a single-round spike. On CIFAR-10 with ResNet-18, FedRolex reaches $82.20\%$ at round 100, next to the proposed peak of $82.23\%$, yet its mean over the last 10 rounds is $76.56\%$, against $80.91\%$ for the proposed method. On CIFAR-10 with VGG11 the late curves are closer: FedAvg averages $76.88\%$ over the last 10 rounds and the proposed method $74.70\%$, while the proposed peak remains higher ($81.09\%$ versus $78.08\%$).
 
-Two controls isolate where the gain comes from. With token-weighted aggregation fixed, FedRolex and Random ignore the probe. Random uploads a feasible subset drawn uniformly, so the trained experts need not be the ones the local router uses. FedRolex cycles a window of $K_i^{(r)}$ experts and likewise ignores per-client utility, so a tight uplink can be spent on experts that the client rarely routes to. Against the stronger of these two, probe-before-train gains $1.89$ points on average. With probe-before-train fixed, FedAvg and FedAdam change only the server update. FedAvg imputes missing experts as zeros, so an expert is pulled toward clients that did not train it in that round; this costs $3.68$ points on average. FedAdam then applies server Adam to the uploaded tensors and is the weakest method on average, trailing by $5.87$ points, including $9.51$ points on STL-10 with ResNet-18 ($45.29$ versus $35.78$). Routed-token weights follow which experts actually ran; sample size and server Adam do not replace that count.
+Two controls isolate where the gain comes from. With token-weighted aggregation fixed, FedRolex and Random ignore the probe. Random uploads a feasible subset drawn uniformly, so the trained experts need not be the ones the local router uses. FedRolex cycles a window of $|\widehat{\mathcal{S}}_{i,m}^{(r)}|$ experts and likewise ignores per-client utility, so a tight uplink can be spent on experts that the client rarely routes to. Against the stronger of these two, probe-before-train gains $1.89$ points on average. With probe-before-train fixed, FedAvg and FedAdam change only the server update. FedAvg imputes missing experts as zeros, so an expert is pulled toward clients that did not train it in that round; this costs $3.68$ points on average. FedAdam then applies server Adam to the uploaded tensors and is the weakest method on average, trailing by $5.87$ points, including $9.51$ points on STL-10 with ResNet-18 ($45.29$ versus $35.78$). Routed-token weights follow which experts actually ran; sample size and server Adam do not replace that count.
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{fig01_max_smooth.pdf}
+\includegraphics[width=\textwidth]{Main Results.pdf}
 \caption{Smoothed test accuracy under $\alpha=0.1$ and a time-varying uplink. Top: ResNet-18. Bottom: VGG11. Each curve is a centered moving average of the per-round test accuracy.}
 \label{fig:main_acc}
 \end{figure*}
 
-\subsection{Scalability Analysis}
+\subsection{Sensitivity}
 
-Fig.~\ref{fig:clients} varies the number of clients on CIFAR-10, CIFAR-100, and CINIC-10 with $\alpha=0.1$ and $N\in\{20,35,50\}$. The proposed method remains the strongest among the compared baselines at all three scales. Larger $N$ fragments each local distribution; restricting both training and aggregation to probed, communication-feasible experts avoids mixing inconsistent truncated updates.
+Fig.~\ref{fig:sensitivity} varies the uplink transmission budget $B_i^{(r)}$, the number of experts $n_e$, and the number of clients $n$ on CIFAR-100 with ResNet-18. Each panel uses the same methods as the main comparison and the same centered moving average as the CIFAR-100 panels.
 
-\begin{figure*}[!t]
+\begin{figure}[!t]
 \centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.4cm}
-{\small Placeholder for accuracy curves at $N\in\{20,35,50\}$ on CIFAR-10, CIFAR-100, and CINIC-10.}
-\vspace{2.4cm}}}
-\caption{Test accuracy under varying numbers of clients with $\alpha=0.1$. Numerical curves will be inserted after experiments.}
-\label{fig:clients}
-\end{figure*}
-
-Fig.~\ref{fig:noniid} varies $\alpha\in\{0.1,0.3,0.5\}$ under the same time-varying uplink. The method is comparable to existing approaches at $\alpha=0.5$ and pulls ahead as the split becomes more skewed. Smaller $\alpha$ peaks local gating, so a few forward passes suffice to identify a feasible expert subset before gradient descent.
-
-Fig.~\ref{fig:budget} varies $K\in\{1,2,3,4\}$ and a time-varying $B_i^{(r)}$. All methods improve as more experts can be transmitted, but the proposed method degrades more slowly at $K\in\{1,2\}$, because the feasible subset in~\eqref{eq:knapsack_general} is chosen before local training. Per-round probing also tracks fluctuating channels rather than relying on a static expert allocation.
-
-\begin{figure*}[!t]
-\centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.4cm}
-{\small Placeholder for accuracy curves at $\alpha\in\{0.1,0.3,0.5\}$ on CIFAR-10, CIFAR-100, and CINIC-10.}
-\vspace{2.4cm}}}
-\caption{Test accuracy under varying non-IID levels with a time-varying uplink budget. Numerical curves will be inserted after experiments.}
-\label{fig:noniid}
-\end{figure*}
-
-\begin{figure*}[!t]
-\centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.4cm}
-{\small Placeholder for accuracy curves under $K\in\{1,2,3,4\}$ and a time-varying uplink budget.}
-\vspace{2.4cm}}}
-\caption{Test accuracy under varying uplink budgets with $\alpha=0.1$. Numerical curves will be inserted after experiments.}
-\label{fig:budget}
-\end{figure*}
+\includegraphics[width=\columnwidth]{Sensitivity.pdf}
+\caption{Sensitivity of test accuracy on CIFAR-100 with ResNet-18. Top: uplink transmission budget $B_i^{(r)}$. Middle: number of experts $n_e$. Bottom: number of clients $n$.}
+\label{fig:sensitivity}
+\end{figure}
 
 \subsection{Probe-before-train versus Post-hoc Sparse Upload}
 \label{sec:prepost}
 
-Fig.~\ref{fig:prepost} compares probe-before-train with Post-hoc Sparse Upload on CIFAR-10 and CIFAR-100 under $\alpha=0.1$ and the same time-varying uplink. Both methods upload $K_i^{(r)}$ experts per round and share the same gate utility, so the uplink cardinality is matched. The difference is when selection happens. Post-hoc trains every routed expert and only then discards updates that cannot be transmitted; those extra backward passes never enter aggregation, yet they still consume local time. Probe-before-train freezes the unselected experts before SGD, so local computation tracks the upload budget.
+Fig.~\ref{fig:prepost} compares probe-before-train with Post-hoc Sparse Upload on CIFAR-10 and CIFAR-100 under $\alpha=0.1$ and the same time-varying uplink. Both methods upload $|\widehat{\mathcal{S}}_{i,m}^{(r)}|$ experts per round and share the same gate utility, so the uplink cardinality is matched. The difference is when selection happens. Post-hoc trains every routed expert and only then discards updates that cannot be transmitted; those extra backward passes never enter aggregation, yet they still consume local time. Probe-before-train freezes the unselected experts before SGD, so local computation tracks the upload budget.
 
 Because the two methods spend a different amount of work in each round, we plot test accuracy against cumulative local training time rather than the round index. Evaluation time is excluded. Under this axis, the proposed method reaches $xx.x\%$ / $xx.x\%$ accuracy $xx.x\times$ / $xx.x\times$ faster on CIFAR-10 / CIFAR-100, and reduces per-round expert-training cost by $xx.x\%$. Round-wise accuracy remains comparable ($xx.x$ vs.\ $xx.x$ points), confirming that the main saving is compute rather than a change in the communication protocol.
 
@@ -76,7 +52,7 @@ Because the two methods spend a different amount of work in each round, we plot 
 \centering
 \fbox{\parbox{0.96\textwidth}{\centering\vspace{2.6cm}
 {\small Placeholder for accuracy versus cumulative local training time: probe-before-train vs.\ Post-hoc Sparse Upload, on CIFAR-10/100 under $\alpha=0.1$.}\\[0.4em]
-{\scriptsize Same $K_i^{(r)}$ and gate utility; evaluation time excluded.}
+{\scriptsize Same $|\widehat{\mathcal{S}}_{i,m}^{(r)}|$ and gate utility; evaluation time excluded.}
 \vspace{2.6cm}}}
 \caption{Probe-before-train versus Post-hoc Sparse Upload: test accuracy against cumulative local training time. Numerical curves will be inserted after experiments.}
 \label{fig:prepost}
