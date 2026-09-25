@@ -14,6 +14,7 @@ import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE / 'data'
+LATEX = HERE.parents[2] / 'latex'
 
 COLORS = ['#0072B2', '#D55E00', '#009E73']
 METHODS = [
@@ -69,11 +70,15 @@ def pad_ylim(ax, curves):
     ax.set_ylim(float(ycat.min()) - pad, float(ycat.max()) + pad)
 
 
-def save(fig, stem: str):
+def save(fig, stem: str, latex_copy: bool = False):
     for ext in ('png', 'pdf'):
         path = HERE / f'{stem}.{ext}'
         fig.savefig(path)
         print(path)
+    if latex_copy:
+        latex_pdf = LATEX / f'{stem}.pdf'
+        fig.savefig(latex_pdf)
+        print(latex_pdf)
     plt.close(fig)
 
 
@@ -125,19 +130,41 @@ def plot_accuracy():
 
 
 def plot_avg_local_time():
-    apply_paper_style()
-    fig, axes = plt.subplots(
-        1, 2, figsize=(3.15 * 2, 3.15),
-        sharey=False, layout='constrained',
-    )
+    # 单栏左右：左 ResNet、右 VGG11。字号和灰框跟 Main Raw 的子图一致。
+    plt.rcParams.update({
+        'font.family': 'serif',
+        'font.serif': ['Times New Roman', 'Times', 'DejaVu Serif'],
+        'mathtext.fontset': 'stix',
+        'font.size': 22,
+        'axes.labelsize': 24,
+        'axes.titlesize': 22,
+        'xtick.labelsize': 20,
+        'ytick.labelsize': 20,
+        'axes.linewidth': 0.9,
+        'axes.grid': True,
+        'grid.alpha': 0.28,
+        'grid.linestyle': '--',
+        'grid.linewidth': 0.5,
+        'axes.spines.top': True,
+        'axes.spines.right': True,
+        'axes.edgecolor': '#9A9A9A',
+        'pdf.fonttype': 42,
+        'ps.fonttype': 42,
+        'savefig.dpi': 300,
+        'savefig.bbox': 'tight',
+        'savefig.pad_inches': 0.04,
+        'figure.facecolor': 'white',
+        'axes.facecolor': 'white',
+    })
+    fig, axes = plt.subplots(1, 2, figsize=(4.7 * 2, 3.6), sharey=False)
     order = [
         ('random', 'Random', '#009E73'),
         ('ours', 'Ours', '#0072B2'),
         ('posthoc', 'Post-hoc', '#D55E00'),
     ]
     x = np.arange(len(order))
-    for c, (backbone_name, backbone_slug) in enumerate(BACKBONES):
-        ax = axes[c]
+    for r, (backbone_name, backbone_slug) in enumerate(BACKBONES):
+        ax = axes[r]
         means = []
         for method_slug, _label, _color in order:
             df = load_frame(backbone_slug, method_slug)
@@ -147,26 +174,33 @@ def plot_avg_local_time():
             width=0.62,
             color=[color for _slug, _label, color in order],
             edgecolor='black',
-            linewidth=0.6,
+            linewidth=0.8,
             zorder=3,
         )
         ymax = max(means)
-        ax.set_ylim(0, ymax * 1.18)
+        ax.set_ylim(0, ymax * 1.22)
         ax.set_xticks(x, [label for _slug, label, _color in order])
+        ax.tick_params(axis='x', labelbottom=True)
         ax.grid(axis='y')
         ax.set_axisbelow(True)
-        ax.set_title(f'CIFAR-100 / {backbone_name}', fontsize=10)
+        ax.margins(x=0.08)
+        for spine in ax.spines.values():
+            spine.set_visible(True)
+            spine.set_color('#7A7A7A')
+            spine.set_linewidth(1.15)
+        ax.set_title(f'CIFAR-100 / {backbone_name}', fontsize=22, pad=6)
         ax.set_xlabel('Method')
-        if c == 0:
-            ax.set_ylabel('Avg. local training time per round (s)')
+        if r == 0:
+            ax.set_ylabel('Time (s)')
         for bar, value in zip(bars, means):
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
-                value + ymax * 0.02,
+                value + ymax * 0.025,
                 f'{value:.1f}',
-                ha='center', va='bottom', fontsize=8,
+                ha='center', va='bottom', fontsize=18,
             )
-    save(fig, 'fig03_avg_local_time')
+    fig.subplots_adjust(left=0.08, right=0.985, bottom=0.16, top=0.88, wspace=0.18)
+    save(fig, 'Efficiency', latex_copy=True)
 
 
 def plot_efficiency():

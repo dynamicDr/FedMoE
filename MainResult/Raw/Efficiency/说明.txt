@@ -14,12 +14,13 @@ Efficiency：先选再训练 vs 先训再丢 vs 随机选 的复现材料
 脚本会在本目录写出：
     fig01_test_accuracy.png / .pdf
     fig02_accuracy_vs_local_time.png / .pdf
-    fig03_avg_local_time.png / .pdf
+    Efficiency.png / .pdf
+脚本同时把同一份 PDF 写到 latex/Efficiency.pdf。
     fig04_expert_upload.png / .pdf
 
 图
 --
-1 行 × 2 列。左：ResNet。右：VGG11。
+fig01 和 fig02 是 1 行 × 2 列。左：ResNet。右：VGG11。
 Ours / Random：CIFAR-100，8 专家，带宽 [10, 80]，来自 exp01。
 Post-hoc：CIFAR-100，32 专家，带宽 [1, 40]，来自 exp10。
 本地训练对全部专家做前向和反传，再按门控分数只上传 K 个。
@@ -33,7 +34,7 @@ Post-hoc：CIFAR-100，32 专家，带宽 [1, 40]，来自 exp10。
 fig01 横轴是通信轮次。
 fig02 横轴是累计本地训练时间（分钟），由 LocalTrainTimeSec 逐轮累加后再除以 60。
 不含聚合时间，也不含测试时间。
-fig03 是柱状图，左右仍是 ResNet 和 VGG11。柱从左到右是 Random，Ours，Post-hoc。
+Efficiency 是单栏柱状图，左 ResNet、右 VGG11，四边灰色矩形边框，字号与 Main Raw 子图一致。纵轴为 Time (s)。柱从左到右是 Random，Ours，Post-hoc。
 高度是 LocalTrainTimeSec 在 100 轮上的平均值（秒），不含聚合和测试。
 柱顶标数值。纵轴从 0 起。
 fig04 只画 ResNet 的 Ours，32 专家，带宽 [10, 320]，来自 exp03。

@@ -46,14 +46,11 @@ Fig.~\ref{fig:sensitivity} varies the uplink transmission budget $B_i^{(r)}$, th
 
 Fig.~\ref{fig:prepost} compares probe-before-train with Post-hoc Sparse Upload on CIFAR-10 and CIFAR-100 under $\alpha=0.1$ and the same time-varying uplink. Both methods upload $|\widehat{\mathcal{S}}_{i,m}^{(r)}|$ experts per round and share the same gate utility, so the uplink cardinality is matched. The difference is when selection happens. Post-hoc trains every routed expert and only then discards updates that cannot be transmitted; those extra backward passes never enter aggregation, yet they still consume local time. Probe-before-train freezes the unselected experts before SGD, so local computation tracks the upload budget.
 
-Because the two methods spend a different amount of work in each round, we plot test accuracy against cumulative local training time rather than the round index. Evaluation time is excluded. Under this axis, the proposed method reaches $xx.x\%$ / $xx.x\%$ accuracy $xx.x\times$ / $xx.x\times$ faster on CIFAR-10 / CIFAR-100, and reduces per-round expert-training cost by $xx.x\%$. Round-wise accuracy remains comparable ($xx.x$ vs.\ $xx.x$ points), confirming that the main saving is compute rather than a change in the communication protocol.
+Fig.~\ref{fig:prepost} reports the average local training time per round on CIFAR-100. Aggregation and evaluation time are excluded. Ours takes $53.2$\,s on ResNet-18 and $47.0$\,s on VGG11, against $67.5$\,s and $63.0$\,s for Post-hoc.
 
-\begin{figure*}[!t]
+\begin{figure}[!t]
 \centering
-\fbox{\parbox{0.96\textwidth}{\centering\vspace{2.6cm}
-{\small Placeholder for accuracy versus cumulative local training time: probe-before-train vs.\ Post-hoc Sparse Upload, on CIFAR-10/100 under $\alpha=0.1$.}\\[0.4em]
-{\scriptsize Same $|\widehat{\mathcal{S}}_{i,m}^{(r)}|$ and gate utility; evaluation time excluded.}
-\vspace{2.6cm}}}
-\caption{Probe-before-train versus Post-hoc Sparse Upload: test accuracy against cumulative local training time. Numerical curves will be inserted after experiments.}
+\includegraphics[width=\columnwidth]{Efficiency.pdf}
+\caption{Average local training time per round on CIFAR-100. Left: ResNet-18. Right: VGG11. Aggregation and evaluation time are excluded.}
 \label{fig:prepost}
-\end{figure*}
+\end{figure}
