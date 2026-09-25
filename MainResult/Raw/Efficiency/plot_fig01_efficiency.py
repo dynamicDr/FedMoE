@@ -124,6 +124,51 @@ def plot_accuracy():
     save(fig, 'fig01_test_accuracy')
 
 
+def plot_avg_local_time():
+    apply_paper_style()
+    fig, axes = plt.subplots(
+        1, 2, figsize=(3.15 * 2, 3.15),
+        sharey=False, layout='constrained',
+    )
+    order = [
+        ('random', 'Random', '#009E73'),
+        ('ours', 'Ours', '#0072B2'),
+        ('posthoc', 'Post-hoc', '#D55E00'),
+    ]
+    x = np.arange(len(order))
+    for c, (backbone_name, backbone_slug) in enumerate(BACKBONES):
+        ax = axes[c]
+        means = []
+        for method_slug, _label, _color in order:
+            df = load_frame(backbone_slug, method_slug)
+            means.append(float(df['LocalTrainTimeSec'].mean()))
+        bars = ax.bar(
+            x, means,
+            width=0.62,
+            color=[color for _slug, _label, color in order],
+            edgecolor='black',
+            linewidth=0.6,
+            zorder=3,
+        )
+        ymax = max(means)
+        ax.set_ylim(0, ymax * 1.18)
+        ax.set_xticks(x, [label for _slug, label, _color in order])
+        ax.grid(axis='y')
+        ax.set_axisbelow(True)
+        ax.set_title(f'CIFAR-100 / {backbone_name}', fontsize=10)
+        ax.set_xlabel('Method')
+        if c == 0:
+            ax.set_ylabel('Avg. local training time per round (s)')
+        for bar, value in zip(bars, means):
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                value + ymax * 0.02,
+                f'{value:.1f}',
+                ha='center', va='bottom', fontsize=8,
+            )
+    save(fig, 'fig03_avg_local_time')
+
+
 def plot_efficiency():
     apply_paper_style()
     fig, axes = plt.subplots(
@@ -154,6 +199,47 @@ def plot_efficiency():
     save(fig, 'fig02_accuracy_vs_local_time')
 
 
+def plot_expert_upload():
+    apply_paper_style()
+    fig, ax = plt.subplots(figsize=(6.6, 3.15), layout='constrained')
+    upload = pd.read_csv(DATA / 'cifar100' / 'resnet' / 'ours-e32_upload.csv')
+    bw = pd.read_csv(DATA / 'cifar100' / 'resnet' / 'ours-e32_bw.csv')
+    ax.scatter(
+        upload['Round'], upload['ExpertId'],
+        s=1.5, color=COLORS[0], linewidths=0, zorder=3,
+    )
+    ax.set_ylim(-0.6, 31.4)
+    ax.set_xlim(0.5, 100.5)
+    twin = ax.twinx()
+    twin.plot(
+        bw['Round'], bw['MeanUplinkBandwidth'],
+        color='black', linewidth=1.1, zorder=2,
+    )
+    twin.set_ylim(0, float(bw['MeanUplinkBandwidth'].max()) * 1.15)
+    twin.grid(False)
+    twin.set_ylabel('Uplink bandwidth')
+    ax.set_title('ResNet / Ours', fontsize=10)
+    ax.set_xlabel('Communication round')
+    ax.set_ylabel('Expert id')
+    handles = [
+        plt.Line2D([0], [0], marker='o', color='none', markerfacecolor='#555555', markersize=4, label='Uploaded expert'),
+        plt.Line2D([0], [0], color='black', linewidth=1.1, label='Uplink bandwidth'),
+    ]
+    legend = fig.legend(
+        handles, [h.get_label() for h in handles],
+        loc='outside upper center', ncol=2,
+        frameon=True, fancybox=False, fontsize=9,
+        borderpad=0.45, handlelength=2.2, columnspacing=1.2,
+    )
+    frame = legend.get_frame()
+    frame.set_edgecolor('black')
+    frame.set_linewidth(0.8)
+    frame.set_facecolor('white')
+    save(fig, 'fig04_expert_upload')
+
+
 if __name__ == '__main__':
     plot_accuracy()
     plot_efficiency()
+    plot_avg_local_time()
+    plot_expert_upload()

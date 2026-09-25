@@ -14,12 +14,17 @@ Efficiency：先选再训练 vs 先训再丢 vs 随机选 的复现材料
 脚本会在本目录写出：
     fig01_test_accuracy.png / .pdf
     fig02_accuracy_vs_local_time.png / .pdf
+    fig03_avg_local_time.png / .pdf
+    fig04_expert_upload.png / .pdf
 
 图
 --
-1 行 × 2 列。CIFAR-100，8 专家，Top-2，10 客户端，Dirichlet 0.1，
-带宽 [10, 80]，聚合均为 token-weighted（ours）。
-左：ResNet。右：VGG11。
+1 行 × 2 列。左：ResNet。右：VGG11。
+Ours / Random：CIFAR-100，8 专家，带宽 [10, 80]，来自 exp01。
+Post-hoc：CIFAR-100，32 专家，带宽 [1, 40]，来自 exp10。
+本地训练对全部专家做前向和反传，再按门控分数只上传 K 个。
+图上只标 Post-hoc，不写带宽。
+三者都是 Top-2 路由、10 客户端、Dirichlet 0.1，聚合均为 token-weighted（ours）。
 每条曲线是原始测试精度，不平滑。
 图例在上方，带黑框，横排：Ours，Post-hoc，Random。
 颜色依次为 #0072B2，#D55E00，#009E73。
@@ -28,17 +33,26 @@ Efficiency：先选再训练 vs 先训再丢 vs 随机选 的复现材料
 fig01 横轴是通信轮次。
 fig02 横轴是累计本地训练时间（分钟），由 LocalTrainTimeSec 逐轮累加后再除以 60。
 不含聚合时间，也不含测试时间。
+fig03 是柱状图，左右仍是 ResNet 和 VGG11。柱从左到右是 Random，Ours，Post-hoc。
+高度是 LocalTrainTimeSec 在 100 轮上的平均值（秒），不含聚合和测试。
+柱顶标数值。纵轴从 0 起。
+fig04 只画 ResNet 的 Ours，32 专家，带宽 [10, 320]，来自 exp03。
+横轴是通信轮次，左纵轴是专家编号。该轮只要有客户端上传这个专家，就画一个点。
+右纵轴的黑线是 10 个客户端上行带宽的平均值。
+点的数据在 data/cifar100/resnet/ours-e32_upload.csv，
+带宽在同目录的 ours-e32_bw.csv。
 
 三条曲线
 --------
   Ours      先探测，再只训练选中的专家。来自 exp01。
-  Post-hoc  先训练全部专家，再按同一门控分数上传 Top-K。来自 exp08。
+  Post-hoc  32 专家，带宽 [1, 40]，先对全部专家做前向和反传，再按门控分数上传 K 个。来自 exp10。
   Random    随机选 K 个专家再训练。来自 exp01。
 
 数据
 ----
 data/cifar100/<骨干>/<方法>.csv
-骨干：resnet，vgg11。方法：ours，posthoc，random。
+骨干：resnet，vgg11。
+方法：ours，posthoc，random。
 每个文件 100 轮。列：
   Round, TestAcc, AvgLoss,
   LocalTrainTimeSec, AggTimeSec, EvalTimeSec, RoundTimeSec,
