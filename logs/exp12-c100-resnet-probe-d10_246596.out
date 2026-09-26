@@ -1,0 +1,335 @@
+========================================
+Job    : exp12-c100-resnet-probe-d10
+Host   : gpu-4090-114
+Date   : Sat Sep 26 07:02:50 HKT 2026
+GPU    : 0
+Python : /userhome/cs3/duanty/miniconda3/envs/moe/bin/python
+Command: python -u probe_agreement.py --dataset cifar100 --backbone resnet --method ours --select ours --merge ours --device cuda --num_clients 10 --radius_mode delta --delta 0.1 --output_dir ./results/exp12-c100-resnet-probe-d10
+========================================
+
+[Partition] Dirichlet beta=0.1, 10 clients
+  Client 0:   4573 samples | 45/100 classes
+  Client 1:   4218 samples | 54/100 classes
+  Client 2:   3656 samples | 48/100 classes
+  Client 3:   5018 samples | 43/100 classes
+  Client 4:   6664 samples | 52/100 classes
+  Client 5:   6137 samples | 45/100 classes
+  Client 6:   6582 samples | 49/100 classes
+  Client 7:   4512 samples | 39/100 classes
+  Client 8:   5219 samples | 46/100 classes
+  Client 9:   3421 samples | 100/100 classes
+
+[Export] /userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254
+[Probe] cifar100 / resnet | experts=8 | clients=10 | tight K=[1, 3] | bw=[10, 80] | batch=64 | beta=0.1 | rounds=100 | from_round=1
+[Probe] radius=delta scale=1 delta=0.1 seed=42
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+    1 | loss 3.7522 | acc   1.60% | best   1.60% | tight 4 | total 4 | stop 16.00 | agree 100.0% (n=4) | 1:02.02
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+    2 | loss 3.3088 | acc   4.12% | best   4.12% | tight 4 | total 8 | stop 14.12 | agree 100.0% (n=8) | 1:03.56
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+    3 | loss 3.1886 | acc   6.10% | best   6.10% | tight 5 | total 13 | stop 12.54 | agree 100.0% (n=13) | 1:05.81
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+    4 | loss 3.0947 | acc   8.65% | best   8.65% | tight 3 | total 16 | stop 13.19 | agree 100.0% (n=16) | 1:02.40
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+    5 | loss 3.0042 | acc  12.15% | best  12.15% | tight 4 | total 20 | stop 13.00 | agree 100.0% (n=20) | 1:03.53
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+    6 | loss 2.8845 | acc  15.37% | best  15.37% | tight 6 | total 26 | stop 13.12 | agree 100.0% (n=26) | 1:07.73
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+    7 | loss 2.7696 | acc  18.25% | best  18.25% | tight 7 | total 33 | stop 11.91 | agree 100.0% (n=33) | 1:11.07
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+    8 | loss 2.7731 | acc  18.60% | best  18.60% | tight 6 | total 39 | stop 11.77 | agree 100.0% (n=39) | 1:09.63
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+    9 | loss 2.5846 | acc  22.85% | best  22.85% | tight 6 | total 45 | stop 11.67 | agree 100.0% (n=45) | 1:08.19
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   10 | loss 2.5082 | acc  25.75% | best  25.75% | tight 5 | total 50 | stop 12.10 | agree 100.0% (n=50) | 1:07.01
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   11 | loss 2.4663 | acc  26.68% | best  26.68% | tight 6 | total 56 | stop 12.25 | agree 100.0% (n=56) | 1:07.38
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   12 | loss 2.3719 | acc  29.97% | best  29.97% | tight 4 | total 60 | stop 12.50 | agree 100.0% (n=60) | 1:06.93
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   13 | loss 2.3886 | acc  29.84% | best  29.97% | tight 8 | total 68 | stop 12.03 | agree 100.0% (n=68) | 1:13.21
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   14 | loss 2.2663 | acc  32.55% | best  32.55% | tight 6 | total 74 | stop 12.15 | agree 98.6% (n=74) | 1:09.35
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   15 | loss 2.2222 | acc  35.05% | best  35.05% | tight 6 | total 80 | stop 11.69 | agree 98.8% (n=80) | 1:09.78
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   16 | loss 2.2447 | acc  34.60% | best  35.05% | tight 4 | total 84 | stop 11.89 | agree 98.8% (n=84) | 1:03.62
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   17 | loss 2.1377 | acc  39.08% | best  39.08% | tight 8 | total 92 | stop 11.60 | agree 98.9% (n=92) | 1:12.64
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   18 | loss 2.1016 | acc  40.32% | best  40.32% | tight 7 | total 99 | stop 11.45 | agree 99.0% (n=99) | 1:11.11
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   19 | loss 2.0737 | acc  41.41% | best  41.41% | tight 4 | total 103 | stop 11.49 | agree 99.0% (n=103) | 1:06.24
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   20 | loss 2.0988 | acc  43.00% | best  43.00% | tight 4 | total 107 | stop 11.23 | agree 99.1% (n=107) | 1:06.20
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   21 | loss 2.0721 | acc  41.38% | best  43.00% | tight 7 | total 114 | stop 11.00 | agree 99.1% (n=114) | 1:09.42
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   22 | loss 2.0071 | acc  44.76% | best  44.76% | tight 6 | total 120 | stop 10.88 | agree 99.2% (n=120) | 1:09.82
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   23 | loss 1.9934 | acc  45.20% | best  45.20% | tight 6 | total 126 | stop 10.64 | agree 99.2% (n=126) | 1:10.16
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   24 | loss 2.0820 | acc  39.53% | best  45.20% | tight 8 | total 134 | stop 10.40 | agree 99.3% (n=134) | 1:14.61
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   25 | loss 1.9562 | acc  47.06% | best  47.06% | tight 3 | total 137 | stop 10.20 | agree 99.3% (n=137) | 1:04.65
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   26 | loss 1.9056 | acc  48.92% | best  48.92% | tight 6 | total 143 | stop 10.34 | agree 99.3% (n=143) | 1:07.97
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   27 | loss 1.8909 | acc  49.05% | best  49.05% | tight 6 | total 149 | stop 10.36 | agree 99.3% (n=149) | 1:09.70
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   28 | loss 1.8674 | acc  49.75% | best  49.75% | tight 8 | total 157 | stop 10.27 | agree 99.4% (n=157) | 1:14.34
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   29 | loss 1.8490 | acc  50.11% | best  50.11% | tight 7 | total 164 | stop 10.42 | agree 99.4% (n=164) | 1:12.24
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   30 | loss 1.8707 | acc  50.67% | best  50.67% | tight 5 | total 169 | stop 10.32 | agree 99.4% (n=169) | 1:07.70
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   31 | loss 1.8426 | acc  51.49% | best  51.49% | tight 6 | total 175 | stop 10.34 | agree 99.4% (n=175) | 1:08.68
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   32 | loss 1.8087 | acc  50.90% | best  51.49% | tight 6 | total 181 | stop 10.53 | agree 99.4% (n=181) | 1:10.27
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   33 | loss 1.7761 | acc  52.39% | best  52.39% | tight 4 | total 185 | stop 10.65 | agree 99.5% (n=185) | 1:07.29
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   34 | loss 1.7678 | acc  53.10% | best  53.10% | tight 2 | total 187 | stop 10.71 | agree 99.5% (n=187) | 1:02.70
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   35 | loss 1.7530 | acc  53.63% | best  53.63% | tight 5 | total 192 | stop 10.84 | agree 99.5% (n=192) | 1:08.27
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   36 | loss 1.7447 | acc  53.53% | best  53.63% | tight 4 | total 196 | stop 10.87 | agree 99.5% (n=196) | 1:04.04
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   37 | loss 1.7277 | acc  53.63% | best  53.63% | tight 6 | total 202 | stop 10.88 | agree 99.5% (n=202) | 1:10.92
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   38 | loss 1.7332 | acc  54.98% | best  54.98% | tight 6 | total 208 | stop 10.81 | agree 99.5% (n=208) | 1:09.59
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   39 | loss 1.7015 | acc  54.93% | best  54.98% | tight 6 | total 214 | stop 10.88 | agree 99.5% (n=214) | 1:10.12
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   40 | loss 1.6909 | acc  55.39% | best  55.39% | tight 5 | total 219 | stop 10.86 | agree 99.5% (n=219) | 1:09.43
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   41 | loss 1.7139 | acc  54.23% | best  55.39% | tight 3 | total 222 | stop 10.73 | agree 99.5% (n=222) | 1:03.24
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   42 | loss 1.6741 | acc  55.47% | best  55.47% | tight 3 | total 225 | stop 10.73 | agree 99.6% (n=225) | 1:04.84
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   43 | loss 1.6557 | acc  55.96% | best  55.96% | tight 5 | total 230 | stop 10.78 | agree 99.6% (n=230) | 1:08.88
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   44 | loss 1.6628 | acc  57.41% | best  57.41% | tight 6 | total 236 | stop 10.92 | agree 99.6% (n=236) | 1:11.72
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   45 | loss 1.6531 | acc  56.95% | best  57.41% | tight 4 | total 240 | stop 10.94 | agree 99.6% (n=240) | 1:06.87
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   46 | loss 1.6353 | acc  57.67% | best  57.67% | tight 5 | total 245 | stop 11.04 | agree 99.6% (n=245) | 1:06.91
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   47 | loss 1.6280 | acc  57.82% | best  57.82% | tight 5 | total 250 | stop 11.02 | agree 99.6% (n=250) | 1:08.41
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   48 | loss 1.6321 | acc  57.77% | best  57.82% | tight 2 | total 252 | stop 10.94 | agree 99.6% (n=252) | 1:03.55
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   49 | loss 1.6065 | acc  58.60% | best  58.60% | tight 4 | total 256 | stop 10.96 | agree 99.6% (n=256) | 1:06.95
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   50 | loss 1.5971 | acc  58.50% | best  58.60% | tight 7 | total 263 | stop 11.04 | agree 99.6% (n=263) | 1:12.05
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   51 | loss 1.5869 | acc  58.42% | best  58.60% | tight 5 | total 268 | stop 11.02 | agree 99.6% (n=268) | 1:06.43
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   52 | loss 1.6014 | acc  58.64% | best  58.64% | tight 6 | total 274 | stop 11.07 | agree 99.6% (n=274) | 1:08.95
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   53 | loss 1.5712 | acc  58.90% | best  58.90% | tight 4 | total 278 | stop 11.14 | agree 99.6% (n=278) | 1:08.34
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   54 | loss 1.5688 | acc  59.74% | best  59.74% | tight 5 | total 283 | stop 11.12 | agree 99.6% (n=283) | 1:09.31
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   55 | loss 1.5597 | acc  59.60% | best  59.74% | tight 3 | total 286 | stop 11.07 | agree 99.7% (n=286) | 1:05.61
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   56 | loss 1.5765 | acc  58.44% | best  59.74% | tight 6 | total 292 | stop 10.97 | agree 99.7% (n=292) | 1:10.88
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   57 | loss 1.5391 | acc  61.06% | best  61.06% | tight 2 | total 294 | stop 10.95 | agree 99.7% (n=294) | 1:01.87
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   58 | loss 1.5484 | acc  60.84% | best  61.06% | tight 5 | total 299 | stop 10.98 | agree 99.7% (n=299) | 1:08.70
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   59 | loss 1.5292 | acc  61.03% | best  61.06% | tight 7 | total 306 | stop 11.05 | agree 99.7% (n=306) | 1:12.64
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   60 | loss 1.5169 | acc  61.09% | best  61.09% | tight 5 | total 311 | stop 11.08 | agree 99.7% (n=311) | 1:09.44
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   61 | loss 1.5139 | acc  61.19% | best  61.19% | tight 5 | total 316 | stop 11.16 | agree 99.7% (n=316) | 1:07.91
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   62 | loss 1.5089 | acc  61.39% | best  61.39% | tight 3 | total 319 | stop 11.11 | agree 99.7% (n=319) | 1:03.80
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   63 | loss 1.5079 | acc  62.00% | best  62.00% | tight 5 | total 324 | stop 11.14 | agree 99.4% (n=324) | 1:08.91
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   64 | loss 1.4915 | acc  61.76% | best  62.00% | tight 6 | total 330 | stop 11.23 | agree 99.4% (n=330) | 1:10.94
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   65 | loss 1.5061 | acc  62.00% | best  62.00% | tight 3 | total 333 | stop 11.23 | agree 99.4% (n=333) | 1:05.04
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   66 | loss 1.4819 | acc  62.06% | best  62.06% | tight 5 | total 338 | stop 11.25 | agree 99.4% (n=338) | 1:09.74
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   67 | loss 1.4774 | acc  62.48% | best  62.48% | tight 4 | total 342 | stop 11.26 | agree 99.4% (n=342) | 1:05.09
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   68 | loss 1.4659 | acc  62.48% | best  62.48% | tight 6 | total 348 | stop 11.30 | agree 99.4% (n=348) | 1:10.39
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   69 | loss 1.4689 | acc  63.02% | best  63.02% | tight 4 | total 352 | stop 11.36 | agree 99.4% (n=352) | 1:07.29
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   70 | loss 1.4632 | acc  63.57% | best  63.57% | tight 7 | total 359 | stop 11.40 | agree 99.4% (n=359) | 1:12.25
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   71 | loss 1.4664 | acc  63.17% | best  63.57% | tight 4 | total 363 | stop 11.41 | agree 99.4% (n=363) | 1:07.30
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   72 | loss 1.4652 | acc  63.07% | best  63.57% | tight 7 | total 370 | stop 11.46 | agree 99.2% (n=370) | 1:10.37
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   73 | loss 1.4516 | acc  62.33% | best  63.57% | tight 5 | total 375 | stop 11.44 | agree 99.2% (n=375) | 1:09.48
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   74 | loss 1.4406 | acc  63.39% | best  63.57% | tight 6 | total 381 | stop 11.39 | agree 99.2% (n=381) | 1:10.28
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   75 | loss 1.4301 | acc  63.32% | best  63.57% | tight 3 | total 384 | stop 11.43 | agree 99.2% (n=384) | 1:06.00
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   76 | loss 1.4234 | acc  63.60% | best  63.60% | tight 6 | total 390 | stop 11.46 | agree 99.2% (n=390) | 1:11.10
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   77 | loss 1.4240 | acc  63.72% | best  63.72% | tight 5 | total 395 | stop 11.41 | agree 99.2% (n=395) | 1:06.61
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   78 | loss 1.4163 | acc  63.63% | best  63.72% | tight 6 | total 401 | stop 11.47 | agree 99.3% (n=401) | 1:09.93
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   79 | loss 1.4098 | acc  63.92% | best  63.92% | tight 6 | total 407 | stop 11.50 | agree 99.0% (n=407) | 1:10.07
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   80 | loss 1.4075 | acc  64.88% | best  64.88% | tight 3 | total 410 | stop 11.54 | agree 99.0% (n=410) | 1:06.03
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   81 | loss 1.4011 | acc  64.77% | best  64.88% | tight 2 | total 412 | stop 11.56 | agree 99.0% (n=412) | 1:03.29
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   82 | loss 1.3972 | acc  64.53% | best  64.88% | tight 5 | total 417 | stop 11.61 | agree 99.0% (n=417) | 1:07.31
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   83 | loss 1.3894 | acc  64.71% | best  64.88% | tight 5 | total 422 | stop 11.56 | agree 99.1% (n=422) | 1:10.05
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   84 | loss 1.3857 | acc  65.27% | best  65.27% | tight 7 | total 429 | stop 11.56 | agree 98.8% (n=429) | 1:12.75
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   85 | loss 1.3800 | acc  64.93% | best  65.27% | tight 3 | total 432 | stop 11.52 | agree 98.8% (n=432) | 1:05.26
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   86 | loss 1.3749 | acc  65.34% | best  65.34% | tight 5 | total 437 | stop 11.54 | agree 98.6% (n=437) | 1:08.96
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   87 | loss 1.3823 | acc  65.15% | best  65.34% | tight 6 | total 443 | stop 11.56 | agree 98.6% (n=443) | 1:08.56
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   88 | loss 1.3714 | acc  65.43% | best  65.43% | tight 6 | total 449 | stop 11.62 | agree 98.7% (n=449) | 1:11.96
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   89 | loss 1.3758 | acc  65.60% | best  65.60% | tight 5 | total 454 | stop 11.64 | agree 98.7% (n=454) | 1:09.96
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   90 | loss 1.3597 | acc  65.57% | best  65.60% | tight 6 | total 460 | stop 11.70 | agree 98.7% (n=460) | 1:11.46
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   91 | loss 1.3587 | acc  65.51% | best  65.60% | tight 5 | total 465 | stop 11.71 | agree 98.3% (n=465) | 1:08.30
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   92 | loss 1.3461 | acc  65.74% | best  65.74% | tight 7 | total 472 | stop 11.74 | agree 98.3% (n=472) | 1:10.80
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   93 | loss 1.3410 | acc  64.97% | best  65.74% | tight 7 | total 479 | stop 11.71 | agree 98.3% (n=479) | 1:14.17
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   94 | loss 1.3438 | acc  65.89% | best  65.89% | tight 4 | total 483 | stop 11.71 | agree 98.3% (n=483) | 1:08.48
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   95 | loss 1.3487 | acc  66.02% | best  66.02% | tight 5 | total 488 | stop 11.70 | agree 98.2% (n=488) | 1:08.52
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   96 | loss 1.3350 | acc  65.90% | best  66.02% | tight 3 | total 491 | stop 11.72 | agree 98.2% (n=491) | 1:05.63
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   97 | loss 1.3309 | acc  66.63% | best  66.63% | tight 3 | total 494 | stop 11.72 | agree 98.2% (n=494) | 1:04.41
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   98 | loss 1.3261 | acc  66.28% | best  66.63% | tight 7 | total 501 | stop 11.78 | agree 98.2% (n=501) | 1:11.50
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+   99 | loss 1.3191 | acc  66.06% | best  66.63% | tight 6 | total 507 | stop 11.83 | agree 98.2% (n=507) | 1:10.84
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+  100 | loss 1.3242 | acc  66.38% | best  66.63% | tight 4 | total 511 | stop 11.77 | agree 98.2% (n=511) | 1:06.48
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.png
+/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254/fig04_probe_agreement.pdf
+[Done] samples=511 best_acc=66.63% time=1:53:52.63
+[Done] started 2026-09-26 07:02:54 dir=/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254
+[Fixed]  ProbeBatches  Agreement  Count
+            1   0.849315    511
+            2   0.896282    511
+            4   0.953033    511
+            8   0.976517    511
+           16   0.982387    511
+[Adaptive] n=511 mean_stop=11.773 agreement=0.9824 certified=0.2818

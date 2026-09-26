@@ -18,5 +18,7 @@ alwaysApply: true
 - `exp08_c100_posthoc.sh`
 - `exp09_c100_posthoc_e32.sh`
 - `exp10_c100_posthoc_e32_bw.sh`
+- `exp11_c100_resnet_probe_agreement.sh`
+- `exp12_c100_resnet_probe_sweep.sh`
 
 任务名和 `--output_dir` 也带上同一编号，避免和旧实验日志、结果目录撞名。

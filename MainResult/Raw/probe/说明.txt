@@ -1,0 +1,24 @@
+CIFAR-100 / ResNet 探测一致率。每张图左轴是固定批次数与全量解的一致率，蓝点是单交换早停的平均批次数和一致率。
+fixed 五列依次是 1/2/4/8/16 个 mini-batch 的一致率（%）。
+
+exp11	radius x1, K=1-3, batch 64	round 100/100	n=511	stop 11.77	agree 97.5%	fixed 82.6/89.4/93.5/95.9/97.5	certified 28.2%	/userhome/cs3/duanty/FedMoE/results/exp11-c100-resnet-probe-agreement/20260926-045857
+s05	radius x0.5, K=1-3, batch 64	round 100/100	n=511	stop 11.77	agree 98.0%	fixed 87.7/91.8/95.3/97.7/98.0	certified 28.2%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-s05/20260926-050841
+s025	radius x0.25, K=1-3, batch 64	round 100/100	n=511	stop 11.77	agree 99.6%	fixed 90.2/93.5/96.3/98.0/99.6	certified 28.2%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-s025/20260926-050837
+s01	radius x0.1, K=1-3, batch 64	round 100/100	n=511	stop 11.77	agree 98.6%	fixed 79.3/86.9/93.2/96.5/98.6	certified 28.2%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-s01/20260926-050838
+s005	radius x0.05, K=1-3, batch 64	round 100/100	n=511	stop 11.77	agree 97.1%	fixed 89.0/91.4/94.5/95.7/97.1	certified 28.2%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-s005/20260926-065312
+d10	delta=0.1, K=1-3, batch 64	round 100/100	n=511	stop 11.77	agree 98.2%	fixed 84.9/89.6/95.3/97.7/98.2	certified 28.2%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d10/20260926-070254
+d01	delta=0.01, K=1-3, batch 64	round 100/100	n=511	stop 11.77	agree 99.0%	fixed 93.0/96.1/98.8/98.6/99.0	certified 28.2%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d01/20260926-070554
+d001	delta=0.001, K=1-3, batch 64	round 100/100	n=511	stop 11.77	agree 99.4%	fixed 81.8/87.5/93.0/96.7/99.4	certified 28.2%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-d001/20260926-071231
+k1-s025	radius x0.25, K=1 only	round 100/100	n=145	stop 1.10	agree 100.0%	fixed 100.0/100.0/100.0/100.0/100.0	certified 99.3%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-k1-s025/20260926-084822
+k12-s025	radius x0.25, K=1-2	round 100/100	n=301	stop 8.82	agree 99.3%	fixed 78.4/84.7/93.4/96.3/99.3	certified 47.8%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-k12-s025/20260926-085655
+k12-s01	radius x0.1, K=1-2	round 100/100	n=301	stop 8.82	agree 88.4%	fixed 72.1/75.4/81.4/88.4/88.4	certified 47.8%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-k12-s01/20260926-090325
+late30-s025	radius x0.25, from round 30	round 100/100	n=347	stop 12.41	agree 96.8%	fixed 72.6/81.8/88.5/93.7/96.8	certified 28.2%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-late30-s025/20260926-091546
+late40-k12-s01	radius x0.1, K=1-2, from round 40	round 100/100	n=167	stop 9.62	agree 97.0%	fixed 67.7/73.7/86.2/93.4/97.0	certified 47.8%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-late40-k12-s01/20260926-103226
+b32-s025	radius x0.25, batch 32	round 80/80	n=336	stop 11.40	agree 100.0%	fixed 89.9/93.2/97.6/99.7/100.0	certified 29.8%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-b32-s025/20260926-104456
+b16-s025	radius x0.25, batch 16	round 60/60	n=266	stop 10.98	agree 97.7%	fixed 85.0/90.2/93.2/94.7/97.7	certified 32.8%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-b16-s025/20260926-110223
+b16-k12-s01	radius x0.1, K=1-2, batch 16, bw<=30	round 60/60	n=492	stop 5.13	agree 100.0%	fixed 99.6/99.8/100.0/100.0/100.0	certified 80.1%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-b16-k12-s01/20260926-112003
+b32-k12-s01	radius x0.1, K=1-2, batch 32	round 79/80	n=201	stop 8.31	agree 100.0%	fixed 100.0/100.0/100.0/100.0/100.0	certified 49.6%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-b32-k12-s01/20260926-121942
+e16-s025	radius x0.25, 16 experts	round 79/80	n=122	stop 10.47	agree 93.4%	fixed 83.6/86.9/87.7/90.2/93.4	certified 35.3%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-e16-s025/20260926-122407
+e4-k12-s025	radius x0.25, 4 experts, K=1-2	round 80/80	n=633	stop 7.59	agree 100.0%	fixed 100.0/100.0/100.0/100.0/100.0	certified 57.2%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-e4-k12-s025/20260926-131245
+beta05-s025	radius x0.25, Dirichlet 0.05	round 80/80	n=365	stop 11.52	agree 99.5%	fixed 92.3/96.4/97.5/98.6/99.5	certified 29.8%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-beta05-s025/20260926-133052
+b32-k12-s015	radius x0.15, K=1-2, batch 32, bw<=40	round 63/80	n=365	stop 8.15	agree 93.2%	fixed 75.1/78.9/86.0/89.9/93.2	certified 52.5%	/userhome/cs3/duanty/FedMoE/results/exp12-c100-resnet-probe-b32-k12-s015/20260926-134330
